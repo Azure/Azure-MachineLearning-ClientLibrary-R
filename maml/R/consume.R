@@ -1,109 +1,193 @@
-consumeURL = "https://requestresponse001.cloudapp.net/workspaces/bbc91d900c3546b695d6507867fc72ae/services/5cab01b0918c42acb3d32bf597f320f5/execute?api-version=2.0&details=true"
-apiKey = "iuB4GWUkRhhXWqa5dhSXJ/hmC9PHfvuyRvP9yb5RJM/F62Bz8wqpGOXpjEB9gQHko02D3J1MHxMhu3j0pHHWcA=="
+library("RCurl")
+library("rjson")
+library("data.table")
+library("df2json")
 
-# Ritika's function
-consumeSingleRequest <- function(api_key, URL, columnNames, ...) {
-  # Accept SSL certificates issued by public Certificate Authorities
-  values = output_list <- lapply(X=list(...), function(x) x)
+#' This function takes in an API key, file name and the request URL (OData Endpoint Address).
+#' It calls a helper function that sends requests to the server to the server in the appropriate format.
+#' It processes requests in batches and stores the responses in order of batches in an array. It returns the output columns along with the scored probablities, and stores the result in a text file.
+#' @param api key must be entered as the first parameter, and must be a string
+#' @param requestURL must be entered as the third parameter, and must be a string
+#' @param infileName the name of the file that is being scored
+#' @param globalParam global parameters entered as a string, default value is ""
+#' @param outfileName the name of the file to write results to, entered as a string, with a default value of "results.txt"
+#' @param batchSize of each batch, which is optional, but 100 by default
+#' @param retryDelay the time in seconds to delay before retrying in case of a server error, default value of 0.3 seconds
+#' @return results in a list of lists, with the scored probability at the end of each list
 
-  options(RCurlOptions = list(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
+consumeFile <- function(api_key, requestURL, infileName, globalParam = "", outfileName = "results.txt", batchSize = 250, retryDelay = 0.3) {
+  if (missing(api_key)) {
+    stop("Need to specify API key")
+  }
+  if (missing(infileName)) {
+    stop("Need to specify file to be scored")
+  }
+  if (missing(requestURL)) {
+    stop("Need to specify request URL")
+  }
+  dataFrame = read.csv(infileName,check.names=FALSE)
+  columnNames = colnames(dataFrame)
+  matrixdf <- as.matrix(dataFrame)
+  rownames(matrixdf) <- NULL
+  colnames(matrixdf) <- NULL
+  matrixdf <- lapply(seq_len(nrow(matrixdf)), function(row) matrixdf[row,])
+  values = matrixdf
+  resultStored = ""
+  valuebatch = list()
+  counter = 1
+  fileConn <-file(outfileName,"w")
 
-  h = basicTextGatherer()
-  hdr = basicHeaderGatherer()
+  for(i in 1:(length(values))) {
+    valuebatch[length(valuebatch) + 1] = values[i]
+    if(counter == batchSize || i == (length(values))) {
+        temp <- callAPI(api_key, requestURL, columnNames, valuebatch, globalParam, retryDelay)
+        resultStored = paste(resultStored,temp,sep=', ')
+        write(temp, fileConn,append = TRUE)
+        print(sprintf("%i %s %i %s", i,"out of",length(values),"processed"))
+        valuebatch = list()
+        counter = 0
+    }
+    counter = counter +1
+  }
+  close(fileConn)
+  return(resultStored)
+}
 
-  req = list(
-    Inputs = list(
-      input1 = list(
-        ColumnNames = columnNames,
-        Values = values
-      )
-    )
-  )
 
-  body = enc2utf8(toJSON(req))
-  print(body)
-  print(api_key)
-  authz_hdr = paste('Bearer', api_key, sep=' ')
-  h$reset()
-  curlPerform(url = URL,
-              httpheader=c('Content-Type' = "application/json", 'Authorization' = authz_hdr),
-              postfields=body,
-              writefunction = h$update,
-              headerfunction = hdr$update,
-              verbose = TRUE,
-              ssl.verifypeer = FALSE,
-              ssl.verifyhost = FALSE
-  )
 
-  headers = hdr$value()
-  httpStatus = headers["status"]
-  if (httpStatus >= 400)
-  {
-    print(paste("The request failed with status code:", httpStatus, sep=" "))
 
-    # Print the headers - they include the request ID and the timestamp, which are useful for debugging the failure
-    print("headers:")
-    print(headers)
+#' This function takes in an API key, the request URL (OData Endpoint Address), the column names and multiple requests
+#' It scores the experiment with the requests stored in a list of lists, and sends it to the server in the appropriate format.
+#' It then obtains a response from Azure Machine Learning Studio and returns a response to the user. It returns the output column(s) along with the scored probablities!
+#' @param api key must be entered as the first parameter, and must be a string
+#' @param requestURL must be entered as the third parameter, and must be a string
+#' @param columnNames entered as a list
+#' @param ... each parameter must be a request in the format of a list that contains a row of values corresponsing to the column names provided
+#' @param globalParam global parameters entered as a string, default value is ""
+#' @param retryDelay the time in seconds to delay before retrying in case of a server error, default value of 0.3 seconds
+#' @return results in a list of lists, with the scored probability at the end of each list
+
+consumeLists <- function(api_key, requestURL, columnNames, ..., globalParam="", retryDelay = 0.3) {
+  if (missing(api_key)) {
+    stop("Need to specify API key")
   }
 
-  result = fromJSON(h$value())
+  if (missing(requestURL)) {
+    stop("Need to specify request URL")
+  }
+  if (missing(columnNames)) {
+    stop("Need to specify column names")
+  }
+  if(missing(globalParam)) {
+    globalParam = ""
+  }
+  valuesList = list(...)
+
+  callAPI(api_key, requestURL, columnNames, valuesList,  globalParam, retryDelay)
+}
+
+#' This function takes in an API key, the request URL (OData Endpoint Address), the column names and multiple requests
+#' It scores the experiment with the requests stored in a list of lists, and sends it to the server in the appropriate format.
+#' It then obtains a response from Azure Machine Learning Studio and returns a response to the user. It returns the output column(s) along with the scored probablities!
+#' @param api key must be entered as the first parameter, and must be a string
+#' @param requestURL must be entered as the third parameter, and must be a string
+#' @param valuesDF the name of the data frame that is being scored
+#' @param globalParam global parameters entered as a string, default value is ""
+#' @param batchSize of each batch, which is optional, but 100 by default
+#' @param retryDelay the time in seconds to delay before retrying in case of a server error, default value of 0.3 seconds
+#' @return results in a list of lists, with the scored probability at the end of each list
+
+consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam="", batchSize = 250, retryDelay = 0.3) {
+  if (missing(api_key)) {
+    stop("Need to specify API key")
+  }
+
+  if (missing(requestURL)) {
+    stop("Need to specify request URL")
+  }
+  if (missing(valuesDF)) {
+    stop("Need to specify dataframe to be scored")
+  }
+  columnNames = colnames(valuesDF)
+  matrixdf <- as.matrix(valuesDF)
+  rownames(matrixdf) <- NULL
+  colnames(matrixdf) <- NULL
+  matrixdf <- lapply(seq_len(nrow(matrixdf)), function(row) matrixdf[row,])
+  values = matrixdf
+  resultStored = ""
+  valuebatch = list()
+  counter = 1
+
+  for(i in 1:(length(values))) {
+    valuebatch[length(valuebatch) + 1] = values[i]
+    if(counter == batchSize || i == (length(values))) {
+      temp <- callAPI(api_key, requestURL, columnNames, valuebatch, globalParam, retryDelay)
+      resultStored = paste(resultStored,temp,sep=', ')
+      print(sprintf("%i %s %i %s", i,"out of",length(values),"processed"))
+      valuebatch = list()
+      counter = 0
+    }
+    counter = counter +1
+  }
+  return(resultStored)}
+
+
+#' This function is a helper that takes in an API key, values and column names to pass to the API and the request URL (OData Endpoint Address).
+#' It then obtains a response from Azure Machine Learning Studio and returns a response to the consumeFile function.
+
+callAPI <- function(api_key, requestURL, columnNames, values,  globalParam, retryDelay) {
+  httpStatus = 0
+  tries = 0
+  for(i in 1:3) {
+    if(tries == 0 || httpStatus >= 500) {
+      if(httpStatus >= 500) {
+        print(paste("The request failed with status code:", httpStatus, sep=" "))
+        print("headers:")
+        print(headers)
+        print(sprintf("%s %i %s", "Retrying in ",retryDelay," seconds"))
+        Sys.sleep(retryDelay)
+      }
+      tries = tries + 1
+      options(RCurlOptions = list(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
+      h = basicTextGatherer()
+      hdr = basicHeaderGatherer()
+
+      req = list(
+        Inputs = list(
+          input1 = list(
+            ColumnNames = columnNames,
+            Values = values
+          )
+        )
+        ,GlobalParameters = globalParam
+      )
+
+      body = enc2utf8(toJSON(req))
+      authz_hdr = paste('Bearer', api_key, sep=' ')
+      h$reset()
+      curlPerform(url = requestURL,
+                  httpheader=c('Content-Type' = "application/json", 'Authorization' = authz_hdr),
+                  postfields=body,
+                  writefunction = h$update,
+                  headerfunction = hdr$update,
+                  verbose = TRUE
+      )
+
+      headers = hdr$value()
+      httpStatus = headers["status"]
+      result = h$value()
+    }
+    if(httpStatus == 200) {
+      return(result)
+    }
+    else if ((httpStatus>= 400) && (500 > httpStatus))
+    {
+      print(paste("The request failed with status code:", httpStatus, sep=" "))
+      print("headers:")
+      print(headers)
+      break
+    }
+  }
   return(result)
 }
-
-# Default arguments for demoing
-defaultUrl = "https://ussouthcentral.services.azureml.net/workspaces/1bbf481194404066a2ee4998a1da2c43/services/da7952281c630641a9bd1a9b1571f65d/score"
-defaultKey = "PAhtatK4xlaDB5G3hnDcEwuuYM45GafP3cSdY1PHBBIEQcUW3Ze9fUtYWy4wpbNy5foWGZIMs8FTG/a0EfOzSQ=="
-defaultParams = list(
-  Id="score00001",
-  Instance=list(
-    FeatureVector = list(
-      "c1" = "4")
-    ,
-    GlobalParameters = RJSONIO::fromJSON('{}')
-  ))
-
-#' Make a call to an API with arguments
-#'
-#' @param serviceUrl The url of the web app
-#' @param key The API key
-#' @param toScore the parameters
-#' @return The call to the web service at \code{serviceUrl} with arguments \code{toScore}
-#' @examples
-#' nKey = "JlSp5W+RWf2boTHLwvOvW32j/dDI8d/+ghCb8HTZHKYBl+QkZE46w+ZAxTAdo6U1lXfR6G2SBgnK3/i3VznSww=="
-#' nUrl = "https://ussouthcentral.services.azureml.net/workspaces/c01fb89129aa4ef0a19affa7f95ecbbc/services/dadb2d2e626b4e06981dfc6b2b960ebb/execute?api-version=2.0&details=true"
-#' nParams = list(
-#'   Inputs = list(
-#'    "input1" = list(
-#'      "ColumnNames" = list("Column 0", "Class", "Sex", "Age", "Freq"),
-#'      "Values" = list( list( "0", "value", "value", "value", "0" ),  list( "0", "value", "value", "value", "0" )  )
-#'    )                ),
-#'  GlobalParameters = fromJSON('{}')
-#')
-#' predictService(url, key, params)
-predictService <- function(serviceUrl=defaultUrl, key=defaultKey, toScore=defaultParams) {
-
-  # Accept SSL certificates issued by public Certificate Authorities
-  options(RCurlOptions = list(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
-
-  h = RCurl::basicTextGatherer()
-  hdr = RCurl::basicTextGatherer()
-
-  body = RJSONIO::toJSON(toScore)
-  api_key = key
-  #api_key = "PAhtatK4xlaDB5G3hnDcEwuuYM45GafP3cSdY1PHBBIEQcUW3Ze9fUtYWy4wpbNy5foWGZIMs8FTG/a0EfOzSQ==" # Replace this with the API key for the web service
-  authz_hdr = paste('Bearer', api_key, sep=' ')
-
-  h$reset()
-  RCurl::curlPerform(url = serviceUrl,
-              httpheader=c('Content-Type' = "application/json", 'Authorization' = authz_hdr),
-              postfields=body,
-              writefunction = h$update,
-              headerfunction = hdr$update,
-              verbose = TRUE
-  )
-
-  # TODO: prettify results?
-  print("Result:")
-  result = h$value()
-  print(RJSONIO::fromJSON(result))
-}
+>>>>>>> 3f5950070628055b026863d9c90d2cc4d6725ef9
