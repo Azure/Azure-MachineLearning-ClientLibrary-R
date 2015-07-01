@@ -1,6 +1,6 @@
 # strings for navigating
 publishURL <- "https://hiteshsm.cloudapp.net/workspaces/%s/webservices/%s" ## REMOVE SSL IGNORING FOR REAL VERSION ##
-wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(matrix(ncol = %s, nrow = nrow(inputDF)))\r\nfor (file in list.files(\"src\")) {\r\n  if (file == \"%s\") {\r\n    load(\"src/%s\")\r\n    for (item in names(dependencies)) {\r\n      assign(item, dependencies[[item]])\r\n    }\r\n  }\r\n  else {\r\n    install.packages(paste(\"src\", file, sep=\"/\"), repos=NULL, type=\"source\")\r\n    library(file, character.only=TRUE)\r\n  }\r\n}\r\naction <- %s\r\n  for (i in 1:nrow(inputDF)) {\r\n    outputDF[i,] <- do.call(\"action\", as.list(inputDF[i,]))\r\n  }\r\nmaml.mapOutputPort(\"outputDF\")"
+wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(matrix(ncol = %s, nrow = nrow(inputDF)))\r\nfor (file in list.files(\"src\")) {\r\n  if (file == \"%s\") {\r\n    load(\"src/%s\")\r\n    for (item in names(dependencies)) {\r\n      assign(item, dependencies[[item]])\r\n    }\r\n  }\r\n  else {\r\n    if (!(file %%in%% installed.packages()[,\"Package\"])) {\r\n      install.packages(paste(\"src\", file, sep=\"/\"), lib=\".\", repos=NULL, verbose=TRUE)\r\n    }\r\n    library(strsplit(file, \"\\\\.\")[[1]][[1]], character.only=TRUE)\r\n  }\r\n}\r\naction <- %s\r\n  for (i in 1:nrow(inputDF)) {\r\n    outputDF[i,] <- do.call(\"action\", as.list(inputDF[i,]))\r\n  }\r\nmaml.mapOutputPort(\"outputDF\")"
 
 ##################################################################################
 # WRAPPER TESTING
@@ -11,13 +11,11 @@ wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(matrix(nco
 inputDF <- maml.mapInputPort(1)
 
 # initialize an empty output dataframe of desired dimensions
-outputDF <- data.frame(matrix(ncol = outVals, nrow = nrow(inputDF)))
-
-"inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(list.files(\"src\"))\r\nmaml.mapOutputPort(\"outputDF\")"
+outputDF <- data.frame(matrix(ncol = "%s", nrow = nrow(inputDF)))
 
 for (file in list.files("src")) {
-  if (file == FILENAME) {
-    load("src/FILENAME")
+  if (file == "%s") {
+    load("src/%s")
     # assert that dependencies exists?
     # NOTE: depedencies object comes from packDependencies(), maybe something more unique to avoid collisions?
     for (item in names(dependencies)) {
@@ -25,38 +23,33 @@ for (file in list.files("src")) {
     }
   }
   else {
-    # Realized that you can't just zip packages and install them, need source
-    # Currently just planning on installing from CRAN, solves dependency problem
-    # but what if users want to use a package not on CRAN?
-
-    #install.packages(paste("src", file, sep="/"), repos=NULL, type="source")
     # if the package isn't installed on Azure already, install it and its dependencies
+    # need to recursively grab dependencies
     if (!(file %in% installed.packages()[,"Package"])) {
-      install.packages(file, dependencies=TRUE)
+      install.packages(paste("src", file, sep="/"), lib= ".", repos=NULL, verbose=TRUE)
     }
     # load the package
-    library(file, character.only=TRUE)
+    library(strsplit(file, "\\.")[[1]][[1]], character.only=TRUE)
   }
 }
 
 # user function
 action <-
 
-  # apply function to every row
-  for (i in 1:nrow(inputDF)) {
-    outputDF[i,] <- do.call("action", as.list(inputDF[i,]))
-  }
+# apply function to every row
+for (i in 1:nrow(inputDF)) {
+  outputDF[i,] <- do.call("action", as.list(inputDF[i,]))
+}
 
 # return output
 maml.mapOutputPort("outputDF")
 
-
-"inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(matrix(ncol = outVals, nrow = nrow(inputDF)))\r\nfor (file in list.files(\"src\")) {\r\n  if (file == \"dependencies\") {\r\n    load(\"src/dependencies\")\r\n    for (item in names(dependencies)) {\r\n      assign(item, dependencies[[item]])\r\n    }\r\n  }\r\n  else {\r\n    install.packages(paste(\"src\", file, sep=\"/\"), repos=NULL, type=\"source\")\r\n    library(file, character.only=TRUE)\r\n  }\r\n}\r\naction <- %s\r\n  for (i in 1:nrow(inputDF)) {\r\n    outputDF[i,] <- do.call(\"action\", as.list(inputDF[i,]))\r\n  }\r\nmaml.mapOutputPort(\"outputDF\")"
-
+# test function
 add <- function(x) {
   print(findGlobals(add))
   return(x+a[[1]])
 }
+
 
 
 ################################################################
@@ -174,21 +167,16 @@ packDependencies <- function(funName) {
   # go to package library, doing this to prevent tarballing entire path to package
   # TODO: what if packages are in different library directories? need to iterate through all paths
   setwd(.libPaths()[[1]])
-  # pack up each package in its own tarball (tz)
+  # list of things to include in aggregate .zip
+  toZip = vector()
+  # pack up each package in its own zip (.zip)
   for (pkg in packages) {
     # should error handle, e.g. if can't find package
-    tar(paste(start, paste(pkg, "tar", sep="."), sep="/"), pkg)
+    zip(paste(start, paste(pkg, "zip", sep="."), sep="/"), pkg)
+    toZip <- c(toZip, paste(pkg, "zip", sep="."))
   }
   # go back to where the user started
   setwd(start)
-  # list of things to include in .zip
-  toZip = vector()
-  # gunzip stuff (gz)
-  for (pkg in packages) {
-    R.utils::gzip(paste(pkg, "tar", sep="."), destname=paste(pkg, "tar", "gz", sep="."), overwrite=TRUE)
-
-    toZip <- c(toZip, paste(pkg, "tar", "gz", sep="."))
-  }
 
   # objects, functions, etc.
   if (length(dependencies) > 0) {
@@ -205,7 +193,7 @@ packDependencies <- function(funName) {
     # delete the packages
     for (pkg in packages) {
       # did I miss anything? maybe extra files floating around
-      file.remove(paste(pkg, "tar", "gz", sep="."))
+      file.remove(paste(pkg, "zip", sep="."))
     }
     # delete the dependency rdta file
     file.remove(guid)
@@ -216,7 +204,7 @@ packDependencies <- function(funName) {
   }
   # if nothing was zipped, return false
   else {
-    return(list(guid, FALSE))
+    return(list(guid, ""))
   }
 }
 
@@ -271,7 +259,7 @@ publishWebService <- function(funName, serviceName, inputSchema, outputSchema, w
 
   # Build the body of the request, differing on whether or not there is a zip to upload
   # Probably a more elegant way to do this
-  if (zipString[[2]] == FALSE) {
+  if (zipString[[2]] == "") {
     req = list(
       "Name" = serviceName,
       "Type" = "Code",
@@ -292,17 +280,16 @@ publishWebService <- function(funName, serviceName, inputSchema, outputSchema, w
         "InputSchema" = format(inputSchema),
         "OutputSchema" = format(outputSchema),
         "Language" = "r-3.1-64",
-#        "SourceCode" = sprintf(wrapper, length(outputSchema), zipString[[1]], zipString[[1]], paste(getFunctionString(funName))),
-        "SourceCode" = "inputDF <- maml.mapInputPort(1)\r\ninstall.packages(paste(\"src\", \"codetools.zip\", sep=\"/\"), lib = \".\", repos=NULL)\r\nlibrary(\"codetools\")\r\noutputDF <- data.frame(findGlobals(findGlobals))\r\nmaml.mapOutputPort(\"outputDF\")",
-#        "SourceCode" = "inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(list.files(\"src\")\r\nmaml.mapOutputPort(\"outputDF\")",
-        "ZipContents" = tZip # zipString
+        "SourceCode" = sprintf(wrapper, length(outputSchema), zipString[[1]], zipString[[1]], paste(getFunctionString(funName))),
+#        "SourceCode" = "inputDF <- maml.mapInputPort(1)\r\ninstall.packages(paste(\"src\", \"codetools.zip\", sep=\"/\"), lib = \".\", repos=NULL)\r\nlibrary(\"codetools\")\r\noutputDF <- data.frame(findGlobals(findGlobals))\r\nmaml.mapOutputPort(\"outputDF\")",
+#        "SourceCode" = "inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(list.files(\"src\"))\r\nmaml.mapOutputPort(\"outputDF\")",
+        "ZipContents" = zipString[[2]]
       )
     )
   }
 
   # convert the payload to JSON as expected by API
   # TODO: consolidate json packages, i.e. use only one if possible
-  print(req)
   body = RJSONIO::toJSON(req)
 
   # Response gatherer

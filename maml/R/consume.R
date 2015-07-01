@@ -50,8 +50,6 @@ consumeSingleRequest <- function(api_key, URL, columnNames, ...) {
   return(result)
 }
 
-consumeSingleRequest(apiKey, consumeURL, list("icol1"), list(0), list(1))
-
 # Default arguments for demoing
 defaultUrl = "https://ussouthcentral.services.azureml.net/workspaces/1bbf481194404066a2ee4998a1da2c43/services/da7952281c630641a9bd1a9b1571f65d/score"
 defaultKey = "PAhtatK4xlaDB5G3hnDcEwuuYM45GafP3cSdY1PHBBIEQcUW3Ze9fUtYWy4wpbNy5foWGZIMs8FTG/a0EfOzSQ=="
