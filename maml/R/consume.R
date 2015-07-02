@@ -2,6 +2,7 @@ library("RCurl")
 library("rjson")
 library("data.table")
 library("df2json")
+library("jsonlite")
 
 #' This function takes in an API key, file name and the request URL (OData Endpoint Address).
 #' It calls a helper function that sends requests to the server to the server in the appropriate format.
@@ -43,7 +44,13 @@ consumeFile <- function(api_key, requestURL, infileName, globalParam = "", outfi
     valuebatch[length(valuebatch) + 1] = values[i]
     if(counter == batchSize || i == (length(values))) {
       temp <- callAPI(api_key, requestURL, columnNames, valuebatch, globalParam, retryDelay)
-      resultStored = paste(resultStored,temp,sep=', ')
+      print(temp)
+      if(resultStored != "") {
+        resultStored = paste(resultStored,temp,sep='\n')
+      } else{
+        resultStored = paste(resultStored,temp,sep='')
+      }
+      
       #write to results file
       write(temp, fileConn,append = TRUE)
       print(sprintf("%i %s %i %s", i,"out of",length(values),"processed"))
@@ -192,10 +199,11 @@ callAPI <- function(api_key, requestURL, columnNames, values,  globalParam, retr
       headers = hdr$value()
       httpStatus = headers["status"]
       result = h$value()
+      formatresult <- jsonlite::toJSON(jsonlite::fromJSON(result), pretty = TRUE)
     }
     #return if successful
     if(httpStatus == 200) {
-      return(result)
+      return(formatresult)
     } 
     #if user error, print and return error details
     else if ((httpStatus>= 400) && (500 > httpStatus))
@@ -206,5 +214,5 @@ callAPI <- function(api_key, requestURL, columnNames, values,  globalParam, retr
       break
     }
   }
-  return(result)
+  return(formatresult)
 }
