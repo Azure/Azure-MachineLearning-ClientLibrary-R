@@ -35,11 +35,11 @@ for (file in list.files("src")) {
 
 # user function
 action <-
-
-# apply function to every row
-for (i in 1:nrow(inputDF)) {
-  outputDF[i,] <- do.call("action", as.list(inputDF[i,]))
-}
+  
+  # apply function to every row
+  for (i in 1:nrow(inputDF)) {
+    outputDF[i,] <- do.call("action", as.list(inputDF[i,]))
+  }
 
 # return output
 maml.mapOutputPort("outputDF")
@@ -57,6 +57,9 @@ add <- function(x) {
 # Return the function as a string
 # Also consider paste(body(fun())) or getAnywhere()
 ################################################################
+
+#' @param x - Name of the function to convert to a string
+#' @return function in string format
 getFunctionString <- function (x)
 {
   if (tryCatch(!is.character(x), error = function(e) TRUE))
@@ -114,7 +117,7 @@ getFunctionString <- function (x)
   res <- list(name = x, objs = objs, where = where, visible = visible,
               dups = dups)
   class(res) <- "getAnywhere"
-
+  
   #don't show the full response!
   #res
   return(gsub("\n", "\r\n", gsub("\"", "\\\"", objs)))
@@ -126,42 +129,45 @@ getFunctionString <- function (x)
 # EXTRACT DEPENDENCIES
 # Takes closure, not string
 ##################################################################################
+
+#' @param functionName - Name of the function to pack the dependencies up for
+#' @return Converted inputSchema to the proper format
 packDependencies <- function(funName) {
   dependencies = list()
   packages = list()
-
+  
   # generate a GUID to act as a file name to store packages, R data
   guid = gsub("-", "", uuid::UUIDgenerate(use.time=TRUE))
-
+  
   # NOTE: will not work if the user function specifies the names directly, e.g. won't find rjson::toJSON
   # from findGlobals man page: "R semantics only allow variables that might be local to be identified"
   # CONSIDER: how robust is this filtering? need to verify
   for (obj in codetools::findGlobals(get(funName))) {
     name = get(obj)
-
+    
     # filter out primitives
     if (is.primitive(name)) {
-        next
+      next
     }
-
+    
     # get objects
     else if (!is.function(name)) {
       dependencies[[obj]] <- name
     }
-
+    
     # grab user defined functions
     else if (identical(environment(name), globalenv())) {
       dependencies[[obj]] <- name
     }
-
+    
     # get the names of packages of package functions
     else if (paste(getNamespaceName(environment(name))) != "base") {
       packages[[obj]] <- getNamespaceName(environment(name))
     }
-
+    
     # need an else branch?
   }
-
+  
   # save current path to restore to later
   start = getwd()
   # go to package library, doing this to prevent tarballing entire path to package
@@ -177,19 +183,19 @@ packDependencies <- function(funName) {
   }
   # go back to where the user started
   setwd(start)
-
+  
   # objects, functions, etc.
   if (length(dependencies) > 0) {
     # maybe can save directly as a .zip and skip the zip() call?
     save(dependencies, file=guid)
     toZip <- c(toZip, guid)
   }
-
+  
   # zip up everything
   if (length(toZip) > 0) {
     zip(zipfile=guid, files=toZip)
     zipEnc <- base64enc::base64encode(paste(guid, ".zip", sep=""))
-
+    
     # delete the packages
     for (pkg in packages) {
       # did I miss anything? maybe extra files floating around
@@ -198,7 +204,7 @@ packDependencies <- function(funName) {
     # delete the dependency rdta file
     file.remove(guid)
     file.remove(paste(guid,"zip",sep="."))
-
+    
     # return the encoded zip as a string
     return(list(guid, zipEnc))
   }
@@ -214,6 +220,9 @@ packDependencies <- function(funName) {
 # CONVERT FORMAT
 # Helper function to convert expected schema to API-expecting format
 ################################################################
+
+#' @param argList - List of expected input parameters
+#' @return Converted inputSchema to the proper format
 convert <- function(argList) {
   form <- list()
   for (arg in names(argList)) {
@@ -244,19 +253,51 @@ convert <- function(argList) {
 
 
 ################################################################
+# This is a helper function to ensure that the inputSchema has recieved all of the expected parameters
+################################################################
+
+#' @param userInput - List of expected input parameters
+#' @param funcName - The function that is being published
+#' @return False if the input was not as expected/True if input matched expectation
+paramCheck <- function(userInput, funcName) {
+  numParamsEXPECTED <- length(formals(funcName))
+  numParamsPASSED <- nrow(userInput)
+  
+  if (numParamsPASSED != numParamsEXPECTED) {
+    errorWarning <- paste("Error: Your input Schema does not contain the proper input. You provided ", numParamsPASSED," inputs and ", numParamsEXPECTED," were expected",sep="")
+    stop(errorWarning, call. = TRUE)
+    return(FALSE)
+  }
+  else {
+    return(TRUE)
+  }
+}
+
+
+
+################################################################
 # expecting inputSchema = list("arg1"="type", "arg2"="type", ...)
 # expecting outputSchema = list("output1"="type", "output2"="type", ...)
-# funName is a string!!
+# functionName is a string!!
 ################################################################
 # TODO: play around with argument order
-publishWebService <- function(funName, serviceName, inputSchema, outputSchema, wkID, authToken) {
-
+publishWebService <- function(functionName, serviceName, inputSchema, outputSchema, wkID, authToken) {
+  
+  # Prepare input for API call
+  paramCheck(inputSchema, functionName)
+  inputSchema <- convert(inputSchema)
+  inputSerialized <- serializeI(inputSchema)
+  
+  # Prepare output for API call
+  outputSchema <- convert(outputSchema)
+  outputSerialized <- serializeO(outputSchema)
+  
   # Accept SSL certificates issued by public Certificate Authorities
   options(RCurlOptions = list(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
-
+  
   # Get and encode the dependencies
-  zipString = packDependencies(funName)
-
+  zipString = packDependencies(functionName)
+  
   # Build the body of the request, differing on whether or not there is a zip to upload
   # Probably a more elegant way to do this
   if (zipString[[2]] == "") {
@@ -264,11 +305,11 @@ publishWebService <- function(funName, serviceName, inputSchema, outputSchema, w
       "Name" = serviceName,
       "Type" = "Code",
       "CodeBundle" = list(
-        "InputSchema" = convert(inputSchema),
-        "OutputSchema" = convert(outputSchema),
+        "InputSchema" = inputSerialized,
+        "OutputSchema" = outputSerialized,
         "Language" = "r-3.1-64",
-        "SourceCode" = sprintf(wrapper, length(outputSchema), zipString[[1]], zipString[[1]], paste(getFunctionString(funName)))
-
+        "SourceCode" = sprintf(wrapper, length(outputSchema), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName)))
+        
       )
     )
   }
@@ -277,38 +318,38 @@ publishWebService <- function(funName, serviceName, inputSchema, outputSchema, w
       "Name" = serviceName,
       "Type" = "Code",
       "CodeBundle" = list(
-        "InputSchema" = format(inputSchema),
-        "OutputSchema" = format(outputSchema),
+        "InputSchema" = inputSerialized,
+        "OutputSchema" = outputSerialized,
         "Language" = "r-3.1-64",
-        "SourceCode" = sprintf(wrapper, length(outputSchema), zipString[[1]], zipString[[1]], paste(getFunctionString(funName))),
-#        "SourceCode" = "inputDF <- maml.mapInputPort(1)\r\ninstall.packages(paste(\"src\", \"codetools.zip\", sep=\"/\"), lib = \".\", repos=NULL)\r\nlibrary(\"codetools\")\r\noutputDF <- data.frame(findGlobals(findGlobals))\r\nmaml.mapOutputPort(\"outputDF\")",
-#        "SourceCode" = "inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(list.files(\"src\"))\r\nmaml.mapOutputPort(\"outputDF\")",
+        "SourceCode" = sprintf(wrapper, length(outputSchema), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName))),
+        #        "SourceCode" = "inputDF <- maml.mapInputPort(1)\r\ninstall.packages(paste(\"src\", \"codetools.zip\", sep=\"/\"), lib = \".\", repos=NULL)\r\nlibrary(\"codetools\")\r\noutputDF <- data.frame(findGlobals(findGlobals))\r\nmaml.mapOutputPort(\"outputDF\")",
+        #        "SourceCode" = "inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(list.files(\"src\"))\r\nmaml.mapOutputPort(\"outputDF\")",
         "ZipContents" = zipString[[2]]
       )
     )
   }
-
+  
   # convert the payload to JSON as expected by API
   # TODO: consolidate json packages, i.e. use only one if possible
-  body = RJSONIO::toJSON(req)
-
+  body = jsonlite::serializeJSON(req)
+  
   # Response gatherer
   h = RCurl::basicTextGatherer()
   h$reset()
-
+  
   # Generate unique guid
   guid = gsub("-", "", uuid::UUIDgenerate(use.time=TRUE))
-
+  
   # API call
   RCurl::httpPUT(url = sprintf(publishURL, wkID, guid), # defined above
                  httpheader=c('Authorization' = paste('Bearer', authToken, sep=' '),
-                          'Content-Type' = 'application/json',
-                          'Accept' = 'application/json'),
+                              'Content-Type' = 'application/json',
+                              'Accept' = 'application/json'),
                  content = body,
                  writefunction = h$update,
                  ssl.verifyhost = FALSE) ### REMOVE THIS FOR THE REAL VERSION ###
-
+  
   # return everything
   # TODO: format output
-  rjson::fromJSON(h$value())
+  jsonlite::unserializeJSON(h$value())
 }
