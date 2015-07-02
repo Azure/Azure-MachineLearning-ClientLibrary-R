@@ -9,3 +9,51 @@ consumeSingleRequest(endpoint[[1]]["PrimaryKey"], paste(endpoint[[1]]["ApiLocati
 
 "outputDF <- data.frame(list.files(\"src\"))\r\nmaml.mapOutputPort(\"outputDF\")"
 "inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(list.files(\"src\")\r\nmaml.mapOutputPort(\"outputDF\")"
+
+##################################################################################
+# WRAPPER TESTING
+# Consider: assert statements (stopifnot), error handling
+# wrap in a function that will return a string with the proper function
+##################################################################################
+# get the input
+inputDF <- maml.mapInputPort(1)
+
+# initialize an empty output dataframe of desired dimensions
+outputDF <- data.frame(matrix(ncol = "%s", nrow = nrow(inputDF)))
+
+for (file in list.files("src")) {
+  if (file == "%s") {
+    load("src/%s")
+    # assert that dependencies exists?
+    # NOTE: depedencies object comes from packDependencies(), maybe something more unique to avoid collisions?
+    for (item in names(dependencies)) {
+      assign(item, dependencies[[item]])
+    }
+  }
+  else {
+    # if the package isn't installed on Azure already, install it and its dependencies
+    # need to recursively grab dependencies
+    if (!(file %in% installed.packages()[,"Package"])) {
+      install.packages(paste("src", file, sep="/"), lib= ".", repos=NULL, verbose=TRUE)
+    }
+    # load the package
+    library(strsplit(file, "\\.")[[1]][[1]], character.only=TRUE)
+  }
+}
+
+# user function
+action <-
+
+  # apply function to every row
+  for (i in 1:nrow(inputDF)) {
+    outputDF[i,] <- do.call("action", as.list(inputDF[i,]))
+  }
+
+# return output
+maml.mapOutputPort("outputDF")
+
+# test function
+add <- function(x) {
+  print(findGlobals(add))
+  return(x+a[[1]])
+}

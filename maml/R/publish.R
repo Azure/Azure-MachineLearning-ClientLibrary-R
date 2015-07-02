@@ -1,54 +1,8 @@
-# strings for navigating
+################################################################
+# String constants
+################################################################
 publishURL <- "https://hiteshsm.cloudapp.net/workspaces/%s/webservices/%s" ## REMOVE SSL IGNORING FOR REAL VERSION ##
 wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(matrix(ncol = %s, nrow = nrow(inputDF)))\r\nfor (file in list.files(\"src\")) {\r\n  if (file == \"%s\") {\r\n    load(\"src/%s\")\r\n    for (item in names(dependencies)) {\r\n      assign(item, dependencies[[item]])\r\n    }\r\n  }\r\n  else {\r\n    if (!(file %%in%% installed.packages()[,\"Package\"])) {\r\n      install.packages(paste(\"src\", file, sep=\"/\"), lib=\".\", repos=NULL, verbose=TRUE)\r\n    }\r\n    library(strsplit(file, \"\\\\.\")[[1]][[1]], character.only=TRUE)\r\n  }\r\n}\r\naction <- %s\r\n  for (i in 1:nrow(inputDF)) {\r\n    outputDF[i,] <- do.call(\"action\", as.list(inputDF[i,]))\r\n  }\r\nmaml.mapOutputPort(\"outputDF\")"
-
-##################################################################################
-# WRAPPER TESTING
-# Consider: assert statements (stopifnot), error handling
-# wrap in a function that will return a string with the proper function
-##################################################################################
-# get the input
-inputDF <- maml.mapInputPort(1)
-
-# initialize an empty output dataframe of desired dimensions
-outputDF <- data.frame(matrix(ncol = "%s", nrow = nrow(inputDF)))
-
-for (file in list.files("src")) {
-  if (file == "%s") {
-    load("src/%s")
-    # assert that dependencies exists?
-    # NOTE: depedencies object comes from packDependencies(), maybe something more unique to avoid collisions?
-    for (item in names(dependencies)) {
-      assign(item, dependencies[[item]])
-    }
-  }
-  else {
-    # if the package isn't installed on Azure already, install it and its dependencies
-    # need to recursively grab dependencies
-    if (!(file %in% installed.packages()[,"Package"])) {
-      install.packages(paste("src", file, sep="/"), lib= ".", repos=NULL, verbose=TRUE)
-    }
-    # load the package
-    library(strsplit(file, "\\.")[[1]][[1]], character.only=TRUE)
-  }
-}
-
-# user function
-action <-
-
-# apply function to every row
-for (i in 1:nrow(inputDF)) {
-  outputDF[i,] <- do.call("action", as.list(inputDF[i,]))
-}
-
-# return output
-maml.mapOutputPort("outputDF")
-
-# test function
-add <- function(x) {
-  print(findGlobals(add))
-  return(x+a[[1]])
-}
 
 
 
@@ -57,6 +11,8 @@ add <- function(x) {
 # Return the function as a string
 # Also consider paste(body(fun())) or getAnywhere()
 ################################################################
+#' @param x - Name of the function to convert to a string
+#' @return function in string format
 getFunctionString <- function (x)
 {
   if (tryCatch(!is.character(x), error = function(e) TRUE))
@@ -126,6 +82,8 @@ getFunctionString <- function (x)
 # EXTRACT DEPENDENCIES
 # Takes closure, not string
 ##################################################################################
+#' @param functionName - Name of the function to pack the dependencies up for
+#' @return Converted inputSchema to the proper format
 packDependencies <- function(funName) {
   dependencies = list()
   packages = list()
@@ -141,7 +99,7 @@ packDependencies <- function(funName) {
 
     # filter out primitives
     if (is.primitive(name)) {
-        next
+      next
     }
 
     # get objects
@@ -214,6 +172,8 @@ packDependencies <- function(funName) {
 # CONVERT FORMAT
 # Helper function to convert expected schema to API-expecting format
 ################################################################
+#' @param argList - List of expected input parameters
+#' @return Converted inputSchema to the proper format
 convert <- function(argList) {
   form <- list()
   for (arg in names(argList)) {
@@ -242,20 +202,56 @@ convert <- function(argList) {
 }
 
 
+################################################################
+# Function to extract function argument names
+################################################################
+getArgNames <- function(x) {
+  argList <- list()
+  for (name in names(x)) {
+    argList <- c(argList, name)
+  }
+  return(argList)
+}
+
+
+################################################################
+# This is a helper function to ensure that the inputSchema has recieved all of the expected parameters
+################################################################
+#' @param userInput - List of expected input parameters
+#' @param funcName - The function that is being published
+#' @return False if the input was not as expected/True if input matched expectation
+paramCheck <- function(userInput, funcName) {
+  numParamsEXPECTED <- length(formals(funcName))
+  numParamsPASSED <- length(userInput)
+
+  if (numParamsPASSED != numParamsEXPECTED) {
+    errorWarning <- paste("Error: Your input Schema does not contain the proper input. You provided ", numParamsPASSED," inputs and ", numParamsEXPECTED," were expected",sep="")
+    stop(errorWarning, call. = TRUE)
+    return(FALSE)
+  }
+  else {
+    return(TRUE)
+  }
+}
+
+
 
 ################################################################
 # expecting inputSchema = list("arg1"="type", "arg2"="type", ...)
 # expecting outputSchema = list("output1"="type", "output2"="type", ...)
-# funName is a string!!
+# functionName is a string!!
 ################################################################
 # TODO: play around with argument order
-publishWebService <- function(funName, serviceName, inputSchema, outputSchema, wkID, authToken) {
+publishWebService <- function(functionName, serviceName, inputSchema, outputSchema, wkID, authToken) {
+
+  # Make sure input schema matches function signature
+  paramCheck(inputSchema, functionName)
 
   # Accept SSL certificates issued by public Certificate Authorities
   options(RCurlOptions = list(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
 
   # Get and encode the dependencies
-  zipString = packDependencies(funName)
+  zipString = packDependencies(functionName)
 
   # Build the body of the request, differing on whether or not there is a zip to upload
   # Probably a more elegant way to do this
@@ -265,10 +261,9 @@ publishWebService <- function(funName, serviceName, inputSchema, outputSchema, w
       "Type" = "Code",
       "CodeBundle" = list(
         "InputSchema" = convert(inputSchema),
-        "OutputSchema" = convert(outputSchema),
+        "OutputSchema" = convert(inputSchema),
         "Language" = "r-3.1-64",
-        "SourceCode" = sprintf(wrapper, length(outputSchema), zipString[[1]], zipString[[1]], paste(getFunctionString(funName)))
-
+        "SourceCode" = sprintf(wrapper, length(outputSchema), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName)))
       )
     )
   }
@@ -277,12 +272,12 @@ publishWebService <- function(funName, serviceName, inputSchema, outputSchema, w
       "Name" = serviceName,
       "Type" = "Code",
       "CodeBundle" = list(
-        "InputSchema" = format(inputSchema),
-        "OutputSchema" = format(outputSchema),
+        "InputSchema" = convert(inputSchema),
+        "OutputSchema" = convert(outputSchema),
         "Language" = "r-3.1-64",
-        "SourceCode" = sprintf(wrapper, length(outputSchema), zipString[[1]], zipString[[1]], paste(getFunctionString(funName))),
-#        "SourceCode" = "inputDF <- maml.mapInputPort(1)\r\ninstall.packages(paste(\"src\", \"codetools.zip\", sep=\"/\"), lib = \".\", repos=NULL)\r\nlibrary(\"codetools\")\r\noutputDF <- data.frame(findGlobals(findGlobals))\r\nmaml.mapOutputPort(\"outputDF\")",
-#        "SourceCode" = "inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(list.files(\"src\"))\r\nmaml.mapOutputPort(\"outputDF\")",
+        "SourceCode" = sprintf(wrapper, length(outputSchema), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName))),
+        #        "SourceCode" = "inputDF <- maml.mapInputPort(1)\r\ninstall.packages(paste(\"src\", \"codetools.zip\", sep=\"/\"), lib = \".\", repos=NULL)\r\nlibrary(\"codetools\")\r\noutputDF <- data.frame(findGlobals(findGlobals))\r\nmaml.mapOutputPort(\"outputDF\")",
+        #        "SourceCode" = "inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(list.files(\"src\"))\r\nmaml.mapOutputPort(\"outputDF\")",
         "ZipContents" = zipString[[2]]
       )
     )
@@ -302,78 +297,23 @@ publishWebService <- function(funName, serviceName, inputSchema, outputSchema, w
   # API call
   RCurl::httpPUT(url = sprintf(publishURL, wkID, guid), # defined above
                  httpheader=c('Authorization' = paste('Bearer', authToken, sep=' '),
-                          'Content-Type' = 'application/json',
-                          'Accept' = 'application/json'),
+                              'Content-Type' = 'application/json',
+                              'Accept' = 'application/json'),
                  content = body,
                  writefunction = h$update,
                  ssl.verifyhost = FALSE) ### REMOVE THIS FOR THE REAL VERSION ###
 
-  # return everything
   # TODO: format output
-  rjson::fromJSON(h$value())
+  newService <- RJSONIO::fromJSON(h$value())
+
+  # Use discovery functions to get default endpoint for immediate use
+  # switch to getEndpoints() later
+  defaultEP <- getEndpointsT(wkID, authToken, newService["Id"])
+
+  # Curry relevant parameters to consumption function
+  consumption <- functional::Curry(consumeSingleRequest, "api_key"=defaultEP[[1]]["PrimaryKey"], "URL"=paste(defaultEP[[1]]["ApiLocation"],"/execute?api-version=2.0&details=true",sep=""), columnNames=as.list(names(inputSchema)))
+
+  # currently returning list of webservice details, default endpoint details, consumption function, in that order
+  return(list(newService, defaultEP, consumption))
 }
 
-
-#####################################################################################################
-# TITANIC DEMO
-#####################################################################################################
-test <- read.csv(file="test.csv")
-train <- read.csv(file="train.csv")
-
-head(test)
-head(train)
-
-#y variable
-survived <- train$Survived
-
-#id
-passengerId <- test$PassengerId
-
-#remove from the training sample
-train = train[,-2]
-
-end_trn = nrow(train)
-
-#combine the two sets
-train <- rbind(train, test)
-#Age replace with mean
-train$Age[is.na(train$Age)] <- 30
-end = nrow(train)
-
-#remove columns
-train = train[,c(-1,-3,-8,-10,-11)]
-head(train)
-
-library(gbm)
-set.seed(123)
-pr=0
-tr=0
-
-n.models = 5
-ntrees=2000
-
-for(i in 1:n.models){
-  GBM.model = gbm.fit(
-    x=train[1:end_trn,], y = survived,
-    distribution= "gaussian",
-    n.trees = ntrees,
-    shrinkage = 0.01,
-    interaction.depth = 25,
-    n.minobsinnode = 5,
-    verbose = TRUE)
-  #test set prediction
-  pr1 = predict.gbm(object=GBM.model,newdata=train[(end_trn+1):end,], ntrees)
-  #training set prediction
-  tr1 = predict.gbm(object = GBM.model,newdata=train[1:end_trn,], ntrees)
-  pr = pr+pr1
-  tr = tr+tr1
-}
-pr = pr/n.models
-tr = tr/n.models
-head(pr)
-head(tr)
-summary(GBM.model)
-
-predictTitanic <- function (Pclass, Sex, Age, SibSp, Parch, Fare) {
-  return(predict.gbm(object=GBM.model, newdata=data.frame("Pclass"=Pclass, "Sex"=Sex, "Age"=Age, "SibSp"=SibSp, "Parch"=Parch, "Fare"=Fare), 2000))
-}
