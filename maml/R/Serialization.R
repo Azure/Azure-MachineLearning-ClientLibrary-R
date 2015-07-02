@@ -91,3 +91,57 @@ serializeFunc <- function(publishedFunction) {
   
   return (jsonlite::serializeJSON(bodyFunction))
 }
+
+#' \name{Serialization}
+#' \title{Serialize MetaData}
+#' \description{
+#' serializeMeta runs the serialized/published function on an internal level
+#' }
+#' \usage{serializeMeta(df, functionName)}
+#' \arguments{
+#' \item{df}{Dataframe containing input parameters}
+#' \item{functionName}{Name of the published function to run}
+#' }
+#' \value {The serialized ouput}
+#' 
+#' Serialize (Published) User Arguments: Expect arguments from user in a dataframe
+#' Take Output from function and save into output dataframe
+#' @param Pass dataframe into function
+#' @return serialized output
+serializeMeta <- function(userDF, funcName) {
+  # convert back to params
+  args <- as.list(userDF[,])
+  
+  #run function
+  output <- do.call(funcName, args)
+  print(output)
+  returnDF <- data.frame(output)
+  
+  #serialize output
+  oArgs = jsonlite::serializeJSON(returnDF)
+  return (oArgs)
+}
+
+#' \name{Serialization}
+#' \title{UnSerialize MetaData}
+#' \description{
+#' serializeMeta converts the serialized output back to readable data for the user
+#' }
+#' \usage{unserializeMeta(output)}
+#' \arguments{
+#' \item{output}{The output from the function run}
+#' }
+#' \value {The unserialized ouput}
+#' 
+#' Serialize (Published) Output: This is an internal funciton
+#' Take Output from function and save into output dataframe
+#' @param Pass dataframe back to user
+#' @return output dataframe
+unserializeMeta <- function(output) {
+  # convert back to params
+  outputDF <<- jsonlite::unserializeJSON(output)
+  outlist <- as.list(outputDF[,])
+  
+  print(outlist)
+  return (outlist)
+}
