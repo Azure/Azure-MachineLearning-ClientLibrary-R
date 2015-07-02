@@ -190,4 +190,3 @@ callAPI <- function(api_key, requestURL, columnNames, values,  globalParam, retr
   }
   return(result)
 }
->>>>>>> 3f5950070628055b026863d9c90d2cc4d6725ef9
