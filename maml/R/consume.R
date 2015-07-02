@@ -3,55 +3,6 @@ library("rjson")
 library("data.table")
 library("df2json")
 
-
-consumeSingleRequest <- function(api_key, URL, columnNames, ...) {
-  # Accept SSL certificates issued by public Certificate Authorities
-  values = output_list <- lapply(X=list(...), function(x) x)
-
-  options(RCurlOptions = list(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
-
-  h = basicTextGatherer()
-  hdr = basicHeaderGatherer()
-
-  req = list(
-    Inputs = list(
-      input1 = list(
-        ColumnNames = columnNames,
-        Values = values
-      )
-    )
-  )
-
-  body = enc2utf8(toJSON(req))
-  authz_hdr = paste('Bearer', api_key, sep=' ')
-  h$reset()
-  curlPerform(url = URL,
-              httpheader=c('Content-Type' = "application/json", 'Authorization' = authz_hdr),
-              postfields=body,
-              writefunction = h$update,
-              headerfunction = hdr$update,
-              verbose = TRUE,
-              ssl.verifypeer = FALSE,
-              ssl.verifyhost = FALSE
-  )
-
-  headers = hdr$value()
-  httpStatus = headers["status"]
-  if (httpStatus >= 400)
-  {
-    print(paste("The request failed with status code:", httpStatus, sep=" "))
-
-    # Print the headers - they include the request ID and the timestamp, which are useful for debugging the failure
-    print("headers:")
-    print(headers)
-  }
-
-  result = fromJSON(h$value())
-  values = as.list(result$Results$output1$value$Values)
-  return(list(values, result))
-}
-
-
 #' This function takes in an API key, file name and the request URL (OData Endpoint Address).
 #' It calls a helper function that sends requests to the server to the server in the appropriate format.
 #' It processes requests in batches and stores the responses in order of batches in an array. It returns the output columns along with the scored probablities, and stores the result in a text file.
@@ -74,6 +25,7 @@ consumeFile <- function(api_key, requestURL, infileName, globalParam = "", outfi
   if (missing(requestURL)) {
     stop("Need to specify request URL")
   }
+  #read file into dataframe, convert into matrix and read column by column into list of lists
   dataFrame = read.csv(infileName,check.names=FALSE)
   columnNames = colnames(dataFrame)
   matrixdf <- as.matrix(dataFrame)
@@ -85,16 +37,18 @@ consumeFile <- function(api_key, requestURL, infileName, globalParam = "", outfi
   valuebatch = list()
   counter = 1
   fileConn <-file(outfileName,"w")
-
+  
+  #process batch by batch and make api calls and store responses
   for(i in 1:(length(values))) {
     valuebatch[length(valuebatch) + 1] = values[i]
     if(counter == batchSize || i == (length(values))) {
-        temp <- callAPI(api_key, requestURL, columnNames, valuebatch, globalParam, retryDelay)
-        resultStored = paste(resultStored,temp,sep=', ')
-        write(temp, fileConn,append = TRUE)
-        print(sprintf("%i %s %i %s", i,"out of",length(values),"processed"))
-        valuebatch = list()
-        counter = 0
+      temp <- callAPI(api_key, requestURL, columnNames, valuebatch, globalParam, retryDelay)
+      resultStored = paste(resultStored,temp,sep=', ')
+      #write to results file
+      write(temp, fileConn,append = TRUE)
+      print(sprintf("%i %s %i %s", i,"out of",length(values),"processed"))
+      valuebatch = list()
+      counter = 0
     }
     counter = counter +1
   }
@@ -120,18 +74,19 @@ consumeLists <- function(api_key, requestURL, columnNames, ..., globalParam="", 
   if (missing(api_key)) {
     stop("Need to specify API key")
   }
-
+  
   if (missing(requestURL)) {
     stop("Need to specify request URL")
   }
   if (missing(columnNames)) {
     stop("Need to specify column names")
-  }
+  }  
   if(missing(globalParam)) {
     globalParam = ""
   }
-  valuesList = list(...)
-
+  #store arguments as mega list of lists
+  valuesList <- lapply(X=list(...), function(x) x)
+  #make api call with components of payload
   callAPI(api_key, requestURL, columnNames, valuesList,  globalParam, retryDelay)
 }
 
@@ -151,13 +106,14 @@ consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam="", batc
   if (missing(api_key)) {
     stop("Need to specify API key")
   }
-
+  
   if (missing(requestURL)) {
     stop("Need to specify request URL")
   }
   if (missing(valuesDF)) {
     stop("Need to specify dataframe to be scored")
   }
+  #format as matrix and parse column by column
   columnNames = colnames(valuesDF)
   matrixdf <- as.matrix(valuesDF)
   rownames(matrixdf) <- NULL
@@ -167,7 +123,8 @@ consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam="", batc
   resultStored = ""
   valuebatch = list()
   counter = 1
-
+  
+  #process in batches and make API calls in batches
   for(i in 1:(length(values))) {
     valuebatch[length(valuebatch) + 1] = values[i]
     if(counter == batchSize || i == (length(values))) {
@@ -188,48 +145,59 @@ consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam="", batc
 callAPI <- function(api_key, requestURL, columnNames, values,  globalParam, retryDelay) {
   httpStatus = 0
   tries = 0
+  # limit number of API calls to 3
   for(i in 1:3) {
+    #make api calls and prepare payload if httpStatus indicates server error or if 
     if(tries == 0 || httpStatus >= 500) {
       if(httpStatus >= 500) {
+        #delay by fixed or specified time if server error
         print(paste("The request failed with status code:", httpStatus, sep=" "))
         print("headers:")
         print(headers)
-        print(sprintf("%s %i %s", "Retrying in ",retryDelay," seconds"))
+        print(sprintf("%s %f %s", "Retrying in ",retryDelay," seconds"))
         Sys.sleep(retryDelay)
       }
       tries = tries + 1
+      #construct request payload and load RCurl functions
       options(RCurlOptions = list(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
-      h = basicTextGatherer()
-      hdr = basicHeaderGatherer()
-
+      h = RCurl::basicTextGatherer()
+      hdr = RCurl::basicHeaderGatherer()
+      
       req = list(
         Inputs = list(
-          input1 = list(
-            ColumnNames = columnNames,
-            Values = values
+          "input1" = list(
+            "ColumnNames" = columnNames,
+            "Values" = values
           )
         )
         ,GlobalParameters = globalParam
       )
-
-      body = enc2utf8(toJSON(req))
+      body = enc2utf8((rjson::toJSON(req)))
+      
+      #make call to API after constructing request payload
+      
       authz_hdr = paste('Bearer', api_key, sep=' ')
       h$reset()
-      curlPerform(url = requestURL,
-                  httpheader=c('Content-Type' = "application/json", 'Authorization' = authz_hdr),
-                  postfields=body,
-                  writefunction = h$update,
-                  headerfunction = hdr$update,
-                  verbose = TRUE
+      RCurl::curlPerform(url = requestURL,
+                         httpheader=c('Content-Type' = "application/json", 'Authorization' = authz_hdr),
+                         postfields=body,
+                         writefunction = h$update,
+                         headerfunction = hdr$update,
+                         verbose = TRUE
+                         #                 Parameters below are needed if using test environment, but should not be included for security reasons                  
+                         ,ssl.verifypeer=FALSE,
+                         ssl.verifyhost = FALSE
       )
-
+      
       headers = hdr$value()
       httpStatus = headers["status"]
       result = h$value()
     }
+    #return if successful
     if(httpStatus == 200) {
       return(result)
-    }
+    } 
+    #if user error, print and return error details
     else if ((httpStatus>= 400) && (500 > httpStatus))
     {
       print(paste("The request failed with status code:", httpStatus, sep=" "))
@@ -240,4 +208,3 @@ callAPI <- function(api_key, requestURL, columnNames, values,  globalParam, retr
   }
   return(result)
 }
-
