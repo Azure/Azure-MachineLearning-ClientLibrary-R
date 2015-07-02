@@ -23,8 +23,6 @@ consumeSingleRequest <- function(api_key, URL, columnNames, ...) {
   )
 
   body = enc2utf8(toJSON(req))
-  print(body)
-  print(api_key)
   authz_hdr = paste('Bearer', api_key, sep=' ')
   h$reset()
   curlPerform(url = URL,
@@ -49,7 +47,8 @@ consumeSingleRequest <- function(api_key, URL, columnNames, ...) {
   }
 
   result = fromJSON(h$value())
-  return(result)
+  values = as.list(result$Results$output1$value$Values)
+  return(list(values, result))
 }
 
 
