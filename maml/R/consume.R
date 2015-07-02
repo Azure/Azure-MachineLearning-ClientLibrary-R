@@ -24,7 +24,7 @@ consumeFile <- function(api_key, requestURL, infileName, globalParam = "", outfi
   }
   if (missing(requestURL)) {
     stop("Need to specify request URL")
-  }
+  }  
   dataFrame = read.csv(infileName,check.names=FALSE)
   columnNames = colnames(dataFrame)
   matrixdf <- as.matrix(dataFrame)
@@ -77,14 +77,15 @@ consumeLists <- function(api_key, requestURL, columnNames, ..., globalParam="", 
   }
   if (missing(columnNames)) {
     stop("Need to specify column names")
-  }
+  }  
   if(missing(globalParam)) {
     globalParam = ""
   }
   valuesList = list(...)
-
+  
   callAPI(api_key, requestURL, columnNames, valuesList,  globalParam, retryDelay)
 }
+
 
 #' This function takes in an API key, the request URL (OData Endpoint Address), the column names and multiple requests
 #' It scores the experiment with the requests stored in a list of lists, and sends it to the server in the appropriate format.
@@ -101,13 +102,13 @@ consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam="", batc
   if (missing(api_key)) {
     stop("Need to specify API key")
   }
-
+  
   if (missing(requestURL)) {
     stop("Need to specify request URL")
   }
   if (missing(valuesDF)) {
     stop("Need to specify dataframe to be scored")
-  }
+  }  
   columnNames = colnames(valuesDF)
   matrixdf <- as.matrix(valuesDF)
   rownames(matrixdf) <- NULL
@@ -151,7 +152,7 @@ callAPI <- function(api_key, requestURL, columnNames, values,  globalParam, retr
       options(RCurlOptions = list(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
       h = basicTextGatherer()
       hdr = basicHeaderGatherer()
-
+      
       req = list(
         Inputs = list(
           input1 = list(
@@ -161,7 +162,7 @@ callAPI <- function(api_key, requestURL, columnNames, values,  globalParam, retr
         )
         ,GlobalParameters = globalParam
       )
-
+      
       body = enc2utf8(toJSON(req))
       authz_hdr = paste('Bearer', api_key, sep=' ')
       h$reset()
@@ -172,14 +173,14 @@ callAPI <- function(api_key, requestURL, columnNames, values,  globalParam, retr
                   headerfunction = hdr$update,
                   verbose = TRUE
       )
-
+      
       headers = hdr$value()
       httpStatus = headers["status"]
       result = h$value()
     }
     if(httpStatus == 200) {
       return(result)
-    }
+    }  
     else if ((httpStatus>= 400) && (500 > httpStatus))
     {
       print(paste("The request failed with status code:", httpStatus, sep=" "))
@@ -190,4 +191,3 @@ callAPI <- function(api_key, requestURL, columnNames, values,  globalParam, retr
   }
   return(result)
 }
->>>>>>> 3f5950070628055b026863d9c90d2cc4d6725ef9
