@@ -7,12 +7,12 @@ This is a technology preview. The APIs exposed by the library and the REST endpo
 
 Publishing a web service
 
-Functions:
-publishWebService <- function(funName, serviceName, inputSchema, outputSchema, wkID, authToken)
+FUNCTIONS:
+publishWebService <- function(functionName, serviceName, inputSchema, outputSchema, wkID, authToken)
 
 Discovering web services
 
-Functions:
+FUNCTIONS:
 getEndpoints <- function(wkID, authToken, wsID, url=epURL)
 getEPDetails <- function(wkID, authToken, wsID, epID, url=epURLdet)
 getWebServices <- function(wkID, authToken, url=wsURL)
@@ -20,7 +20,7 @@ getWSDetails <- function(wkID, authToken, wsID, url=wsURLdet)
 
 Consuming a web service
 
-Functions:
+FUNCTIONS:
 consumeFile <- function(api_key, requestURL, infileName, globalParam = "", outfileName = "results.txt", batchSize = 250, retryDelay = 0.3)
 consumeLists <- function(api_key, requestURL, columnNames, ..., globalParam="", retryDelay = 0.3)
 consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam="", batchSize = 250, retryDelay = 0.3)
