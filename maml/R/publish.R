@@ -79,12 +79,14 @@ getFunctionString <- function (x)
 
 
 ##################################################################################
-# EXTRACT DEPENDENCIES
-# Takes closure, not string
+# packDependencies()
+# Helper function to extract object and package dependencies
+# then pack them into a .zip, then a base64 string
+# Note: takes in a closure, not string
+# TODO: add error handling at each step
 ##################################################################################
-#' @param functionName - Name of the function to pack the dependencies up for
-#' @return Converted inputSchema to the proper format
 packDependencies <- function(funName) {
+  # lists for storing objects and packages
   dependencies = list()
   packages = list()
 
@@ -97,12 +99,13 @@ packDependencies <- function(funName) {
   for (obj in codetools::findGlobals(get(funName))) {
     name = get(obj)
 
-    # filter out primitives
-    if (is.primitive(name)) {
+    # filter out primitives and duplicates
+    if (is.primitive(name) || (obj %in% names(dependencies))) {
       next
     }
 
-    # get objects
+    # get in-memory objects
+    # Can nonfunction objects have dependencies???
     else if (!is.function(name)) {
       dependencies[[obj]] <- name
     }
@@ -110,11 +113,17 @@ packDependencies <- function(funName) {
     # grab user defined functions
     else if (identical(environment(name), globalenv())) {
       dependencies[[obj]] <- name
+      # recursively get dependencies
+      results <- recurDep(obj, dependencies, packages)
+      dependencies <- results$dependencies
+      packages <- results$packages
     }
 
     # get the names of packages of package functions
+    # filter out base functions
     else if (paste(getNamespaceName(environment(name))) != "base") {
-      packages[[obj]] <- getNamespaceName(environment(name))
+      # recursively get packages
+      packages <- recurPkg(paste(getNamespaceName(environment(name))), packages)
     }
 
     # need an else branch?
@@ -123,31 +132,43 @@ packDependencies <- function(funName) {
   # save current path to restore to later
   start = getwd()
   # go to package library, doing this to prevent tarballing entire path to package
-  # TODO: what if packages are in different library directories? need to iterate through all paths
-  setwd(.libPaths()[[1]])
-  # list of things to include in aggregate .zip
+  toPack <- packages
   toZip = vector()
-  # pack up each package in its own zip (.zip)
-  for (pkg in packages) {
-    # should error handle, e.g. if can't find package
-    zip(paste(start, paste(pkg, "zip", sep="."), sep="/"), pkg)
-    toZip <- c(toZip, paste(pkg, "zip", sep="."))
+  for (i in 1:length(.libPaths())) {
+    setwd(.libPaths()[i])
+    # try to find and zip up the packages
+    for (pkg in toPack) {
+      if (file.exists(pkg)) {
+        zip(paste(start, paste(pkg, "zip", sep="."), sep="/"), pkg)
+        toZip <- c(toZip, paste(pkg, "zip", sep="."))
+        toPack <- toPack[toPack != pkg]
+      }
+    }
+    
+    # if done packing, break
+    if (length(toPack) == 0) {
+      break
+    }
+    if (i == length(.libPaths())) {
+      # error: can't find packages
+      stop("Error: unable to locate packages. Please make sure the packages used are in at least one of the library paths.")
+    }
   }
   # go back to where the user started
   setwd(start)
-
+  
   # objects, functions, etc.
   if (length(dependencies) > 0) {
     # maybe can save directly as a .zip and skip the zip() call?
     save(dependencies, file=guid)
     toZip <- c(toZip, guid)
   }
-
+  
   # zip up everything
   if (length(toZip) > 0) {
     zip(zipfile=guid, files=toZip)
     zipEnc <- base64enc::base64encode(paste(guid, ".zip", sep=""))
-
+    
     # delete the packages
     for (pkg in packages) {
       # did I miss anything? maybe extra files floating around
@@ -156,7 +177,7 @@ packDependencies <- function(funName) {
     # delete the dependency rdta file
     file.remove(guid)
     file.remove(paste(guid,"zip",sep="."))
-
+    
     # return the encoded zip as a string
     return(list(guid, zipEnc))
   }
@@ -164,6 +185,57 @@ packDependencies <- function(funName) {
   else {
     return(list(guid, ""))
   }
+}
+
+##################################################################################
+# recurDep()
+# Helper function to recursively gather dependencies from user defined-functions
+# Similar structure to packDependencies()
+##################################################################################
+recurDep <- function(funName, dependencies, packages) {
+  for (obj in codetools::findGlobals(get(funName))) {
+    name = get(obj)
+    if (is.primitive(name) || (obj %in% names(dependencies))) {
+      next
+    }
+    else if (!is.function(name)) {
+      dependencies[[obj]] <- name
+    }
+    else if (identical(environment(name), globalenv())) {
+      dependencies[[obj]] <- name
+      results <- recurDep(obj, dependencies, packages)
+      dependencies <- results$dependencies
+      packages <- results$packages
+    }
+    else if (paste(getNamespaceName(environment(name))) != "base") {
+      packages <- recurPkg(paste(getNamespaceName(environment(name))), packages)
+    }
+  }
+  return(list("dependencies"=dependencies, "packages"=packages))
+}
+
+##################################################################################
+# recurPkg()
+# Helper function to recursively gather dependencies from user defined-functions
+##################################################################################
+recurPkg <- function(pkgName, packages) {
+  # if the package isn't already in the list
+  if (!(pkgName %in% packages)) {
+    # add it
+    packages <- c(pkgName, packages)
+    pkgDeps <- available.packages()
+    
+    # iterate through the dependencies and check if need to add them
+    for (pkg in strsplit(available.packages()[pkgName, "Depends"], split=", ")[[1]]) {
+      # filtout duplicates and R version dependencies
+      if (!(pkg %in% packages) && !(grepl("R \\((.*)\\)", pkg)) && (pkg %in% row.names(available.packages()))) {
+        # recursively call recurPkg
+        packages <- recurPkg(pkg, packages)
+      }
+    }
+  }
+  # return updated list of packages  
+  return(packages)
 }
 
 
