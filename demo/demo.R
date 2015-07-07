@@ -85,12 +85,13 @@ consumeTitanic <- TitanicService[[3]]
 # as connection is left open
 response <- consumeTitanic(list("1", "male", "20", "1", "0", "8.50"), list("1", "female", "20", "1", "0", "8.50"))
 
-# formatting response
-responseMat <- matrix(fromJSON(response)$Results$output1$value$Values)
-colnames(responseMat) <- fromJSON(response)$Results$output1$value$ColumnNames
-
-responseDF <- data.frame(responseMat)
-
 # data frame consumption
 # creating test data.frame
 demoDF <- data.frame("Pclass"=c(1,2,3), "Sex"=c("male","female","male"), "Age"=c("8","20", "50"), "Parch"=c(1,2,3), "SibSp"=c(1,2,3), "Fare"=c(10,7.5, 6))
+responseDF <- consumeDataframe(TitanicService[[2]][[1]]$PrimaryKey, paste(TitanicService[[2]][[1]]$ApiLocation,"/execute?api-version=2.0&details=true",sep=""), demoDF)
+
+# formatting
+responseDF <- fromJSON(responseDF)
+responseDFm <- data.frame(matrix(responseDF$Results$output1$value$Values))
+colnames(responseDFm) <- responseDF$Results$output1$value$ColumnNames
+responseDFm

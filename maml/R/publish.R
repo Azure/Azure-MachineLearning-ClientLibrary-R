@@ -136,7 +136,7 @@ packDependencies <- function(functionName) {
 
   # save current path to restore to later
   start = getwd()
-  # go to package library, doing this to prevent tarballing entire path to package
+  # go to package library, doing this to prevent zipping entire package
   toPack <- packages
   toZip = vector()
   for (i in 1:length(.libPaths())) {
