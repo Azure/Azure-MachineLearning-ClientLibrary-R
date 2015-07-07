@@ -2,8 +2,7 @@
 # String constants
 ################################################################
 publishURL <- "https://hiteshsm.cloudapp.net/workspaces/%s/webservices/%s" ## REMOVE SSL IGNORING FOR REAL VERSION ##
-wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(matrix(ncol = %s, nrow = nrow(inputDF)))\r\nfor (file in list.files(\"src\")) {\r\n  if (file == \"%s\") {\r\n    load(\"src/%s\")\r\n    for (item in names(dependencies)) {\r\n      assign(item, dependencies[[item]])\r\n    }\r\n  }\r\n  else {\r\n    if (!(file %%in%% installed.packages()[,\"Package\"])) {\r\n      install.packages(paste(\"src\", file, sep=\"/\"), lib=\".\", repos=NULL, verbose=TRUE)\r\n    }\r\n    library(strsplit(file, \"\\\\.\")[[1]][[1]], character.only=TRUE)\r\n  }\r\n}\r\naction <- %s\r\n  for (i in 1:nrow(inputDF)) {\r\n    outputDF[i,] <- do.call(\"action\", as.list(inputDF[i,]))\r\n  }\r\nmaml.mapOutputPort(\"outputDF\")"
-
+wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- matrix(ncol = %s, nrow = nrow(inputDF))\r\ncolnames(outputDF) <- list(%s)\r\noutputDF <- data.frame(outputDF)\r\nfor (file in list.files(\"src\")) {\r\n  if (file == \"%s\") {\r\n    load(\"src/%s\")\r\n    for (item in names(dependencies)) {\r\n      assign(item, dependencies[[item]])\r\n    }\r\n  }\r\n  else {\r\n    if (!(file %%in%% installed.packages()[,\"Package\"])) {\r\n      install.packages(paste(\"src\", file, sep=\"/\"), lib=\".\", repos=NULL, verbose=TRUE)\r\n    }\r\n    library(strsplit(file, \"\\\\.\")[[1]][[1]], character.only=TRUE)\r\n  }\r\n}\r\naction <- %s\r\n  for (i in 1:nrow(inputDF)) {\r\n    outputDF[i,] <- do.call(\"action\", as.list(inputDF[i,]))\r\n  }\r\nmaml.mapOutputPort(\"outputDF\")"
 
 
 ################################################################
@@ -90,6 +89,7 @@ getFunctionString <- function (x)
 # then pack them into a .zip, then a base64 string
 #' @param functionName - function to package dependencies from
 #' @return encoded zip - will return false if nothing was zipped
+# TODO: suppress the red text?
 packDependencies <- function(functionName) {
   # lists for storing objects and packages
   dependencies = list()
@@ -289,17 +289,6 @@ convert <- function(argList) {
 }
 
 
-################################################################
-# Function to extract function argument names
-################################################################
-getArgNames <- function(x) {
-  argList <- list()
-  for (name in names(x)) {
-    argList <- c(argList, name)
-  }
-  return(argList)
-}
-
 
 ################################################################
 # This is a helper function to ensure that the inputSchema has recieved all of the expected parameters
@@ -362,7 +351,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
         "InputSchema" = convert(inputSchema),
         "OutputSchema" = convert(inputSchema),
         "Language" = "r-3.1-64",
-        "SourceCode" = sprintf(wrapper, length(outputSchema), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName)))
+        "SourceCode" = sprintf(wrapper, length(outputSchema), paste(sprintf("\"%s\"", names(outputSchema)), collapse=","), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName)))
       )
     )
   }
@@ -374,9 +363,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
         "InputSchema" = convert(inputSchema),
         "OutputSchema" = convert(outputSchema),
         "Language" = "r-3.1-64",
-        "SourceCode" = sprintf(wrapper, length(outputSchema), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName))),
-        #        "SourceCode" = "inputDF <- maml.mapInputPort(1)\r\ninstall.packages(paste(\"src\", \"codetools.zip\", sep=\"/\"), lib = \".\", repos=NULL)\r\nlibrary(\"codetools\")\r\noutputDF <- data.frame(findGlobals(findGlobals))\r\nmaml.mapOutputPort(\"outputDF\")",
-        #        "SourceCode" = "inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(list.files(\"src\"))\r\nmaml.mapOutputPort(\"outputDF\")",
+        "SourceCode" = sprintf(wrapper, length(outputSchema), paste(sprintf("\"%s\"", names(outputSchema)), collapse=","), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName))),
         "ZipContents" = zipString[[2]]
       )
     )
@@ -407,10 +394,10 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 
   # Use discovery functions to get default endpoint for immediate use
   # switch to getEndpoints() later
-  defaultEP <- getEndpointsT(wkID, authToken, newService["Id"])
+  defaultEP <- getEndpoints(wkID, authToken, newService["Id"], testURL)
 
   # Curry relevant parameters to consumption function
-  consumption <- functional::Curry(consumeSingleRequest, "api_key"=defaultEP[[1]]["PrimaryKey"], "URL"=paste(defaultEP[[1]]["ApiLocation"],"/execute?api-version=2.0&details=true",sep=""), columnNames=as.list(names(inputSchema)))
+  consumption <- functional::Curry(consumeLists, "api_key"=defaultEP[[1]]["PrimaryKey"], "requestURL"=paste(defaultEP[[1]]["ApiLocation"],"/execute?api-version=2.0&details=true",sep=""), "columnNames"=as.list(names(inputSchema)))
 
   # currently returning list of webservice details, default endpoint details, consumption function, in that order
   return(list(newService, defaultEP, consumption))

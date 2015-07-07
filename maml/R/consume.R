@@ -3,6 +3,9 @@ library("rjson")
 library("data.table")
 library("df2json")
 library("jsonlite")
+# TODO: are all these packages needed? What distinguishes a data.table from a data.frame, and
+# why can't rjson or jsonlite (we should consolidate to one of these) handle data.frames to json?
+# Removing excess package usage will be more user friendly
 
 #' This function takes in an API key, file name and the request URL (OData Endpoint Address).
 #' It calls a helper function that sends requests to the server to the server in the appropriate format.

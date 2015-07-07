@@ -6,6 +6,9 @@ wsURLdet = "https://management-tm.azureml.net/workspaces/%s/webservices/%s"
 epURL = "https://management-tm.azureml.net/workspaces/%s/webservices/%s/endpoints"
 epURLdet = "https://management-tm.azureml.net/workspaces/%s/webservices/%s/endpoints/%s"
 
+# remove in real version
+testURL = "https://hiteshsm.cloudapp.net/workspaces/%s/webservices/%s/endpoints"
+
 #############################################################
 # Framework for making an HTTP request to the URL specified
 # returns a list of lists, so that the elements can be accessed
@@ -26,7 +29,8 @@ getFramework <- function(tUrl, authToken) {
               httpheader=c('Authorization' = auth, 'Content-Type' = "application/json", 'Accept' = "application/json"),
               writefunction = h$update,
               headerfunction = hdr$update,
-              verbose = TRUE
+              verbose = TRUE,
+              ssl.verifyhost = FALSE # REMOVE FOR PRODUCTION
   )
 
   # Print results
