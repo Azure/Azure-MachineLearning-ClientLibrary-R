@@ -2,8 +2,7 @@
 # String constants
 ################################################################
 publishURL <- "https://hiteshsm.cloudapp.net/workspaces/%s/webservices/%s" ## REMOVE SSL IGNORING FOR REAL VERSION ##
-wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(matrix(ncol = %s, nrow = nrow(inputDF)))\r\nfor (file in list.files(\"src\")) {\r\n  if (file == \"%s\") {\r\n    load(\"src/%s\")\r\n    for (item in names(dependencies)) {\r\n      assign(item, dependencies[[item]])\r\n    }\r\n  }\r\n  else {\r\n    if (!(file %%in%% installed.packages()[,\"Package\"])) {\r\n      install.packages(paste(\"src\", file, sep=\"/\"), lib=\".\", repos=NULL, verbose=TRUE)\r\n    }\r\n    library(strsplit(file, \"\\\\.\")[[1]][[1]], character.only=TRUE)\r\n  }\r\n}\r\naction <- %s\r\n  for (i in 1:nrow(inputDF)) {\r\n    outputDF[i,] <- do.call(\"action\", as.list(inputDF[i,]))\r\n  }\r\nmaml.mapOutputPort(\"outputDF\")"
-
+wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- matrix(ncol = %s, nrow = nrow(inputDF))\r\ncolnames(outputDF) <- list(%s)\r\noutputDF <- data.frame(outputDF)\r\nfor (file in list.files(\"src\")) {\r\n  if (file == \"%s\") {\r\n    load(\"src/%s\")\r\n    for (item in names(dependencies)) {\r\n      assign(item, dependencies[[item]])\r\n    }\r\n  }\r\n  else {\r\n    if (!(file %%in%% installed.packages()[,\"Package\"])) {\r\n      install.packages(paste(\"src\", file, sep=\"/\"), lib=\".\", repos=NULL, verbose=TRUE)\r\n    }\r\n    library(strsplit(file, \"\\\\.\")[[1]][[1]], character.only=TRUE)\r\n  }\r\n}\r\naction <- %s\r\n  for (i in 1:nrow(inputDF)) {\r\n    outputDF[i,] <- do.call(\"action\", as.list(inputDF[i,]))\r\n  }\r\nmaml.mapOutputPort(\"outputDF\")"
 
 
 ################################################################
@@ -11,6 +10,7 @@ wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(matrix(nco
 # Return the function as a string
 # Also consider paste(body(fun())) or getAnywhere()
 ################################################################
+#' This is a helper function that will convert a function to a string
 #' @param x - Name of the function to convert to a string
 #' @return function in string format
 getFunctionString <- function (x)
@@ -79,12 +79,19 @@ getFunctionString <- function (x)
 
 
 ##################################################################################
-# EXTRACT DEPENDENCIES
-# Takes closure, not string
+# packDependencies()
+# Helper function to extract object and package dependencies
+# then pack them into a .zip, then a base64 string
+# Note: takes in a closure, not string
+# TODO: add error handling at each step
 ##################################################################################
-#' @param functionName - Name of the function to pack the dependencies up for
-#' @return Converted inputSchema to the proper format
-packDependencies <- function(funName) {
+#' This is a helper function to extract object and package dependencies
+# then pack them into a .zip, then a base64 string
+#' @param functionName - function to package dependencies from
+#' @return encoded zip - will return false if nothing was zipped
+# TODO: suppress the red text?
+packDependencies <- function(functionName) {
+  # lists for storing objects and packages
   dependencies = list()
   packages = list()
 
@@ -94,15 +101,16 @@ packDependencies <- function(funName) {
   # NOTE: will not work if the user function specifies the names directly, e.g. won't find rjson::toJSON
   # from findGlobals man page: "R semantics only allow variables that might be local to be identified"
   # CONSIDER: how robust is this filtering? need to verify
-  for (obj in codetools::findGlobals(get(funName))) {
+  for (obj in codetools::findGlobals(get(functionName))) {
     name = get(obj)
 
-    # filter out primitives
-    if (is.primitive(name)) {
+    # filter out primitives and duplicates
+    if (is.primitive(name) || (obj %in% names(dependencies))) {
       next
     }
 
-    # get objects
+    # get in-memory objects
+    # Can nonfunction objects have dependencies???
     else if (!is.function(name)) {
       dependencies[[obj]] <- name
     }
@@ -110,11 +118,17 @@ packDependencies <- function(funName) {
     # grab user defined functions
     else if (identical(environment(name), globalenv())) {
       dependencies[[obj]] <- name
+      # recursively get dependencies
+      results <- recurDep(obj, dependencies, packages)
+      dependencies <- results$dependencies
+      packages <- results$packages
     }
 
     # get the names of packages of package functions
+    # filter out base functions
     else if (paste(getNamespaceName(environment(name))) != "base") {
-      packages[[obj]] <- getNamespaceName(environment(name))
+      # recursively get packages
+      packages <- recurPkg(paste(getNamespaceName(environment(name))), packages)
     }
 
     # need an else branch?
@@ -123,31 +137,43 @@ packDependencies <- function(funName) {
   # save current path to restore to later
   start = getwd()
   # go to package library, doing this to prevent tarballing entire path to package
-  # TODO: what if packages are in different library directories? need to iterate through all paths
-  setwd(.libPaths()[[1]])
-  # list of things to include in aggregate .zip
+  toPack <- packages
   toZip = vector()
-  # pack up each package in its own zip (.zip)
-  for (pkg in packages) {
-    # should error handle, e.g. if can't find package
-    zip(paste(start, paste(pkg, "zip", sep="."), sep="/"), pkg)
-    toZip <- c(toZip, paste(pkg, "zip", sep="."))
+  for (i in 1:length(.libPaths())) {
+    setwd(.libPaths()[i])
+    # try to find and zip up the packages
+    for (pkg in toPack) {
+      if (file.exists(pkg)) {
+        zip(paste(start, paste(pkg, "zip", sep="."), sep="/"), pkg)
+        toZip <- c(toZip, paste(pkg, "zip", sep="."))
+        toPack <- toPack[toPack != pkg]
+      }
+    }
+    
+    # if done packing, break
+    if (length(toPack) == 0) {
+      break
+    }
+    if (i == length(.libPaths())) {
+      # error: can't find packages
+      stop("Error: unable to locate packages. Please make sure the packages used are in at least one of the library paths.")
+    }
   }
   # go back to where the user started
   setwd(start)
-
+  
   # objects, functions, etc.
   if (length(dependencies) > 0) {
     # maybe can save directly as a .zip and skip the zip() call?
     save(dependencies, file=guid)
     toZip <- c(toZip, guid)
   }
-
+  
   # zip up everything
   if (length(toZip) > 0) {
     zip(zipfile=guid, files=toZip)
     zipEnc <- base64enc::base64encode(paste(guid, ".zip", sep=""))
-
+    
     # delete the packages
     for (pkg in packages) {
       # did I miss anything? maybe extra files floating around
@@ -156,7 +182,7 @@ packDependencies <- function(funName) {
     # delete the dependency rdta file
     file.remove(guid)
     file.remove(paste(guid,"zip",sep="."))
-
+    
     # return the encoded zip as a string
     return(list(guid, zipEnc))
   }
@@ -166,12 +192,73 @@ packDependencies <- function(funName) {
   }
 }
 
+##################################################################################
+# recurDep()
+# Helper function to recursively gather dependencies from user defined-functions
+# Similar structure to packDependencies()
+##################################################################################
+#' This is helper function to recursively gather dependencies from user defined-functions
+#' @param functionName - Name of function to recursively gather dependencies from
+#' @param dependencies - List of package dependencies
+#' @param packages - Name of available packages
+#' @return list of packages and dependencies
+recurDep <- function(functionName, dependencies, packages) {
+  for (obj in codetools::findGlobals(get(functionName))) {
+    name = get(obj)
+    if (is.primitive(name) || (obj %in% names(dependencies))) {
+      next
+    }
+    else if (!is.function(name)) {
+      dependencies[[obj]] <- name
+    }
+    else if (identical(environment(name), globalenv())) {
+      dependencies[[obj]] <- name
+      results <- recurDep(obj, dependencies, packages)
+      dependencies <- results$dependencies
+      packages <- results$packages
+    }
+    else if (paste(getNamespaceName(environment(name))) != "base") {
+      packages <- recurPkg(paste(getNamespaceName(environment(name))), packages)
+    }
+  }
+  return(list("dependencies"=dependencies, "packages"=packages))
+}
+
+##################################################################################
+# recurPkg()
+# Helper function to recursively gather dependencies from user defined-functions
+##################################################################################
+#' This is helper function to recursively gather dependencies from user defined-functions
+#' @param pkgName - Name of package to check for existence in list of packages
+#' @param packages - Name of available packages
+#' @return list of packages
+recurPkg <- function(pkgName, packages) {
+  # if the package isn't already in the list
+  if (!(pkgName %in% packages)) {
+    # add it
+    packages <- c(pkgName, packages)
+    pkgDeps <- available.packages()
+    
+    # iterate through the dependencies and check if need to add them
+    for (pkg in strsplit(available.packages()[pkgName, "Depends"], split=", ")[[1]]) {
+      # filtout duplicates and R version dependencies
+      if (!(pkg %in% packages) && !(grepl("R \\((.*)\\)", pkg)) && (pkg %in% row.names(available.packages()))) {
+        # recursively call recurPkg
+        packages <- recurPkg(pkg, packages)
+      }
+    }
+  }
+  # return updated list of packages  
+  return(packages)
+}
+
 
 
 ################################################################
 # CONVERT FORMAT
 # Helper function to convert expected schema to API-expecting format
 ################################################################
+#' This is a helper function to convert expected schema to API-expecting format
 #' @param argList - List of expected input parameters
 #' @return Converted inputSchema to the proper format
 convert <- function(argList) {
@@ -202,21 +289,11 @@ convert <- function(argList) {
 }
 
 
-################################################################
-# Function to extract function argument names
-################################################################
-getArgNames <- function(x) {
-  argList <- list()
-  for (name in names(x)) {
-    argList <- c(argList, name)
-  }
-  return(argList)
-}
-
 
 ################################################################
 # This is a helper function to ensure that the inputSchema has recieved all of the expected parameters
 ################################################################
+#' This is a helper function to check that the user has passed in all of the expected parameters.
 #' @param userInput - List of expected input parameters
 #' @param funcName - The function that is being published
 #' @return False if the input was not as expected/True if input matched expectation
@@ -242,6 +319,17 @@ paramCheck <- function(userInput, funcName) {
 # functionName is a string!!
 ################################################################
 # TODO: play around with argument order
+#' This function publishes code given a valid workspace ID and authentication token. The function expects the function name, service name, and 
+#' the input and output schemas from the user.
+#' The user can expect a list of the web service details, the default endpoint details and the consumption function and use this information to access
+#' the published function.
+#' @param functionName - The function that is being published
+#' @param serviceName - The name they would like the function published under
+#' @param inputSchema - List of expected input parameters
+#' @param outputSchema - List of expected output
+#' @param wkID - The workspace ID
+#' @param authToken - The primary authorization token
+#' @return List of webservice details, default endpoint details, and the consumption function
 publishWebService <- function(functionName, serviceName, inputSchema, outputSchema, wkID, authToken) {
 
   # Make sure input schema matches function signature
@@ -263,7 +351,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
         "InputSchema" = convert(inputSchema),
         "OutputSchema" = convert(inputSchema),
         "Language" = "r-3.1-64",
-        "SourceCode" = sprintf(wrapper, length(outputSchema), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName)))
+        "SourceCode" = sprintf(wrapper, length(outputSchema), paste(sprintf("\"%s\"", names(outputSchema)), collapse=","), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName)))
       )
     )
   }
@@ -275,9 +363,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
         "InputSchema" = convert(inputSchema),
         "OutputSchema" = convert(outputSchema),
         "Language" = "r-3.1-64",
-        "SourceCode" = sprintf(wrapper, length(outputSchema), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName))),
-        #        "SourceCode" = "inputDF <- maml.mapInputPort(1)\r\ninstall.packages(paste(\"src\", \"codetools.zip\", sep=\"/\"), lib = \".\", repos=NULL)\r\nlibrary(\"codetools\")\r\noutputDF <- data.frame(findGlobals(findGlobals))\r\nmaml.mapOutputPort(\"outputDF\")",
-        #        "SourceCode" = "inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(list.files(\"src\"))\r\nmaml.mapOutputPort(\"outputDF\")",
+        "SourceCode" = sprintf(wrapper, length(outputSchema), paste(sprintf("\"%s\"", names(outputSchema)), collapse=","), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName))),
         "ZipContents" = zipString[[2]]
       )
     )
@@ -308,10 +394,10 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 
   # Use discovery functions to get default endpoint for immediate use
   # switch to getEndpoints() later
-  defaultEP <- getEndpointsT(wkID, authToken, newService["Id"])
+  defaultEP <- getEndpoints(wkID, authToken, newService["Id"], testURL)
 
   # Curry relevant parameters to consumption function
-  consumption <- functional::Curry(consumeSingleRequest, "api_key"=defaultEP[[1]]["PrimaryKey"], "URL"=paste(defaultEP[[1]]["ApiLocation"],"/execute?api-version=2.0&details=true",sep=""), columnNames=as.list(names(inputSchema)))
+  consumption <- functional::Curry(consumeLists, "api_key"=defaultEP[[1]]["PrimaryKey"], "requestURL"=paste(defaultEP[[1]]["ApiLocation"],"/execute?api-version=2.0&details=true",sep=""), "columnNames"=as.list(names(inputSchema)))
 
   # currently returning list of webservice details, default endpoint details, consumption function, in that order
   return(list(newService, defaultEP, consumption))
