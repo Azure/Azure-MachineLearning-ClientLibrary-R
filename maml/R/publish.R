@@ -11,6 +11,7 @@ wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- data.frame(matrix(nco
 # Return the function as a string
 # Also consider paste(body(fun())) or getAnywhere()
 ################################################################
+#' This is a helper function that will convert a function to a string
 #' @param x - Name of the function to convert to a string
 #' @return function in string format
 getFunctionString <- function (x)
@@ -85,7 +86,11 @@ getFunctionString <- function (x)
 # Note: takes in a closure, not string
 # TODO: add error handling at each step
 ##################################################################################
-packDependencies <- function(funName) {
+#' This is a helper function to extract object and package dependencies
+# then pack them into a .zip, then a base64 string
+#' @param functionName - function to package dependencies from
+#' @return encoded zip - will return false if nothing was zipped
+packDependencies <- function(functionName) {
   # lists for storing objects and packages
   dependencies = list()
   packages = list()
@@ -96,7 +101,7 @@ packDependencies <- function(funName) {
   # NOTE: will not work if the user function specifies the names directly, e.g. won't find rjson::toJSON
   # from findGlobals man page: "R semantics only allow variables that might be local to be identified"
   # CONSIDER: how robust is this filtering? need to verify
-  for (obj in codetools::findGlobals(get(funName))) {
+  for (obj in codetools::findGlobals(get(functionName))) {
     name = get(obj)
 
     # filter out primitives and duplicates
@@ -192,8 +197,13 @@ packDependencies <- function(funName) {
 # Helper function to recursively gather dependencies from user defined-functions
 # Similar structure to packDependencies()
 ##################################################################################
-recurDep <- function(funName, dependencies, packages) {
-  for (obj in codetools::findGlobals(get(funName))) {
+#' This is helper function to recursively gather dependencies from user defined-functions
+#' @param functionName - Name of function to recursively gather dependencies from
+#' @param dependencies - List of package dependencies
+#' @param packages - Name of available packages
+#' @return list of packages and dependencies
+recurDep <- function(functionName, dependencies, packages) {
+  for (obj in codetools::findGlobals(get(functionName))) {
     name = get(obj)
     if (is.primitive(name) || (obj %in% names(dependencies))) {
       next
@@ -218,6 +228,10 @@ recurDep <- function(funName, dependencies, packages) {
 # recurPkg()
 # Helper function to recursively gather dependencies from user defined-functions
 ##################################################################################
+#' This is helper function to recursively gather dependencies from user defined-functions
+#' @param pkgName - Name of package to check for existence in list of packages
+#' @param packages - Name of available packages
+#' @return list of packages
 recurPkg <- function(pkgName, packages) {
   # if the package isn't already in the list
   if (!(pkgName %in% packages)) {
@@ -244,6 +258,7 @@ recurPkg <- function(pkgName, packages) {
 # CONVERT FORMAT
 # Helper function to convert expected schema to API-expecting format
 ################################################################
+#' This is a helper function to convert expected schema to API-expecting format
 #' @param argList - List of expected input parameters
 #' @return Converted inputSchema to the proper format
 convert <- function(argList) {
@@ -289,6 +304,7 @@ getArgNames <- function(x) {
 ################################################################
 # This is a helper function to ensure that the inputSchema has recieved all of the expected parameters
 ################################################################
+#' This is a helper function to check that the user has passed in all of the expected parameters.
 #' @param userInput - List of expected input parameters
 #' @param funcName - The function that is being published
 #' @return False if the input was not as expected/True if input matched expectation
@@ -314,6 +330,17 @@ paramCheck <- function(userInput, funcName) {
 # functionName is a string!!
 ################################################################
 # TODO: play around with argument order
+#' This function publishes code given a valid workspace ID and authentication token. The function expects the function name, service name, and 
+#' the input and output schemas from the user.
+#' The user can expect a list of the web service details, the default endpoint details and the consumption function and use this information to access
+#' the published function.
+#' @param functionName - The function that is being published
+#' @param serviceName - The name they would like the function published under
+#' @param inputSchema - List of expected input parameters
+#' @param outputSchema - List of expected output
+#' @param wkID - The workspace ID
+#' @param authToken - The primary authorization token
+#' @return List of webservice details, default endpoint details, and the consumption function
 publishWebService <- function(functionName, serviceName, inputSchema, outputSchema, wkID, authToken) {
 
   # Make sure input schema matches function signature
