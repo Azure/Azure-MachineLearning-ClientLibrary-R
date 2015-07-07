@@ -73,14 +73,24 @@ predictTitanic <- function (Pclass, Sex, Age, SibSp, Parch, Fare) {
 predictTitanic(1, "male", "20", "2", "0", "8.50")
 
 # Publish the function
-result <- publishWebService("predictTitanic", "TitanicDemo7-7", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), myID, myAuth)
+TitanicService <- publishWebService("predictTitanic", "TitanicDemo7-7", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), myID, myAuth)
 
 # Currently response is a list of three things: 
 #   new web service details, default endpoint details, specific consumption function
 # Rename the consumption function
-consumeTitanic <- result[[3]]
+consumeTitanic <- TitanicService[[3]]
 
-# Use the new function
-response <- consumeTitanic(list("1", "male", "20", "2", "0", "8.50"))
+# Use the new function, consumeList curried with the new web service details
+# Slow initially as it makes the connection, but subsequent calls are faster
+# as connection is left open
+response <- consumeTitanic(list("1", "male", "20", "1", "0", "8.50"), list("1", "female", "20", "1", "0", "8.50"))
 
-# Convert the response into values
+# formatting response
+responseMat <- matrix(fromJSON(response)$Results$output1$value$Values)
+colnames(responseMat) <- fromJSON(response)$Results$output1$value$ColumnNames
+
+responseDF <- data.frame(responseMat)
+
+# data frame consumption
+# creating test data.frame
+demoDF <- data.frame("Pclass"=c(1,2,3), "Sex"=c("male","female","male"), "Age"=c("8","20", "50"), "Parch"=c(1,2,3), "SibSp"=c(1,2,3), "Fare"=c(10,7.5, 6))

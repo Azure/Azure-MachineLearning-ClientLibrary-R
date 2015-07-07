@@ -97,7 +97,10 @@ consumeLists <- function(api_key, requestURL, columnNames, ..., globalParam="", 
   #store arguments as mega list of lists
   valuesList <- lapply(X=list(...), function(x) x)
   #make api call with components of payload
-  callAPI(api_key, requestURL, columnNames, valuesList,  globalParam, retryDelay)
+  result <- callAPI(api_key, requestURL, columnNames, valuesList,  globalParam, retryDelay)
+  resultDF <- data.frame(matrix(jsonlite::fromJSON(result)$Results$output1$value$Values))
+  colnames(resultDF) <- jsonlite::fromJSON(result)$Results$output1$value$ColumnNames
+  return(resultDF)
 }
 
 
@@ -146,7 +149,8 @@ consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam="", batc
     }
     counter = counter +1
   }
-  return(resultStored)}
+  return(resultStored)
+}
 
 
 #' This function is a helper that takes in an API key, values and column names to pass to the API and the request URL (OData Endpoint Address).
@@ -203,6 +207,7 @@ callAPI <- function(api_key, requestURL, columnNames, values,  globalParam, retr
       httpStatus = headers["status"]
       result = h$value()
       formatresult <- jsonlite::toJSON(jsonlite::fromJSON(result), pretty = TRUE)
+
     }
     #return if successful
     if(httpStatus == 200) {
