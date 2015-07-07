@@ -3,6 +3,8 @@ library("rjson")
 library("data.table")
 library("df2json")
 library("jsonlite")
+library(httr)
+
 
 #' This function takes in an API key, file name and the request URL (OData Endpoint Address).
 #' It calls a helper function that sends requests to the server to the server in the appropriate format.
@@ -169,7 +171,6 @@ callAPI <- function(api_key, requestURL, columnNames, values,  globalParam, retr
       options(RCurlOptions = list(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
       h = RCurl::basicTextGatherer()
       hdr = RCurl::basicHeaderGatherer()
-      
       req = list(
         Inputs = list(
           "input1" = list(
@@ -215,4 +216,21 @@ callAPI <- function(api_key, requestURL, columnNames, values,  globalParam, retr
     }
   }
   return(formatresult)
+}
+
+discoverSchema <- function(requestURL) {
+  # It's a self-signed cert, hence need to ignore host
+  httr::set_config(config(ssl_VERIFYHOST=FALSE,ssl_verifyPEER=FALSE), override=TRUE)
+  resp <- httr::GET(requestURL)
+  
+  # will parse automatically
+  swagger <- httr::content(resp)
+  
+  #condensed three steps into one line: Access JSON and then use rjson and json lite in order to structure it as a layered json object
+  inputschema = jsonlite::toJSON(jsonlite::fromJSON((rjson::toJSON(swagger$definitions$ExecutionInputs))), pretty = TRUE)
+  inputexample <- jsonlite::toJSON(jsonlite::fromJSON((rjson::toJSON(swagger$definitions$ExecutionRequest$example))), pretty = TRUE)
+  
+  # return both by putting them into a list
+  returnList = list(inputschema, inputexample)
+  return (returnList)
 }
