@@ -49,7 +49,6 @@ consumeFile <- function(api_key, requestURL, infileName, globalParam = "", outfi
     valuebatch[length(valuebatch) + 1] = values[i]
     if(counter == batchSize || i == (length(values))) {
       temp <- callAPI(api_key, requestURL, columnNames, valuebatch, globalParam, retryDelay)
-      print(temp)
       if(resultStored != "") {
         resultStored = paste(resultStored,temp,sep='\n')
       } else{
@@ -141,7 +140,11 @@ consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam="", batc
     valuebatch[length(valuebatch) + 1] = values[i]
     if(counter == batchSize || i == (length(values))) {
       temp <- callAPI(api_key, requestURL, columnNames, valuebatch, globalParam, retryDelay)
-      resultStored = paste(resultStored,temp,sep=', ')
+      if(resultStored != "") {
+        resultStored = paste(resultStored,temp,sep='\n')
+      } else{
+        resultStored = paste(resultStored,temp,sep='')
+      }
       print(sprintf("%i %s %i %s", i,"out of",length(values),"processed"))
       valuebatch = list()
       counter = 0
