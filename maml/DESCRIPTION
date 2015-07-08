@@ -10,4 +10,9 @@ LazyData: TRUE
 Imports:
   RCurl,
   RJSONIO,
-  rjson
+  uuid,
+  jsonlite,
+  codetools,
+  base64enc,
+  functional,
+  httr
