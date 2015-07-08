@@ -16,3 +16,4 @@ Imports:
   base64enc,
   functional,
   httr
+  data.table
