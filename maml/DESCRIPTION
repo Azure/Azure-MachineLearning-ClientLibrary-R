@@ -17,3 +17,5 @@ Imports:
   functional,
   httr
   data.table
+  df2json
+  
