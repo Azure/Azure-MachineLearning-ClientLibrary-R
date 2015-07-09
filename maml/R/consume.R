@@ -1,5 +1,5 @@
 library("RCurl")
-library("rjson")
+library("RJSONIO")
 library("data.table")
 library("df2json")
 library("jsonlite")
@@ -170,6 +170,10 @@ consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam="", batc
   }
   colnames(df) <- "Scored probabilities"
   return(df)
+  resultStored <- jsonlite::fromJSON(resultStored)
+  resultDF <- data.frame(matrix(resultStored$Results$output1$value$Values))
+  colnames(resultDF) <- resultStored$Results$output1$value$ColumnNames
+  return(resultDF)
 }
 
 
@@ -254,8 +258,8 @@ discoverSchema <- function(requestURL) {
   swagger <- httr::content(resp)
   
   #condensed three steps into one line: Access JSON and then use rjson and json lite in order to structure it as a layered json object
-  inputschema = jsonlite::toJSON(jsonlite::fromJSON((rjson::toJSON(swagger$definitions$ExecutionInputs))), pretty = TRUE)
-  inputexample <- jsonlite::toJSON(jsonlite::fromJSON((rjson::toJSON(swagger$definitions$ExecutionRequest$example))), pretty = TRUE)
+  inputschema = jsonlite::toJSON(jsonlite::fromJSON((RJSONIO::toJSON(swagger$definitions$ExecutionInputs))), pretty = TRUE)
+  inputexample <- jsonlite::toJSON(jsonlite::fromJSON((RJSONIO::toJSON(swagger$definitions$ExecutionRequest$example))), pretty = TRUE)
   
   # return both by putting them into a list
   returnList = list(inputschema, inputexample)

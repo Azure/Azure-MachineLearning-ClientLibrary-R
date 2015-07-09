@@ -34,7 +34,7 @@ getFramework <- function(tUrl, authToken) {
   )
 
   # Print results
-  return(rjson::fromJSON(h$value()))
+  return(RJSONIO::fromJSON(h$value()))
 }
 
 
