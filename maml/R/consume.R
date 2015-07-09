@@ -149,12 +149,13 @@ consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam="", batc
       valuebatch = list()
       counter = 0
     }
-    counter = counter +1
+    counter = counter + 1
   }
   resultStored <- jsonlite::fromJSON(resultStored)
   resultDF <- data.frame(matrix(resultStored$Results$output1$value$Values))
   colnames(resultDF) <- resultStored$Results$output1$value$ColumnNames
   return(resultDF)
+  #return(resultStored)
 }
 
 

@@ -1,3 +1,7 @@
+dataframe <- read.csv("forestfires.csv")
+testConsumeDF <- consumeDataframe("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true",dataframe)
+
+
 testing <- publishWebService("add", "e2eTest2", list("icol1"="int"), list("ocol1"="int"), wsID, auth)
 endpoint <- getEndpointsT(wsID, auth, testing["Id"])
 consumeSingleRequest(endpoint[[1]]["PrimaryKey"], paste(endpoint[[1]]["ApiLocation"],"/execute?api-version=2.0&details=true",sep=""), list("icol1"), list(1))
