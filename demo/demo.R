@@ -3,9 +3,16 @@
 #####################################################################################################
 
 # IMPORTANT: need to compile all of consume, discover, publish functions before running this demo
-setwd("C://Users/t-ritra/Documents/GitHub/Azure-MachineLearning-ClientLibrary-R/demo")
+setwd("C://Users/t-ritra/Github/Documents/Azure-MachineLearning-ClientLibrary-R/demo")
+setwd("C://Users/t-alewa/Documents/Azure-MachineLearning-ClientLibrary-R/demo")
+
+# test server
 myID = "bbc91d900c3546b695d6507867fc72ae"
 myAuth = "ffc4b8d52c494e9eb42726b77112be88"
+
+# internal server
+myID = "3612640f27234eb7b2b91ac62e8b4a40"
+myAuth = "abcbe14a958a40978f93aa0e0e71f5be"
 test <- read.csv(file="test.csv")
 train <- read.csv(file="train.csv")
 
@@ -74,27 +81,34 @@ predictTitanic(1, "male", "20", "2", "0", "8.50")
 
 
 
-
-
 # Publish the function
-TitanicService <- publishWebService("predictTitanic", "TitanicDemo7-8", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), myID, myAuth)
-TitanicService <- publishWebService("predictTitanic", "TitanicDemo7-9", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), myID, myAuth)
-
-# Currently response is a list of three things: 
-#   new web service details, default endpoint details, specific consumption function
-# Rename the consumption function
-consumeTitanic <- TitanicService[[3]]
+# Go to https://metaanalytics001.cloudapp.net/Home/ViewWorkspace/bbc91d900c3546b695d6507867fc72ae?#Workspace/WebServiceGroups/listWebServiceGroups
+# to see published function
+TitanicService <- publishWebService("predictTitanic", "TitanicDemo7-10", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="double"), list("survProb"="double"), myID, myAuth)
+# Currently response is a list of two things: 
+#   new web service details, default endpoint details (using discovery functions)
 
 
 
+# Discover the endpoints
+# Go to help page
+endpoints <- getEndpoints(myID, myAuth, TitanicService[[1]]["Id"], internalURL)
+# Alternatively,
+endpoints <- TitanicService[[2]]
 
-# Use the new function, consumeList curried with the new web service details
-# Slow initially as it makes the connection, but subsequent calls are faster
-# as connection is left open
-response <- consumeTitanic(list("1", "male", "20", "1", "0", "8.50"), list("1", "female", "20", "1", "0", "8.50"))
 
-# data frame consumption
+
+# Consume the new webservice
+# First, consume with inputs as a list
+# Slow initially as it makes the connection
+response <- consumeLists(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("1", "male", "20", "1", "0", "8.50"), list("1", "female", "20", "1", "0", "8.50"))
+# Subsequent calls are faster as connection is left open
+response2 <- consumeLists(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("2", "male", "50", "1", "0", "8.50"), list("2", "female", "50", "1", "0", "8.50"))
+
+# consume with inputs as dataframe
 # creating test data.frame
-demoDF <- data.frame("Pclass"=c(1,2,3), "Sex"=c("male","female","male"), "Age"=c("8","20", "50"), "Parch"=c(1,2,3), "SibSp"=c(1,2,3), "Fare"=c(10,7.5, 6))
+demoDF <- data.frame("Pclass"=c(1,2,3), "Sex"=c("male","female","male"), "Age"=c("8","20", "50"), "Parch"=c(1,2,3), "SibSp"=c(1,1,1), "Fare"=c(10,7.5, 6))
 responseDF <- consumeDataframe(TitanicService[[2]][[1]]$PrimaryKey, paste(TitanicService[[2]][[1]]$ApiLocation,"/execute?api-version=2.0&details=true",sep=""), demoDF)
-responseDF <- consumeDataframe(TitanicService[[2]][[1]]$PrimaryKey, paste(TitanicService[[2]][[1]]$ApiLocation,"/execute?api-version=2.0&details=true",sep=""), demoDF)
+
+
+# Questions, comments, concerns?

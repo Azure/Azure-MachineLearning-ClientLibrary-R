@@ -8,6 +8,7 @@ epURLdet = "https://management-tm.azureml.net/workspaces/%s/webservices/%s/endpo
 
 # remove in real version
 testURL = "https://hiteshsm.cloudapp.net/workspaces/%s/webservices/%s/endpoints"
+internalURL = "https://management.azureml-int.net/workspaces/%s/webservices/%s/endpoints"
 
 #############################################################
 # Framework for making an HTTP request to the URL specified
