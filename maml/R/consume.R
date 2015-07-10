@@ -153,27 +153,19 @@ consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam="", batc
       resultStored <- jsonlite::fromJSON(temp)
       resultList = resultStored$Results$output1$value$Values
       resultDF <- data.frame(resultList[,(ncol(resultList))])
-      print(resultDF)
-      print(is.data.frame(resultDF))
       if(length(df) != 0 && length(resultDF) != 0) {
         names(df) <- names(resultDF)
       }
       df <- rbind(df,resultDF)
-      colnames(df) <- "Scored probabilities"      
-      
-      print("passed")
+      colnames(df) <- resultStored$Results$output1$value$ColumnNames      
       print(sprintf("%i %s %i %s", i,"out of",length(values),"processed"))
       valuebatch = list()
       counter = 0
     }
     counter = counter + 1
   }
-  colnames(df) <- "Scored probabilities"
   return(df)
-  resultStored <- jsonlite::fromJSON(resultStored)
-  resultDF <- data.frame(matrix(resultStored$Results$output1$value$Values))
-  colnames(resultDF) <- resultStored$Results$output1$value$ColumnNames
-  return(resultDF)
+
 }
 
 
