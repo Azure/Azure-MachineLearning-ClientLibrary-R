@@ -3,8 +3,8 @@
 #####################################################################################################
 
 # IMPORTANT: need to compile all of consume, discover, publish functions before running this demo
-setwd("C://Users/t-ritra/Github/Documents/Azure-MachineLearning-ClientLibrary-R/demo")
 setwd("C://Users/t-alewa/Documents/Azure-MachineLearning-ClientLibrary-R/demo")
+setwd("C://Users/t-ritra/Github/Documents/Azure-MachineLearning-ClientLibrary-R/demo")
 
 # test server
 myID = "bbc91d900c3546b695d6507867fc72ae"
@@ -13,6 +13,8 @@ myAuth = "ffc4b8d52c494e9eb42726b77112be88"
 # internal server
 myID = "3612640f27234eb7b2b91ac62e8b4a40"
 myAuth = "abcbe14a958a40978f93aa0e0e71f5be"
+
+# 
 test <- read.csv(file="test.csv")
 train <- read.csv(file="train.csv")
 
