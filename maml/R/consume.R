@@ -18,7 +18,7 @@ library("httr")
 #' @param retryDelay the time in seconds to delay before retrying in case of a server error, default value of 0.3 seconds
 #' @return results in a list of lists, with the scored probability at the end of each list
 
-consumeFile <- function(api_key, requestURL, infileName, globalParam = "", outfileName = "results.txt", batchSize = 250, retryDelay = 0.3) {
+consumeFile <- function(api_key, requestURL, infileName, globalParam = "", outfileName = "results.csv", batchSize = 250, retryDelay = 0.3) {
   if (missing(api_key)) {
     stop("Need to specify API key")
   }
@@ -36,32 +36,40 @@ consumeFile <- function(api_key, requestURL, infileName, globalParam = "", outfi
   colnames(matrixdf) <- NULL
   matrixdf <- lapply(seq_len(nrow(matrixdf)), function(row) matrixdf[row,])
   values = matrixdf
-  resultStored = ""
+  df <- data.frame(stringsAsFactors=FALSE)
   valuebatch = list()
   counter = 1
-  fileConn <-file(outfileName,"w")
-  
+
   #process batch by batch and make api calls and store responses
   for(i in 1:(length(values))) {
     valuebatch[length(valuebatch) + 1] = values[i]
     if(counter == batchSize || i == (length(values))) {
       temp <- callAPI(api_key, requestURL, columnNames, valuebatch, globalParam, retryDelay)
-      if(resultStored != "") {
-        resultStored = paste(resultStored,temp,sep='\n')
-      } else{
-        resultStored = paste(resultStored,temp,sep='')
+      resultStored <- jsonlite::fromJSON(temp)
+      resultList = resultStored$Results$output1$value$Values
+      resultDF <- data.frame(resultList[,(ncol(resultList))])
+      print(resultDF)
+      print(is.data.frame(resultDF))
+      if(length(df) != 0 && length(resultDF) != 0) {
+        names(df) <- names(resultDF)
       }
+      df <- rbind(df,resultDF)
+      colnames(df) <- "Scored probabilities"      
       
-      #write to results file
-      write(temp, fileConn,append = TRUE)
+      print("passed")
       print(sprintf("%i %s %i %s", i,"out of",length(values),"processed"))
       valuebatch = list()
       counter = 0
     }
-    counter = counter +1
+    counter = counter + 1
   }
+  
+  
+  fileConn <-file(outfileName,"w")
+  write.csv(df, fileConn)
   close(fileConn)
-  return(resultStored)
+  colnames(df) <- "Scored probabilities"
+  return (df)
 }
 
 
@@ -96,8 +104,10 @@ consumeLists <- function(api_key, requestURL, columnNames, ..., globalParam="", 
   valuesList <- lapply(X=list(...), function(x) x)
   #make api call with components of payload
   result <- callAPI(api_key, requestURL, columnNames, valuesList,  globalParam, retryDelay)
-  resultDF <- data.frame(matrix(jsonlite::fromJSON(result)$Results$output1$value$Values))
-  colnames(resultDF) <- jsonlite::fromJSON(result)$Results$output1$value$ColumnNames
+  resultStored <- jsonlite::fromJSON(result)
+  resultList = resultStored$Results$output1$value$Values
+  resultDF <- data.frame(resultList[,(ncol(resultList))])
+  colnames(resultDF) <- "Scored probabilities"
   return(resultDF)
 }
 
@@ -131,7 +141,7 @@ consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam="", batc
   colnames(matrixdf) <- NULL
   matrixdf <- lapply(seq_len(nrow(matrixdf)), function(row) matrixdf[row,])
   values = matrixdf
-  resultStored = ""
+  df <- data.frame(stringsAsFactors=FALSE)
   valuebatch = list()
   counter = 1
   
@@ -140,17 +150,26 @@ consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam="", batc
     valuebatch[length(valuebatch) + 1] = values[i]
     if(counter == batchSize || i == (length(values))) {
       temp <- callAPI(api_key, requestURL, columnNames, valuebatch, globalParam, retryDelay)
-      if(resultStored != "") {
-        resultStored = paste(resultStored,temp,sep='\n')
-      } else{
-        resultStored = paste(resultStored,temp,sep='')
+      resultStored <- jsonlite::fromJSON(temp)
+      resultList = resultStored$Results$output1$value$Values
+      resultDF <- data.frame(resultList[,(ncol(resultList))])
+      print(resultDF)
+      print(is.data.frame(resultDF))
+      if(length(df) != 0 && length(resultDF) != 0) {
+        names(df) <- names(resultDF)
       }
+      df <- rbind(df,resultDF)
+      colnames(df) <- "Scored probabilities"      
+      
+      print("passed")
       print(sprintf("%i %s %i %s", i,"out of",length(values),"processed"))
       valuebatch = list()
       counter = 0
     }
-    counter = counter +1
+    counter = counter + 1
   }
+  colnames(df) <- "Scored probabilities"
+  return(df)
   resultStored <- jsonlite::fromJSON(resultStored)
   resultDF <- data.frame(matrix(resultStored$Results$output1$value$Values))
   colnames(resultDF) <- resultStored$Results$output1$value$ColumnNames
@@ -210,7 +229,8 @@ callAPI <- function(api_key, requestURL, columnNames, values,  globalParam, retr
       headers = hdr$value()
       httpStatus = headers["status"]
       result = h$value()
-      formatresult <- jsonlite::toJSON(jsonlite::fromJSON(result), pretty = TRUE)
+      formatresult = result
+#      formatresult <- jsonlite::toJSON(jsonlite::fromJSON(result), pretty = TRUE)
 
     }
     #return if successful
