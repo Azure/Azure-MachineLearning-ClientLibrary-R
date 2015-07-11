@@ -4,15 +4,15 @@
 
 # IMPORTANT: need to compile all of consume, discover, publish functions before running this demo
 setwd("C://Users/t-alewa/Documents/Azure-MachineLearning-ClientLibrary-R/demo")
-setwd("C://Users/t-ritra/Github/Documents/Azure-MachineLearning-ClientLibrary-R/demo")
+#setwd("C://Users/t-ritra/Github/Documents/Azure-MachineLearning-ClientLibrary-R/demo")
 
 # test server
-myID = "bbc91d900c3546b695d6507867fc72ae"
-myAuth = "ffc4b8d52c494e9eb42726b77112be88"
+wsID = "bbc91d900c3546b695d6507867fc72ae"
+wsAuth = "ffc4b8d52c494e9eb42726b77112be88"
 
 # internal server
-myID = "3612640f27234eb7b2b91ac62e8b4a40"
-myAuth = "abcbe14a958a40978f93aa0e0e71f5be"
+wsID = "3612640f27234eb7b2b91ac62e8b4a40"
+wsAuth = "abcbe14a958a40978f93aa0e0e71f5be"
 
 # 
 test <- read.csv(file="test.csv")
@@ -73,6 +73,9 @@ head(pr)
 head(tr)
 summary(GBM.model)
 
+pr = round(pr)
+tr = round(tr)
+
 # create a function to make predictions using the trained model
 predictTitanic <- function (Pclass, Sex, Age, SibSp, Parch, Fare) {
   return(predict.gbm(object=GBM.model, newdata=data.frame("Pclass"=Pclass, "Sex"=Sex, "Age"=Age, "SibSp"=SibSp, "Parch"=Parch, "Fare"=Fare), 2000))
@@ -86,7 +89,7 @@ predictTitanic(1, "male", "20", "2", "0", "8.50")
 # Publish the function
 # Go to https://metaanalytics001.cloudapp.net/Home/ViewWorkspace/bbc91d900c3546b695d6507867fc72ae?#Workspace/WebServiceGroups/listWebServiceGroups
 # to see published function
-TitanicService <- publishWebService("predictTitanic", "TitanicDemo7-10", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="double"), list("survProb"="double"), myID, myAuth)
+TitanicService <- publishWebService("predictTitanic", "TitanicDemo7-10", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="double"), list("survProb"="double"), wsID, wsAuth)
 # Currently response is a list of two things: 
 #   new web service details, default endpoint details (using discovery functions)
 
@@ -94,7 +97,7 @@ TitanicService <- publishWebService("predictTitanic", "TitanicDemo7-10", list("P
 
 # Discover the endpoints
 # Go to help page
-endpoints <- getEndpoints(myID, myAuth, TitanicService[[1]]["Id"], internalURL)
+endpoints <- getEndpoints(wsID, wsAuth, TitanicService[[1]]["Id"], internalURL)
 # Alternatively,
 endpoints <- TitanicService[[2]]
 
@@ -112,5 +115,3 @@ response2 <- consumeLists(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["Ap
 demoDF <- data.frame("Pclass"=c(1,2,3), "Sex"=c("male","female","male"), "Age"=c("8","20", "50"), "Parch"=c(1,2,3), "SibSp"=c(1,1,1), "Fare"=c(10,7.5, 6))
 responseDF <- consumeDataframe(TitanicService[[2]][[1]]$PrimaryKey, paste(TitanicService[[2]][[1]]$ApiLocation,"/execute?api-version=2.0&details=true",sep=""), demoDF)
 
-
-# Questions, comments, concerns?
