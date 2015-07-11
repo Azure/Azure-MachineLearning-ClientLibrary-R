@@ -17,11 +17,12 @@ wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- matrix(ncol = %s, nro
 
 #Testing consumption functions
 
-testconsumeSingle <- consumeLists("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true",list( "X","Y","month","day","FFMC","DMC","DC","ISI","temp","RH","wind","rain","area"),list("0","0","jan","mon","0","0","0","0","0","0","0","0","0"))
-testConsumeFile <- consumeFile("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true","forestfires.csv")
-testConsumeDF <- consumeDataframe("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true",dataframe)
-discoverSchema("https://requestresponse001.cloudapp.net:443/workspaces/7e8f135f31274b7eac419bd056875c03/services/a5b003e52c924d16a2e38ade45dd0154/swagger.json?api-version=2.0")
-##################################################################################
+testconsumeSingleDT <- consumeDataTable("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true",list( "X","Y","month","day","FFMC","DMC","DC","ISI","temp","RH","wind","rain","area"),list("0","0","jan","mon","0","0","0","0","0","0","0","0","0"))
+testConsumeFile <- consumeFile("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true&format=swagger","forestfires.csv")
+testConsumeDF <- consumeDataframe("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true&format=swagger",dataframe)
+testDiscoverSchema <- discoverSchema("7e8f135f31274b7eac419bd056875c03", "a5b003e52c924d16a2e38ade45dd0154")
+testconsumeSingle <- consumeLists("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true&format=swagger",list( "X" = 0,"Y" = 0,"month" = "jan","day" = "mon","FFMC" = 0,"DMC" = 0,"DC" = 0,"ISI" = 0,"temp" = 0,"RH" = 0,"wind"=0,"rain" = 0,"area" = 0))
+
 
 ##################################################################################
 # WRAPPER TESTING

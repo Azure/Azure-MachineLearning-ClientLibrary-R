@@ -6,6 +6,7 @@
 setwd("C://Users/t-alewa/Documents/Azure-MachineLearning-ClientLibrary-R/demo")
 #setwd("C://Users/t-ritra/Github/Documents/Azure-MachineLearning-ClientLibrary-R/demo")
 
+
 # test server
 wsID = "bbc91d900c3546b695d6507867fc72ae"
 wsAuth = "ffc4b8d52c494e9eb42726b77112be88"
