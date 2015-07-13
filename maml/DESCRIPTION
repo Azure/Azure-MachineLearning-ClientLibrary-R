@@ -15,7 +15,7 @@ Imports:
   codetools,
   base64enc,
   functional,
-  httr
-  data.table
-  df2json
+  httr,
+  data.table,
+  df2json,
   gbm
