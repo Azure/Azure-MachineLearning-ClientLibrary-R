@@ -107,9 +107,9 @@ endpoints <- TitanicService[[2]]
 # Consume the new webservice
 # First, consume with inputs as a list
 # Slow initially as it makes the connection
-response <- consumeLists(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("1", "male", "20", "1", "0", "8.50"), list("1", "female", "20", "1", "0", "8.50"))
+response <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("1", "male", "20", "1", "0", "8.50"), list("1", "female", "20", "1", "0", "8.50"))
 # Subsequent calls are faster as connection is left open
-response2 <- consumeLists(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("2", "male", "50", "1", "0", "8.50"), list("2", "female", "50", "1", "0", "8.50"))
+response2 <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("2", "male", "50", "1", "0", "8.50"), list("2", "female", "50", "1", "0", "8.50"))
 
 # consume with inputs as dataframe
 # creating test data.frame
