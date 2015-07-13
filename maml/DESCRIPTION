@@ -1,11 +1,13 @@
 Package: maml
 Type: Package
-Title: Publishes trained models to Microsoft Azure to make accessible as a web service
+Title: Publishes, discovers and consumes trained models to Microsoft Azure to make accessible as a web service
 Version: 0.1
 Date: 2015-05-29
-Author@R: person("John", "Doe", email = "t-alewa@microsoft.com", role = c("aut", "cre"))
-Description: Provides an interface with Microsoft Azure to easily publish models as a web service, will return URL or sample code to access newly created web service's API
-License: What license is it under?
+Author@R: person("Alex", "Wang", email = "t-alewa@microsoft.com", role = c("aut", "cre"))
+Author@R: person("Brianna", "Gerads", email = "t-brger@microsoft.com", role = c("aut", "cre"))
+Author@R: person("Ritika", "Ravichandra", email = "t-ritra@microsoft.com", role = c("aut", "cre"))
+Description: Provides an interface with Microsoft Azure to easily publish, consume and discover models as a web service, will return URL or sample code to access newly created web service's API
+License: Microsoft
 LazyData: TRUE
 Imports:
   RCurl,
