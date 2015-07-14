@@ -374,8 +374,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
   # convert the payload to JSON as expected by API
   # TODO: consolidate json packages, i.e. use only one if possible
   body = RJSONIO::toJSON(req)
-  print(body)
-  
+
   # Response gatherer
   h = RCurl::basicTextGatherer()
   h$reset()
