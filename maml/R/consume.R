@@ -168,36 +168,46 @@ consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam=setNames
   if (missing(valuesDF)) {
     stop("Need to specify dataframe to be scored")
   }
-  
+  #format as matrix and parse column by column
+  columnNames = colnames(valuesDF)
+  matrixdf <- as.matrix(valuesDF)
+  rownames(matrixdf) <- NULL
+  colnames(matrixdf) <- NULL
+  matrixdf <- lapply(seq_len(nrow(matrixdf)), function(row) matrixdf[row,])
+  values = matrixdf
   df <- data.frame(stringsAsFactors=FALSE)
-  valuebatch = data.frame(stringsAsFactors=FALSE)
+  valuebatch = list()
   counter = 1
-  lastproc = 0
   
   #process in batches and make API calls in batches
-  for(i in 1:(nrow(valuesDF))) {
-    if(counter == batchSize || i == (nrow(valuesDF))) {
-      resultDF = data.frame(stringsAsFactors=FALSE)
-      valuebatch = valuesDF[(lastproc+1):i,]
-      keyvalues = rjson::fromJSON((df2json::df2json(valuebatch)))
-      temp <- callAPI(api_key, requestURL, keyvalues, globalParam, retryDelay)
-      lastproc = i
+  for(i in 1:(length(values))) {
+    valuebatch[length(valuebatch) + 1] = values[i]
+    if(counter == batchSize || i == (length(values))) {
+      temp <- callDTAPI(api_key, requestURL, columnNames, valuebatch, globalParam, retryDelay)
       resultStored <- jsonlite::fromJSON(temp)
-      resultList = resultStored$Results$output1
+      resultList = resultStored$Results$output1$value$Values
       resultDF <- data.frame(resultList[,(ncol(resultList))])
+      print(resultDF)
+      print(is.data.frame(resultDF))
       if(length(df) != 0 && length(resultDF) != 0) {
         names(df) <- names(resultDF)
       }
       df <- rbind(df,resultDF)
+      colnames(df) <- "Scored probabilities"      
       
-      print(sprintf("%i %s %i %s", i,"out of",nrow(valuesDF),"processed"))
-      valuebatch = data.frame(stringsAsFactors=FALSE)
+      print("passed")
+      print(sprintf("%i %s %i %s", i,"out of",length(values),"processed"))
+      valuebatch = list()
       counter = 0
     }
     counter = counter + 1
   }
   colnames(df) <- "Scored probabilities"
   return(df)
+#   resultStored <- jsonlite::fromJSON(resultStored)
+#   resultDF <- data.frame(matrix(resultStored$Results$output1$value$Values))
+#   colnames(resultDF) <- resultStored$Results$output1$value$ColumnNames
+#   return(resultDF)
 }
 
 
