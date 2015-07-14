@@ -113,6 +113,6 @@ response2 <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]
 
 # consume with inputs as dataframe
 # creating test data.frame
-demoDF <- data.frame("Pclass"=c(1,2,3), "Sex"=c("male","female","male"), "Age"=c("8","20", "50"), "Parch"=c(1,2,3), "SibSp"=c(1,1,1), "Fare"=c(10,7.5, 6))
+demoDF <- data.frame("Pclass"=c(1,2,1), "Sex"=c("male","female","male"), "Age"=c("8","20", "30"), "Parch"=c(1,1,1), "SibSp"=c(1,3,1), "Fare"=c(10,7.5, 9))
 responseDF <- consumeDataframe(TitanicService[[2]][[1]]$PrimaryKey, paste(TitanicService[[2]][[1]]$ApiLocation,"/execute?api-version=2.0&details=true",sep=""), demoDF)
 
