@@ -90,7 +90,7 @@ predictTitanic(1, "male", "20", "2", "0", "8.50")
 # Publish the function
 # Go to https://metaanalytics001.cloudapp.net/Home/ViewWorkspace/bbc91d900c3546b695d6507867fc72ae?#Workspace/WebServiceGroups/listWebServiceGroups
 # to see published function
-TitanicService <- publishWebService("predictTitanic", "TitanicDemo7-10", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="double"), list("survProb"="double"), wsID, wsAuth)
+TitanicService <- publishWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
 # Currently response is a list of two things: 
 #   new web service details, default endpoint details (using discovery functions)
 
@@ -107,9 +107,12 @@ endpoints <- TitanicService[[2]]
 # Consume the new webservice
 # First, consume with inputs as a list
 # Slow initially as it makes the connection
-response <- consumeLists(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("1", "male", "20", "1", "0", "8.50"), list("1", "female", "20", "1", "0", "8.50"))
+response <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("1", "male", "20", "1", "0", "8.50"), list("1", "female", "20", "1", "0", "8.50"))
 # Subsequent calls are faster as connection is left open
-response2 <- consumeLists(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("2", "male", "50", "1", "0", "8.50"), list("2", "female", "50", "1", "0", "8.50"))
+response2 <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("2", "male", "50", "1", "0", "8.50"), list("2", "female", "50", "1", "0", "8.50"))
+response3 <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list(1, "male", "20", "2", "0", 8.50))
+
+
 
 # consume with inputs as dataframe
 # creating test data.frame

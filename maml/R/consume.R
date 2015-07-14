@@ -98,11 +98,15 @@ consumeDataTable <- function(api_key, requestURL, columnNames, ..., globalParam=
   #store arguments as mega list of lists
   valuesList <- lapply(X=list(...), function(x) x)
   #make api call with components of payload
-  result <- callDTAPI(api_key, requestURL, columnNames, valuesList,  globalParam, retryDelay)
-  resultStored <- jsonlite::fromJSON(result)
-  resultList = resultStored$Results$output1$value$Values
-  resultDF <- data.frame(resultList[,(ncol(resultList))])
-  colnames(resultDF) = "Scored probabilities"
+  results <- callDTAPI(api_key, requestURL, columnNames, valuesList,  globalParam, retryDelay)
+  results <- jsonlite::fromJSON(results)
+
+  resultValues = results$Results$output1$value$Values
+  # Previous lines were commented out, would not return correctly if there were multiple return values
+  #resultDF <- data.frame(resultList[,(ncol(resultList))])
+  #colnames(resultDF) = "Scored probabilities"
+  resultDF <- data.frame(resultValues$Values)
+  colnames(resultDF) <- resultValues$ColumnNames
   return(resultDF)
 }
 
@@ -112,7 +116,7 @@ consumeDataTable <- function(api_key, requestURL, columnNames, ..., globalParam=
 #' @param api key must be entered as the first parameter, and must be a string
 #' @param requestURL must be entered as the third parameter, and must be a string
 #' @param columnNames entered as a list
-#' @param ... each parameter must be a request in the format of a list that contains a row of values corresponsing to the column names provided
+#' @param ... each parameter must be a request in the format of a list that contains a row of values corresponding to the column names provided
 #' @param globalParam global parameters entered as a string, default value is ""
 #' @param retryDelay the time in seconds to delay before retrying in case of a server error, default value of 0.3 seconds
 #' @return results in a list of lists, with the scored probability at the end of each list
@@ -268,7 +272,6 @@ callDTAPI <- function(api_key, requestURL, columnNames, values,  globalParam, re
   }
   return(formatresult)
 }
-
 #' This function is a helper that takes in an API key, values in the key value format and column names to pass to the API and the request URL (OData Endpoint Address).
 #' It then obtains a response from Azure Machine Learning Studio and returns a response to the consumeFile function.
 
@@ -299,6 +302,7 @@ callAPI <- function(api_key, requestURL, keyvalues,  globalParam, retryDelay) {
         ,GlobalParameters = globalParam
       )
       body = enc2utf8((rjson::toJSON(req)))
+      print(body)
       
       #make call to API after constructing request payload
       
@@ -336,6 +340,7 @@ callAPI <- function(api_key, requestURL, keyvalues,  globalParam, retryDelay) {
   }
   return(formatresult)
 }
+
 
 
 discoverSchema <- function(wkID, token, schemes = "https", host = "requestresponse001.cloudapp.net:443", api_version = "2.0") {

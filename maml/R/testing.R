@@ -79,3 +79,15 @@ add2 <- function(x) {
   print(toJSON(list("test")))
   return(x+a[[1]])
 }
+
+testService <- publishWebService("add", "addTest", list("out"="float"), list("in"="float"), wsID, wsAuth)
+testEndpoints <- testService[[2]]
+response <- consumeDataTable(testEndpoints[[1]]["PrimaryKey"], paste(testEndpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("out"), list("1"), list("2"), list("3"))
+
+testModel <- function(Pclass, Sex, Age, SibSp, Parch, Fare) {
+  class(GBM.model)
+  return(list(Pclass, Sex, Age, SibSp, Parch, Fare))
+}
+TitanicTest <- publishWebService("testModel", "TestingModel7-13", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), wsID, wsAuth)
+testEndpoints <- TitanicTest[[2]]
+response3 <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list(1, "male", "20", "2", "0", 8.50))
