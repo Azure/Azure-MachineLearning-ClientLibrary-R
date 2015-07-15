@@ -3,7 +3,7 @@
 #####################################################################################################
 
 # IMPORTANT: need to compile all of consume, discover, publish functions before running this demo
-setwd("C://Users/t-alewa/Documents/Azure-MachineLearning-ClientLibrary-R/demo")
+#setwd("C://Users/t-alewa/Documents/Azure-MachineLearning-ClientLibrary-R/demo")
 #setwd("C://Users/t-ritra/Github/Documents/Azure-MachineLearning-ClientLibrary-R/demo")
 
 
@@ -83,7 +83,7 @@ predictTitanic <- function (Pclass, Sex, Age, SibSp, Parch, Fare) {
 }
 
 # Sample local call
-predictTitanic(1, "male", "20", "2", "0", "8.50")
+predictTitanic(1, "male", 20, 2, 0, 8.50)
 
 
 
@@ -107,7 +107,7 @@ endpoints <- TitanicService[[2]]
 # Consume the new webservice
 # First, consume with inputs as a list
 # Slow initially as it makes the connection
-response <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("1", "male", "20", "1", "0", "8.50"), list("1", "female", "20", "1", "0", "8.50"))
+response <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("1", "male", "20", "2", "0", "8.50"), list("1", "female", "20", "1", "0", "8.50"))
 # Subsequent calls are faster as connection is left open
 response2 <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("2", "male", "50", "1", "0", "8.50"), list("2", "female", "50", "1", "0", "8.50"))
 
