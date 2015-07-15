@@ -69,7 +69,7 @@ for(i in 1:n.models){
   tr = tr+tr1
 }
 pr = pr/n.models
-tr = tr/n.models
+tr = tr/n.modelsti
 head(pr)
 head(tr)
 summary(GBM.model)
