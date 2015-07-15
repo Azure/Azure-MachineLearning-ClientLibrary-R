@@ -1,1 +1,12 @@
 exportPattern("^[[:alpha:]]+")
+import(RCurl,
+  RJSONIO,
+  uuid,
+  jsonlite,
+  codetools,
+  base64enc,
+  functional,
+  httr,
+  data.table,
+  df2json,
+  gbm)
