@@ -25,7 +25,7 @@ testConsumeFile <- consumeFile("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/
 #testConsumeDF <- consumeDataframe("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true&format=swagger",dataframe)
 testConsumeDF <- consumeDataframe("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==",testDiscoverSchema[["requestUrl"]],dataframe)
 #testconsumeSingle <- consumeLists("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true&format=swagger",list( "X" = 0,"Y" = 0,"month" = "jan","day" = "mon","FFMC" = 0,"DMC" = 0,"DC" = 0,"ISI" = 0,"temp" = 0,"RH" = 0,"wind"=0,"rain" = 0,"area" = 0))
-testconsumeSingle <- consumeLists("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==",testDiscoverSchema[["requestUrl"]],list( "X" = 0,"Y" = 0,"month" = "jan","day" = "mon","FFMC" = 0,"DMC" = 0,"DC" = 0,"ISI" = 0,"temp" = 0,"RH" = 0,"wind"=0,"rain" = 0,"area" = 0))
+testconsumeSingle <- consumeLists("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==",testDiscoverSchema[["requestUrl"]],testDiscoverSchema[["sampleInput"]])
 
 ##################################################################################
 # WRAPPER TESTING
