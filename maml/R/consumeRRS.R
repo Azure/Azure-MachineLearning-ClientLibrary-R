@@ -5,7 +5,6 @@ library("df2json")
 library("jsonlite")
 library("httr")
 
-#change scored probabilities part
 
 ################################################################################################################################
 #' This function discovers using the workspace ID and web service ID, information specific to the consumption functions
@@ -29,10 +28,18 @@ discoverSchema <- function(workspaceId, webserviceID, scheme = "https", host = "
   
   # Accesses the input schema in the swagger document
   inputSchema = swagger$definitions$ExecutionInputs$properties
+  
   #Accesses the example in the swagger document and converts it to JSON 
   exampleJson <- rjson::toJSON(swagger$definitions$ExecutionRequest$example)
+  
   #Accesses a single specific JSON object and formats it to be a request inputted as a list in R
   inputExample = as.list((jsonlite::fromJSON((exampleJson)))$Inputs$input1)
+  
+  for(i in 1:length(inputExample)) {
+    if(typeof(inputExample[[i]]) == "character") {
+      inputExample[i] = "Please input valid String"
+    }
+  }
   #Accesses the names of the columns in the example and stores it in a list of column names
   columnNames = list()
   for(i in 1:length(inputExample)) {
@@ -46,6 +53,7 @@ discoverSchema <- function(workspaceId, webserviceID, scheme = "https", host = "
     pathNo = pathNo + 1
     for(operationpath in execPath) {
       for(operation in operationpath) {
+        #Goes through the characteristcs in every operation e.g. operationId
         for(charac in operation) {
           # Finds the path in which the operationId (characteristic of the path) = execute and sets the execution path number
           if(charac[1] == "execute")
@@ -61,12 +69,15 @@ discoverSchema <- function(workspaceId, webserviceID, scheme = "https", host = "
   }
 
   #Stores the execution path
-  executePath = names(swagger$paths)[[execPathNo]]
-
+  if(foundExecPath) {
+    executePath = names(swagger$paths)[[execPathNo]]
+  } else{
+    executePath = "Path not found"
+  }
   # Constructs the request URL with the parameters as well as execution path found. The separator is set to an empty string 
   requestUrl = paste(scheme,"://", host, "/workspaces/", workspaceId, "/services/", webserviceID, executePath, sep = "")
   # Constructs the request URL to send a request in the Data Table format with the parameters as well as execution path found. This excludes the suffix &format=swagger which is for key-value format requests
-  requestUrlDataTable = paste(scheme,"://", host, "/workspaces/", workspaceId, "/services/", webserviceID, "/execute?api-version=2.0", sep = "")
+  requestUrlDataTable = paste(scheme,"://", host, "/workspaces/", workspaceId, "/services/", webserviceID, "/execute?api-version=2.0&details=true", sep = "")
   
   # Access the HTTP method type e.g. GET/ POST and constructs an example request
   httpMethod = toupper(names(swagger$paths[[2]]))
@@ -79,7 +90,21 @@ discoverSchema <- function(workspaceId, webserviceID, scheme = "https", host = "
     consumeSingleRows = paste("To score requests as lists in the data table format: consumeSingleRows(apiKey, requestUrl, columnNames, ...)")
     cat("Sample functions to execute the web service and get a response synchronously:","\n", consumeFile,"\n", consumeDataFrame,"\n", consumeLists,"\n", consumeSingleRows,"\n","\n")
     
+  } else {
+    cat("Warning! There was no execution path found for this web service, hence a request URL cannot be constructed!","\n","\n")
   }
+  # Warns user of characters and urges them to enter valid strings for them
+  firstWarning = TRUE
+  for(i in 1:length(inputExample)) {
+    if(typeof(inputExample[[i]]) == "character") {
+      if(firstWarning) {
+        cat("Warning! The sample input does not contain sample values for characters. Please input valid Strings for these fields", "\n")
+      }
+      cat("   ", names(inputExample)[[i]],"\n")
+      firstWarning = FALSE
+    }
+  }
+  
   #Returns what was discovered in the form of a list
   return (list("requestUrl" = requestUrl, "requestUrlDataTable" = requestUrlDataTable, "columnNames" = columnNames, "sampleInput" = inputExample, "inputSchema" = inputSchema))
 }
@@ -99,7 +124,7 @@ discoverSchema <- function(workspaceId, webserviceID, scheme = "https", host = "
 #' @return returnDataFrame data frame containing results returned from web service call
 ################################################################################################################################
 
-consumeFile <- function(apiKey, requestUrl, inFileName, globalParam = setNames(list(), character(0)), outputFileName = "results.csv", batchSize = 250, retryDelay = 0.3) {
+consumeFile <- function(apiKey, requestUrl, inFileName, globalParam = setNames(list(), character(0)), outputFileName = "results.csv", batchSize = 300, retryDelay = 0.3) {
   #Stops users if they miss out mandatory fields
   if (missing(apiKey)) {
     stop("Need to specify API key")
@@ -199,15 +224,18 @@ consumeSingleRows <- function(apiKey, requestUrl, columnNames, ..., globalParam=
   requestsLists <- lapply(X=list(...), function(x) x)
   # Make API call with parameters
   result <- callDTAPI(apiKey, requestUrl, columnNames, requestsLists,  globalParam, retryDelay)
+
   # Access output by converting from JSON into list and indexing into Results 
   resultStored <- jsonlite::fromJSON(result)
   resultList = resultStored$Results
-  # Store results in a data frame
+  # Store output results in a data frame
   resultDataFrame = data.frame(stringsAsFactors=FALSE)
   for(output in resultList) {
-    
-    resultDataFrame <- rbind(resultDataFrame,data.frame(output))
-    colnames(resultDataFrame) = colnames(output)
+    # Access the actual values
+    outputVal = output$value$Values
+    resultDataFrame <- rbind(resultDataFrame,data.frame(outputVal))
+    # Set column names
+    colnames(resultDataFrame) = output$value$ColumnNames
   }
 
   return(resultDataFrame)
@@ -249,7 +277,6 @@ consumeLists <- function(apiKey, requestUrlDataTable, ..., globalParam = setName
   # Store results in a data frame
   resultDataFrame = data.frame(stringsAsFactors=FALSE)
   for(output in resultList) {
-    
     resultDataFrame <- rbind(resultDataFrame,data.frame(output))
     colnames(resultDataFrame) = colnames(output)
   }
@@ -270,7 +297,7 @@ consumeLists <- function(apiKey, requestUrlDataTable, ..., globalParam = setName
 #' @return returnDataFrame data frame containing results returned from web service call
 ################################################################################################################################
 
-consumeDataframe <- function(apiKey, requestUrl, scoreDataFrame, globalParam=setNames(list(), character(0)), batchSize = 250, retryDelay = 0.3) {
+consumeDataframe <- function(apiKey, requestUrl, scoreDataFrame, globalParam=setNames(list(), character(0)), batchSize = 300, retryDelay = 0.3) {
   #Stops users if they miss out mandatory fields
   
   if (missing(apiKey)) {
@@ -371,7 +398,7 @@ callDTAPI <- function(apiKey, requestUrl, columnNames, requestList,  globalParam
       )
       # Convert request payload to JSON
       body = enc2utf8((rjson::toJSON(req)))
-      
+      print(body)
       # Create authorization header
       authz_hdr = paste('Bearer', apiKey, sep=' ')
       
@@ -446,7 +473,7 @@ callAPI <- function(apiKey, requestUrl, keyvalues,  globalParam, retryDelay) {
       )
       # Convert request payload to JSON
       body = enc2utf8((rjson::toJSON(req)))
-      
+      print(body)
       # Create authorization header
       authz_hdr = paste('Bearer', apiKey, sep=' ')
       
@@ -457,7 +484,7 @@ callAPI <- function(apiKey, requestUrl, keyvalues,  globalParam, retryDelay) {
                          postfields=body,
                          writefunction = h$update,
                          headerfunction = hdr$update,
-                         verbose = TRUE
+                         verbose = TRUE           
                          # Parameters below are needed if using test environment, but should not be included for security reasons                  
                          ,ssl.verifypeer=FALSE,
                          ssl.verifyhost = FALSE
