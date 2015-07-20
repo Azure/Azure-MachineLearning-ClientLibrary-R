@@ -75,6 +75,7 @@ getFunctionString <- function (x)
   #don't show the full response!
   #res
   # Might return multiple objects in a list, currently returning first object (BIG ASSUMPTION)
+  #return(objs[1])
   return(gsub("\n", "\r\n", gsub("\"", "\\\"", objs[1])))
 }
 
@@ -240,13 +241,24 @@ recurPkg <- function(pkgName, packages) {
     # add it
     packages <- c(pkgName, packages)
     pkgDeps <- available.packages()
-    
-    # iterate through the dependencies and check if need to add them
-    for (pkg in strsplit(available.packages()[pkgName, "Depends"], split=", ")[[1]]) {
-      # filtout duplicates and R version dependencies
-      if (!(pkg %in% packages) && !(grepl("R \\((.*)\\)", pkg)) && (pkg %in% row.names(available.packages()))) {
-        # recursively call recurPkg
-        packages <- recurPkg(pkg, packages)
+
+    # if the package is available on a repo    
+    if (pkgName %in% row.names(available.packages())) {
+      # iterate through the dependencies and check if need to add them
+      for (pkg in strsplit(available.packages()[pkgName, "Depends"], split=", ")[[1]]) {
+        # filter out duplicates and R version dependencies
+        if (!(pkg %in% packages) && !(grepl("R \\((.*)\\)", pkg)) && (pkg %in% row.names(available.packages()))) {
+          # recursively call recurPkg
+          packages <- recurPkg(pkg, packages)
+        }
+      }
+      # iterate through imports
+      for (pkg in strsplit(available.packages()[pkgName, "Imports"], split=", ")[[1]]) {
+        # filter out duplicates and R version dependencies
+        if (!(pkg %in% packages) && !(grepl("R \\((.*)\\)", pkg)) && (pkg %in% row.names(available.packages()))) {
+          # recursively call recurPkg
+          packages <- recurPkg(pkg, packages)
+        }
       }
     }
   }

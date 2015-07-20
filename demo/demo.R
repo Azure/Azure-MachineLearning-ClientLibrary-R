@@ -4,8 +4,8 @@
 
 # IMPORTANT: need to compile all of consume, discover, publish functions before running this demo
 
-# setwd("C://Users/t-alewa/Documents/Azure-MachineLearning-ClientLibrary-R/demo")
-setwd("C://Users/t-ritra/Documents/Github/Azure-MachineLearning-ClientLibrary-R/demo")
+setwd("C://Users/t-alewa/Documents/Azure-MachineLearning-ClientLibrary-R/demo")
+#setwd("C://Users/t-ritra/Documents/Github/Azure-MachineLearning-ClientLibrary-R/demo")
 
 
 # test server
@@ -116,4 +116,3 @@ response2 <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]
 # creating test data.frame
 demoDF <- data.frame("Pclass"=c(1,2,1), "Sex"=c("male","female","male"), "Age"=c("8","20", "30"), "Parch"=c(1,1,1), "SibSp"=c(1,3,1), "Fare"=c(10,7.5, 9))
 responseDF <- consumeDataframe(TitanicService[[2]][[1]]$PrimaryKey, paste(TitanicService[[2]][[1]]$ApiLocation,"/execute?api-version=2.0&details=true",sep=""), demoDF)
-
