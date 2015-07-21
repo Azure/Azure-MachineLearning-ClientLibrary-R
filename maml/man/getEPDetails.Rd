@@ -4,7 +4,7 @@
 \alias{getEPDetails}
 \title{Get the details on a specific endpoint}
 \usage{
-getEPDetails(wkID, authToken, wsID, epID)
+getEPDetails(wkID, authToken, wsID, epID, url = epURLdet)
 }
 \arguments{
 \item{wkID}{The workspace ID}
@@ -25,6 +25,7 @@ Returns a named list representing the endpoint with the following fields:
 Get the details on a specific endpoint
 }
 \examples{
+DELETE TOKENS IN REAL VERSION
 defaultEP = getEPDetails("c01fb89129aa4ef0a19affa7f95ecbbc", "523709d06661441bbf129d68f84cd6a4", "6a46d1f2a5e6406b8b1a5c563bf1cd10", "default")
 }
 

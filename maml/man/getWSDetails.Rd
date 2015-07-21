@@ -4,7 +4,7 @@
 \alias{getWSDetails}
 \title{Get detailed information about a specific webservice}
 \usage{
-getWSDetails(wkID, authToken, wsID)
+getWSDetails(wkID, authToken, wsID, url = wsURLdet)
 }
 \arguments{
 \item{wkID}{The workspace ID}
@@ -22,6 +22,7 @@ with the following fields:
 Get detailed information about a specific webservice
 }
 \examples{
+DELETE TOKENS IN REAL VERSION
 service = getWSDetails("c01fb89129aa4ef0a19affa7f95ecbbc", "523709d06661441bbf129d68f84cd6a4", "6a46d1f2a5e6406b8b1a5c563bf1cd10")
 serviceID = service["Id"]
 }
