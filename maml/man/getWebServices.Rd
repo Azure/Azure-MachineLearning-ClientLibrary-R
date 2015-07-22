@@ -20,8 +20,8 @@ as a nested named list with the following fields:
 Get a list of webservices available to a workspace
 }
 \examples{
-<< Please note that you will need to retrieve all of the signature details from your AzureML account >>
-services = getWebServices("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
+DELETE TOKENS IN REAL VERSION
+services = getWebServices("c01fb89129aa4ef0a19affa7f95ecbbc", "523709d06661441bbf129d68f84cd6a4")
 serviceID = services[[1]]["Id"]
 }
 

@@ -26,6 +26,5 @@ Get the endpoints that are part of a web service
 \examples{
 << Please note that you will need to retrieve all of the signature details from your AzureML account >>
 endpoints = getEndpoints("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
-defaultEP = endpoints[[1]]
 }
 
