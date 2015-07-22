@@ -1,19 +1,20 @@
-################################################################
+#############################################################
 # String constants
-################################################################
+#############################################################
 publishURL <- "https://management.azureml-int.net/workspaces/%s/webservices/%s" ## REMOVE SSL IGNORING FOR REAL VERSION ##
 #publishURL <- "https://hiteshsm.cloudapp.net/workspaces/%s/webservices/%s" ## REMOVE SSL IGNORING FOR REAL VERSION ##
 wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- matrix(ncol = %s, nrow = nrow(inputDF))\r\ncolnames(outputDF) <- list(%s)\r\noutputDF <- data.frame(outputDF)\r\nfor (file in list.files(\"src\")) {\r\n  if (file == \"%s\") {\r\n    load(\"src/%s\")\r\n    for (item in names(dependencies)) {\r\n      assign(item, dependencies[[item]])\r\n    }\r\n  }\r\n  else {\r\n    if (!(file %%in%% installed.packages()[,\"Package\"])) {\r\n      install.packages(paste(\"src\", file, sep=\"/\"), lib=\".\", repos=NULL, verbose=TRUE)\r\n    }\r\n    library(strsplit(file, \"\\\\.\")[[1]][[1]], character.only=TRUE)\r\n  }\r\n}\r\naction <- %s\r\nfor (i in 1:nrow(inputDF)) {\r\n  outputDF[i,] <- do.call(\"action\", as.list(inputDF[i,]))\r\n}\r\nmaml.mapOutputPort(\"outputDF\")"
 
 
-################################################################
-# GET THE FUNCTION SOURCE CODE AS A STRING
-# Return the function as a string
-# Also consider paste(body(fun())) or getAnywhere()
-################################################################
-#' This is a helper function that will convert a function to a string
+
+#############################################################
+#' @title Get Function Source Code as a String
+#' @description
+#' This is a helper function that will convert a function's source code to a string
+#' Also consider paste(body(fun())) or getAnywhere()
 #' @param x Name of the function to convert to a string
 #' @return function in string format
+#############################################################
 getFunctionString <- function (x)
 {
   if (tryCatch(!is.character(x), error = function(e) TRUE))
@@ -81,18 +82,18 @@ getFunctionString <- function (x)
 
 
 
-##################################################################################
-# packDependencies()
-# Helper function to extract object and package dependencies
-# then pack them into a .zip, then a base64 string
-# Note: takes in a closure, not string
+#############################################################
 # TODO: add error handling at each step
-##################################################################################
-#' This is a helper function to extract object and package dependencies
-# then pack them into a .zip, then a base64 string
-#' @param string functionName - function to package dependencies from
-#' @return encoded zip - will return false if nothing was zipped
 # TODO: suppress the red text?
+#############################################################
+#' @title HELPER FUNCTION: Package Dependencies
+#' @description
+#' This is a helper function to extract object and package dependencies
+#' then pack them into a .zip, then a base64 string
+#' packDependencies()
+#' @param closure functionName - function to package dependencies from
+#' @return encoded zip - will return false if nothing was zipped
+#############################################################
 packDependencies <- function(functionName) {
   # lists for storing objects and packages
   dependencies = list()
@@ -116,6 +117,10 @@ packDependencies <- function(functionName) {
     # Can nonfunction objects have dependencies???
     else if (!is.function(name)) {
       dependencies[[obj]] <- name
+      nameEnv <- environment(get(class(name)))
+      if (!(identical(nameEnv, NULL)) && !(identical(nameEnv, .BaseNamespaceEnv))) {
+        packages <- recurPkg(paste(getNamespaceName(nameEnv)), packages)
+      }
     }
 
     # grab user defined functions
@@ -195,16 +200,18 @@ packDependencies <- function(functionName) {
   }
 }
 
-##################################################################################
-# recurDep()
-# Helper function to recursively gather dependencies from user defined-functions
-# Similar structure to packDependencies()
-##################################################################################
-#' This is helper function to recursively gather dependencies from user defined-functions
+
+
+#############################################################
+#' @title HELPER FUNCTION: Recursive Dependencies
+#' @description This is helper function to recursively gather dependencies from user defined-functions
+#' Similar structure to packDependencies()
+#' recurDep()
 #' @param string functionName - Name of function to recursively gather dependencies from
 #' @param list dependencies - List of package dependencies
 #' @param list packages - Name of available packages
 #' @return list of packages and dependencies
+#############################################################
 recurDep <- function(functionName, dependencies, packages) {
   for (obj in codetools::findGlobals(get(functionName))) {
     name = get(obj)
@@ -227,14 +234,16 @@ recurDep <- function(functionName, dependencies, packages) {
   return(list("dependencies"=dependencies, "packages"=packages))
 }
 
-##################################################################################
-# recurPkg()
-# Helper function to recursively gather dependencies from user defined-functions
-##################################################################################
-#' This is helper function to recursively gather dependencies from user defined-functions
+
+
+#############################################################
+#' @title HELPER FUNCTION: Recursive Packaging
+#' @description This is helper function to recursively gather dependencies from user defined-functions
+#' recurPkg()
 #' @param string pkgName - Name of package to check for existence in list of packages
 #' @param list packages - Name of available packages
 #' @return list of packages
+#############################################################
 recurPkg <- function(pkgName, packages) {
   # if the package isn't already in the list
   if (!(pkgName %in% packages)) {
@@ -268,18 +277,18 @@ recurPkg <- function(pkgName, packages) {
 
 
 
-################################################################
-# CONVERT FORMAT
-# Helper function to convert expected schema to API-expecting format
-################################################################
-#' This is a helper function to convert expected schema to API-expecting format
+
+#############################################################
+#' @title HELPER FUNCTION: Convert Format
+#' @description This is a helper function to convert expected schema to API-expecting format
 #' @param list argList - List of expected input parameters
 #' @return Converted inputSchema to the proper format
+#############################################################
 convert <- function(argList) {
   form <- list()
   for (arg in names(argList)) {
     type = argList[[arg]]
-    # probably a better way to code this
+
     if (type == "float" || type == "double") {
       form[[ arg ]] <- list("type"="number", "format"=type)
     }
@@ -304,13 +313,14 @@ convert <- function(argList) {
 
 
 
-################################################################
-# This is a helper function to ensure that the inputSchema has recieved all of the expected parameters
-################################################################
-#' This is a helper function to check that the user has passed in all of the expected parameters.
+
+#############################################################
+#' @title HELPER FUNCTION: Parameter Check
+#' @description This is a helper function to check that the user has passed in all of the expected parameters.
 #' @param list userInput - List of expected input parameters
 #' @param string funcName - The function that is being published
 #' @return False if the input was not as expected/True if input matched expectation
+#############################################################
 paramCheck <- function(userInput, funcName) {
   numParamsEXPECTED <- length(formals(funcName))
   numParamsPASSED <- length(userInput)
@@ -327,24 +337,25 @@ paramCheck <- function(userInput, funcName) {
 
 
 
-################################################################
-# expecting inputSchema = list("arg1"="type", "arg2"="type", ...)
-# expecting outputSchema = list("output1"="type", "output2"="type", ...)
-# functionName is a string!!
-################################################################
-
+#############################################################
 #' @title Publish Web Service
-#' @description This function publishes code given a valid workspace ID and authentication token. The function expects the function name, service name, and
+#' @description
+#' This function publishes code given a valid workspace ID and authentication token. The function expects the function name, service name, and
 #' the input and output schemas from the user.
 #' The user can expect a list of the web service details, the default endpoint details and the consumption function and use this information to access
 #' the published function.
 #' @param string functionName - The function that is being published
 #' @param string serviceName - The name they would like the function published under
 #' @param list inputSchema - List of expected input parameters
+#' expecting inputSchema = list("arg1"="type", "arg2"="type", ...)
 #' @param list outputSchema - List of expected output
+#' expecting outputSchema = list("output1"="type", "output2"="type", ...)
 #' @param string wkID - The workspace ID
 #' @param string authToken - The primary authorization token
 #' @return List of webservice details, default endpoint details, and the consumption function
+#' @examples
+#'
+#############################################################
 publishWebService <- function(functionName, serviceName, inputSchema, outputSchema, wkID, authToken) {
 
   # Make sure input schema matches function signature
@@ -357,7 +368,6 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
   zipString = packDependencies(functionName)
 
   # Build the body of the request, differing on whether or not there is a zip to upload
-  # Probably a more elegant way to do this
   if (zipString[[2]] == "") {
     req = list(
       "Name" = serviceName,
@@ -387,6 +397,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
   # convert the payload to JSON as expected by API
   # TODO: consolidate json packages, i.e. use only one if possible
   body = RJSONIO::toJSON(req)
+  #print(sprintf(wrapper, length(outputSchema), paste(sprintf("\"%s\"", names(outputSchema)), collapse=","), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName))))
 
   # Response gatherer
   h = RCurl::basicTextGatherer()
@@ -417,3 +428,79 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
   return(list(newService, defaultEP))#, consumption))
 }
 
+
+# Update a web service using the service ID
+# Note: cannot change the service name
+updateWebService <- function(functionName, serviceGUID, inputSchema, outputSchema, wkID, authToken) {
+  
+  # Make sure input schema matches function signature
+  paramCheck(inputSchema, functionName)
+  
+  # Accept SSL certificates issued by public Certificate Authorities
+  options(RCurlOptions = list(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
+  
+  # Get and encode the dependencies
+  zipString = packDependencies(functionName)
+  
+  # Build the body of the request, differing on whether or not there is a zip to upload
+  # Probably a more elegant way to do this
+  if (zipString[[2]] == "") {
+    req = list(
+      "Name" = serviceName,
+      "Type" = "Code",
+      "CodeBundle" = list(
+        "InputSchema" = convert(inputSchema),
+        "OutputSchema" = convert(inputSchema),
+        "Language" = "r-3.1-64",
+        "SourceCode" = sprintf(wrapper, length(outputSchema), paste(sprintf("\"%s\"", names(outputSchema)), collapse=","), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName)))
+      )
+    )
+  }
+  else {
+    req = list(
+      "Name" = serviceName,
+      "Type" = "Code",
+      "CodeBundle" = list(
+        "InputSchema" = convert(inputSchema),
+        "OutputSchema" = convert(outputSchema),
+        "Language" = "r-3.1-64",
+        "SourceCode" = sprintf(wrapper, length(outputSchema), paste(sprintf("\"%s\"", names(outputSchema)), collapse=","), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName))),
+        "ZipContents" = zipString[[2]]
+      )
+    )
+  }
+  
+  # convert the payload to JSON as expected by API
+  # TODO: consolidate json packages, i.e. use only one if possible
+  body = RJSONIO::toJSON(req)
+  #print(sprintf(wrapper, length(outputSchema), paste(sprintf("\"%s\"", names(outputSchema)), collapse=","), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName))))
+  
+  # Response gatherer
+  h = RCurl::basicTextGatherer()
+  h$reset()
+  
+  # Generate unique guid
+  #guid = gsub("-", "", uuid::UUIDgenerate(use.time=TRUE))
+  guid = serviceGUID
+  
+  # API call
+  RCurl::httpPUT(url = sprintf(publishURL, wkID, guid), # defined above
+                 httpheader=c('Authorization' = paste('Bearer', authToken, sep=' '),
+                              'Content-Type' = 'application/json',
+                              'Accept' = 'application/json'),
+                 content = body,
+                 writefunction = h$update)
+  
+  # TODO: format output
+  newService <- RJSONIO::fromJSON(h$value())
+  
+  # Use discovery functions to get default endpoint for immediate use
+  # switch to getEndpoints() later
+  defaultEP <- getEndpoints(wkID, authToken, newService["Id"], internalURL)
+  
+  # Curry relevant parameters to consumption function
+  #consumption <- functional::Curry(consumeLists, "api_key"=defaultEP[[1]]["PrimaryKey"], "requestURL"=paste(defaultEP[[1]]["ApiLocation"],"/execute?api-version=2.0&details=true",sep=""), "columnNames"=as.list(names(inputSchema)))
+  
+  # currently returning list of webservice details, default endpoint details, consumption function, in that order
+  return(list(newService, defaultEP))#, consumption))
+}
