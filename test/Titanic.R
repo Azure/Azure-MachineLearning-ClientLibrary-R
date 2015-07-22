@@ -1,3 +1,7 @@
+setwd("C://Users/t-alewa/Documents/Azure-MachineLearning-ClientLibrary-R/test")
+wsID = "3612640f27234eb7b2b91ac62e8b4a40"
+wsAuth = "abcbe14a958a40978f93aa0e0e71f5be"
+
 test <- read.csv(file="test.csv")
 train <- read.csv(file="train.csv")
 
