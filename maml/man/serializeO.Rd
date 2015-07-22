@@ -7,14 +7,14 @@
 serializeO(output)
 }
 \arguments{
-\item{list}{Take arguments of a function in type list}
+\item{list}{Take arguments of a function in type list
+Expecting:
+   outputSchema = list("output1"="type", "output2"="type", ...)}
 }
 \value{
 serialized output expectations
 }
 \description{
 Serialize the output DataFrame
-Expecting:
-   outputSchema = list("output1"="type", "output2"="type", ...)
 }
 

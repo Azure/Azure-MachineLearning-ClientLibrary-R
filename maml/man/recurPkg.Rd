@@ -2,7 +2,7 @@
 % Please edit documentation in R/publish.R
 \name{recurPkg}
 \alias{recurPkg}
-\title{This is helper function to recursively gather dependencies from user defined-functions}
+\title{HELPER FUNCTION: Recursive Packaging}
 \usage{
 recurPkg(pkgName, packages)
 }
@@ -16,5 +16,6 @@ list of packages
 }
 \description{
 This is helper function to recursively gather dependencies from user defined-functions
+recurPkg()
 }
 

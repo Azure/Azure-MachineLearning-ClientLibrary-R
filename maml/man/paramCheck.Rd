@@ -2,7 +2,7 @@
 % Please edit documentation in R/publish.R
 \name{paramCheck}
 \alias{paramCheck}
-\title{This is a helper function to check that the user has passed in all of the expected parameters.}
+\title{HELPER FUNCTION: Parameter Check}
 \usage{
 paramCheck(userInput, funcName)
 }

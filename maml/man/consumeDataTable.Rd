@@ -2,9 +2,7 @@
 % Please edit documentation in R/consume.R
 \name{consumeDataTable}
 \alias{consumeDataTable}
-\title{This function takes in an API key, the request URL (OData Endpoint Address), the column names and multiple requests
-It scores the experiment with the requests stored in a list of lists, and sends it to the server in the appropriate format.
-It then obtains a response from Azure Machine Learning Studio and returns a response to the user. It returns the output column(s) along with the scored probablities!}
+\title{Consume Data Table}
 \usage{
 consumeDataTable(api_key, requestURL, columnNames, ..., globalParam = "",
   retryDelay = 0.3)
@@ -29,5 +27,18 @@ results in a list of lists, with the scored probability at the end of each list
 This function takes in an API key, the request URL (OData Endpoint Address), the column names and multiple requests
 It scores the experiment with the requests stored in a list of lists, and sends it to the server in the appropriate format.
 It then obtains a response from Azure Machine Learning Studio and returns a response to the user. It returns the output column(s) along with the scored probablities!
+}
+\examples{
+# Consuming a newly published titanic demo webservice
+# First, consume with inputs as a list
+# Slow initially as it makes the connection
+response <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list(1, "male", 20, 2, 0, 8.50), list(1, "female", 20, 1, 0, 8.50))
+# Subsequent calls are faster as connection is left open
+response2 <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list(2, "male", 50, 1, 0, 8.50), list(2, "female", 50, 1, 0, 8.50))
+
+# consume with inputs as dataframe
+# creating test data.frame
+demoDF <- data.frame("Pclass"=c(1,2,1), "Sex"=c("male","female","male"), "Age"=c(8,20, 30), "Parch"=c(1,1,1), "SibSp"=c(1,3,1), "Fare"=c(10,7.5, 9))
+responseDF <- consumeDataframe(TitanicService[[2]][[1]]$PrimaryKey, paste(TitanicService[[2]][[1]]$ApiLocation,"/execute?api-version=2.0&details=true",sep=""), demoDF)
 }
 

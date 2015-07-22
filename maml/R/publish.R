@@ -354,7 +354,13 @@ paramCheck <- function(userInput, funcName) {
 #' @param string authToken - The primary authorization token
 #' @return List of webservice details, default endpoint details, and the consumption function
 #' @examples
-#'
+#' # create a function to make predictions using the trained model
+#' # For this example we will use the Titanic
+#' I.e. predictTitanic <- function (Pclass, Sex, Age, SibSp, Parch, Fare)
+#' # Sample local call
+#' predictTitanic(1, "male", 20, 2, 0, 8.50)
+#' #Publish the function
+#' TitanicService <- publishWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
 #############################################################
 publishWebService <- function(functionName, serviceName, inputSchema, outputSchema, wkID, authToken) {
 
@@ -429,21 +435,46 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 }
 
 
-# Update a web service using the service ID
-# Note: cannot change the service name
+
+#############################################################
+#' @title Update a Published Web Service
+#' @description
+#' This function updates published code given a valid workspace ID and authentication token. The function expects the function name, service id, and
+#' the input and output schemas from the user.
+#' The user can expect a list of the web service details, the default endpoint details and the consumption function and use this information to access
+#' the published function.
+#' @param string functionName - The function that is being updated
+#' @param string serviceGUID - The name they would like the function published under
+#' ((Note: cannot change the service name))
+#' @param list inputSchema - List of expected input parameters
+#' expecting inputSchema = list("arg1"="type", "arg2"="type", ...)
+#' @param list outputSchema - List of expected output
+#' expecting outputSchema = list("output1"="type", "output2"="type", ...)
+#' @param string wkID - The workspace ID
+#' @param string authToken - The primary authorization token
+#' @return List of webservice details, default endpoint details, and the consumption function
+#' @examples
+#' # create a function to make predictions using the trained model
+#' I.e. predictTitanic <- function (Pclass, Sex, Age, SibSp, Parch, Fare)
+#' # Sample local call
+#' predictTitanic(1, "male", 20, 2, 0, 8.50)
+#' # Publish the function
+#' TitanicService <- publishWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
+#' # Let's say that predictTitanic was updated to add more functionality now and we want to republish
+#' TitanicService <- updateWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
+#############################################################
 updateWebService <- function(functionName, serviceGUID, inputSchema, outputSchema, wkID, authToken) {
-  
+
   # Make sure input schema matches function signature
   paramCheck(inputSchema, functionName)
-  
+
   # Accept SSL certificates issued by public Certificate Authorities
   options(RCurlOptions = list(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
-  
+
   # Get and encode the dependencies
   zipString = packDependencies(functionName)
-  
+
   # Build the body of the request, differing on whether or not there is a zip to upload
-  # Probably a more elegant way to do this
   if (zipString[[2]] == "") {
     req = list(
       "Name" = serviceName,
@@ -469,20 +500,20 @@ updateWebService <- function(functionName, serviceGUID, inputSchema, outputSchem
       )
     )
   }
-  
+
   # convert the payload to JSON as expected by API
   # TODO: consolidate json packages, i.e. use only one if possible
   body = RJSONIO::toJSON(req)
   #print(sprintf(wrapper, length(outputSchema), paste(sprintf("\"%s\"", names(outputSchema)), collapse=","), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName))))
-  
+
   # Response gatherer
   h = RCurl::basicTextGatherer()
   h$reset()
-  
+
   # Generate unique guid
   #guid = gsub("-", "", uuid::UUIDgenerate(use.time=TRUE))
   guid = serviceGUID
-  
+
   # API call
   RCurl::httpPUT(url = sprintf(publishURL, wkID, guid), # defined above
                  httpheader=c('Authorization' = paste('Bearer', authToken, sep=' '),
@@ -490,17 +521,17 @@ updateWebService <- function(functionName, serviceGUID, inputSchema, outputSchem
                               'Accept' = 'application/json'),
                  content = body,
                  writefunction = h$update)
-  
+
   # TODO: format output
   newService <- RJSONIO::fromJSON(h$value())
-  
+
   # Use discovery functions to get default endpoint for immediate use
   # switch to getEndpoints() later
   defaultEP <- getEndpoints(wkID, authToken, newService["Id"], internalURL)
-  
+
   # Curry relevant parameters to consumption function
   #consumption <- functional::Curry(consumeLists, "api_key"=defaultEP[[1]]["PrimaryKey"], "requestURL"=paste(defaultEP[[1]]["ApiLocation"],"/execute?api-version=2.0&details=true",sep=""), "columnNames"=as.list(names(inputSchema)))
-  
+
   # currently returning list of webservice details, default endpoint details, consumption function, in that order
   return(list(newService, defaultEP))#, consumption))
 }

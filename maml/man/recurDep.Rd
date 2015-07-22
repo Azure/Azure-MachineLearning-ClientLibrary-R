@@ -2,7 +2,7 @@
 % Please edit documentation in R/publish.R
 \name{recurDep}
 \alias{recurDep}
-\title{This is helper function to recursively gather dependencies from user defined-functions}
+\title{HELPER FUNCTION: Recursive Dependencies}
 \usage{
 recurDep(functionName, dependencies, packages)
 }
@@ -18,5 +18,7 @@ list of packages and dependencies
 }
 \description{
 This is helper function to recursively gather dependencies from user defined-functions
+Similar structure to packDependencies()
+recurDep()
 }
 

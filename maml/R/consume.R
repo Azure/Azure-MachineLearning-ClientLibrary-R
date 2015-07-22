@@ -21,7 +21,7 @@ library("httr")
 #' @param int batchSize of each batch, which is optional, but 100 by default
 #' @param int retryDelay the time in seconds to delay before retrying in case of a server error, default value of 0.3 seconds
 #' @return results in a list of lists, with the scored probability at the end of each list
-#' @examples
+#' #add example
 #'
 #############################################################
 consumeFile <- function(api_key, requestURL, infileName, globalParam = setNames(list(), character(0)), outfileName = "results.csv", batchSize = 250, retryDelay = 0.3) {
@@ -87,7 +87,17 @@ consumeFile <- function(api_key, requestURL, infileName, globalParam = setNames(
 #' @param retryDelay the time in seconds to delay before retrying in case of a server error, default value of 0.3 seconds
 #' @return results in a list of lists, with the scored probability at the end of each list
 #' @examples
+#' # Consuming a newly published titanic demo webservice
+#' # First, consume with inputs as a list
+#' # Slow initially as it makes the connection
+#' response <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list(1, "male", 20, 2, 0, 8.50), list(1, "female", 20, 1, 0, 8.50))
+#' # Subsequent calls are faster as connection is left open
+#' response2 <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list(2, "male", 50, 1, 0, 8.50), list(2, "female", 50, 1, 0, 8.50))
 #'
+#' # consume with inputs as dataframe
+#' # creating test data.frame
+#' demoDF <- data.frame("Pclass"=c(1,2,1), "Sex"=c("male","female","male"), "Age"=c(8,20, 30), "Parch"=c(1,1,1), "SibSp"=c(1,3,1), "Fare"=c(10,7.5, 9))
+#' responseDF <- consumeDataframe(TitanicService[[2]][[1]]$PrimaryKey, paste(TitanicService[[2]][[1]]$ApiLocation,"/execute?api-version=2.0&details=true",sep=""), demoDF)
 #############################################################
 consumeDataTable <- function(api_key, requestURL, columnNames, ..., globalParam="", retryDelay = 0.3) {
   if (missing(api_key)) {
@@ -133,7 +143,7 @@ consumeDataTable <- function(api_key, requestURL, columnNames, ..., globalParam=
 #' @param string globalParam - global parameters, default value is ""
 #' @param int retryDelay the time in seconds to delay before retrying in case of a server error, default value of 0.3 seconds
 #' @return results in a list of lists, with the scored probability at the end of each list
-#' @examples
+#' #add example
 #'
 #############################################################
 consumeLists <- function(api_key, requestURL, ..., globalParam = setNames(list(), character(0)), retryDelay = 0.3) {
@@ -176,7 +186,7 @@ consumeLists <- function(api_key, requestURL, ..., globalParam = setNames(list()
 #' @param int batchSize of each batch, which is optional, but 100 by default
 #' @param int retryDelay the time in seconds to delay before retrying in case of a server error, default value of 0.3 seconds
 #' @return results in a list of lists, with the scored probability at the end of each list
-#' @examples
+#' # add examples
 #'
 #############################################################
 consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam=setNames(list(), character(0)), batchSize = 250, retryDelay = 0.3) {
