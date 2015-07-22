@@ -1,18 +1,20 @@
-library(e1071)
+install.packages("e1071")
+library("e1071")
 
-setwd("C://Users/t-alewa/Documents/Azure-MachineLearning-ClientLibrary-R/test")
-# t-alewa on studio internal
+# setwd("C://Users/t-alewa/Documents/Azure-MachineLearning-ClientLibrary-R/test")
+#setwd("C://Users/t-ritra/Documents/Github/Azure-MachineLearning-ClientLibrary-R/test")
+
 wsID = "3612640f27234eb7b2b91ac62e8b4a40"
 wsAuth = "abcbe14a958a40978f93aa0e0e71f5be"
 
 dataset <- read.csv(file="iris.csv")
 
-features <- get.feature.columns(dataset)
-labels   <- as.factor(get.label.column(dataset))
-
-train.data <- data.frame(features, labels)
-feature.names <- get.feature.column.names(dataset)
-names(train.data) <- c(feature.names, "Class")
+# features <- get.feature.columns(dataset)
+# labels   <- as.factor(get.label.column(dataset))
+# 
+# train.data <- data.frame(features, labels)
+# feature.names <- get.feature.column.names(dataset)
+# names(train.data) <- c(feature.names, "Class")
 
 #model <- naiveBayes(Class ~ ., train.data)
 model <- naiveBayes(as.factor(Species) ~., dataset)
