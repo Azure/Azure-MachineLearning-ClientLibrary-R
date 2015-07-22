@@ -70,7 +70,7 @@ head(survived, n = 20)
 #in sample classification accuracy
 1 - sum(abs(survived - tr)) / nrow(train)
 
-predictTitanic <- function (Pclass, Sex, Age, SibSp, Parch, Fare) {
+predictTitanicSurvival <- function (Pclass, Sex, Age, SibSp, Parch, Fare) {
   return(predict.gbm(object=GBM.model2, newdata=data.frame("Pclass"=Pclass, "Sex"=Sex, "Age"=Age, "SibSp"=SibSp, "Parch"=Parch, "Fare"=Fare), 2000))
 }
 
