@@ -12,7 +12,7 @@ wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- matrix(ncol = %s, nro
 # Also consider paste(body(fun())) or getAnywhere()
 ################################################################
 #' This is a helper function that will convert a function to a string
-#' @param x - Name of the function to convert to a string
+#' @param x Name of the function to convert to a string
 #' @return function in string format
 getFunctionString <- function (x)
 {
@@ -90,7 +90,7 @@ getFunctionString <- function (x)
 ##################################################################################
 #' This is a helper function to extract object and package dependencies
 # then pack them into a .zip, then a base64 string
-#' @param functionName - function to package dependencies from
+#' @param string functionName - function to package dependencies from
 #' @return encoded zip - will return false if nothing was zipped
 # TODO: suppress the red text?
 packDependencies <- function(functionName) {
@@ -156,7 +156,7 @@ packDependencies <- function(functionName) {
         toPack <- toPack[toPack != pkg]
       }
     }
-    
+
     # if done packing, break
     if (length(toPack) == 0) {
       break
@@ -168,19 +168,19 @@ packDependencies <- function(functionName) {
   }
   # go back to where the user started
   setwd(start)
-  
+
   # objects, functions, etc.
   if (length(dependencies) > 0) {
     # maybe can save directly as a .zip and skip the zip() call?
     save(dependencies, file=guid)
     toZip <- c(toZip, guid)
   }
-  
+
   # zip up everything
   if (length(toZip) > 0) {
     zip(zipfile=guid, files=toZip)
     zipEnc <- base64enc::base64encode(paste(guid, ".zip", sep=""))
-    
+
     # delete the packages
     for (pkg in packages) {
       # did I miss anything? maybe extra files floating around
@@ -189,7 +189,7 @@ packDependencies <- function(functionName) {
     # delete the dependency rdta file
     file.remove(guid)
     file.remove(paste(guid,"zip",sep="."))
-    
+
     # return the encoded zip as a string
     return(list(guid, zipEnc))
   }
@@ -205,9 +205,9 @@ packDependencies <- function(functionName) {
 # Similar structure to packDependencies()
 ##################################################################################
 #' This is helper function to recursively gather dependencies from user defined-functions
-#' @param functionName - Name of function to recursively gather dependencies from
-#' @param dependencies - List of package dependencies
-#' @param packages - Name of available packages
+#' @param string functionName - Name of function to recursively gather dependencies from
+#' @param list dependencies - List of package dependencies
+#' @param list packages - Name of available packages
 #' @return list of packages and dependencies
 recurDep <- function(functionName, dependencies, packages) {
   for (obj in codetools::findGlobals(get(functionName))) {
@@ -236,8 +236,8 @@ recurDep <- function(functionName, dependencies, packages) {
 # Helper function to recursively gather dependencies from user defined-functions
 ##################################################################################
 #' This is helper function to recursively gather dependencies from user defined-functions
-#' @param pkgName - Name of package to check for existence in list of packages
-#' @param packages - Name of available packages
+#' @param string pkgName - Name of package to check for existence in list of packages
+#' @param list packages - Name of available packages
 #' @return list of packages
 recurPkg <- function(pkgName, packages) {
   # if the package isn't already in the list
@@ -246,7 +246,7 @@ recurPkg <- function(pkgName, packages) {
     packages <- c(pkgName, packages)
     pkgDeps <- available.packages()
 
-    # if the package is available on a repo    
+    # if the package is available on a repo
     if (pkgName %in% row.names(available.packages())) {
       # iterate through the dependencies and check if need to add them
       for (pkg in strsplit(available.packages()[pkgName, "Depends"], split=", ")[[1]]) {
@@ -266,7 +266,7 @@ recurPkg <- function(pkgName, packages) {
       }
     }
   }
-  # return updated list of packages  
+  # return updated list of packages
   return(packages)
 }
 
@@ -277,7 +277,7 @@ recurPkg <- function(pkgName, packages) {
 # Helper function to convert expected schema to API-expecting format
 ################################################################
 #' This is a helper function to convert expected schema to API-expecting format
-#' @param argList - List of expected input parameters
+#' @param list argList - List of expected input parameters
 #' @return Converted inputSchema to the proper format
 convert <- function(argList) {
   form <- list()
@@ -312,8 +312,8 @@ convert <- function(argList) {
 # This is a helper function to ensure that the inputSchema has recieved all of the expected parameters
 ################################################################
 #' This is a helper function to check that the user has passed in all of the expected parameters.
-#' @param userInput - List of expected input parameters
-#' @param funcName - The function that is being published
+#' @param list userInput - List of expected input parameters
+#' @param string funcName - The function that is being published
 #' @return False if the input was not as expected/True if input matched expectation
 paramCheck <- function(userInput, funcName) {
   numParamsEXPECTED <- length(formals(funcName))
@@ -336,17 +336,18 @@ paramCheck <- function(userInput, funcName) {
 # expecting outputSchema = list("output1"="type", "output2"="type", ...)
 # functionName is a string!!
 ################################################################
-# TODO: play around with argument order
-#' This function publishes code given a valid workspace ID and authentication token. The function expects the function name, service name, and 
+
+#' @title Publish Web Service
+#' @description This function publishes code given a valid workspace ID and authentication token. The function expects the function name, service name, and
 #' the input and output schemas from the user.
 #' The user can expect a list of the web service details, the default endpoint details and the consumption function and use this information to access
 #' the published function.
-#' @param functionName - The function that is being published
-#' @param serviceName - The name they would like the function published under
-#' @param inputSchema - List of expected input parameters
-#' @param outputSchema - List of expected output
-#' @param wkID - The workspace ID
-#' @param authToken - The primary authorization token
+#' @param string functionName - The function that is being published
+#' @param string serviceName - The name they would like the function published under
+#' @param list inputSchema - List of expected input parameters
+#' @param list outputSchema - List of expected output
+#' @param string wkID - The workspace ID
+#' @param string authToken - The primary authorization token
 #' @return List of webservice details, default endpoint details, and the consumption function
 publishWebService <- function(functionName, serviceName, inputSchema, outputSchema, wkID, authToken) {
 

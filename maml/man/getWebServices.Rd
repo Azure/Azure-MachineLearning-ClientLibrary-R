@@ -4,7 +4,7 @@
 \alias{getWebServices}
 \title{Get a list of webservices available to a workspace}
 \usage{
-getWebServices(wkID, authToken)
+getWebServices(wkID, authToken, url = wsURL)
 }
 \arguments{
 \item{wkID}{The workspace ID}
@@ -20,6 +20,7 @@ as a nested named list with the following fields:
 Get a list of webservices available to a workspace
 }
 \examples{
+DELETE TOKENS IN REAL VERSION
 services = getWebServices("c01fb89129aa4ef0a19affa7f95ecbbc", "523709d06661441bbf129d68f84cd6a4")
 serviceID = services[[1]]["Id"]
 }
