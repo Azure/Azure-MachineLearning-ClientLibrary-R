@@ -277,6 +277,7 @@ callDTAPI <- function(api_key, requestURL, columnNames, values,  globalParam, re
       print(paste("The request failed with status code:", httpStatus, sep=" "))
       print("headers:")
       print(headers)
+      print(h$value())
       break
     }
   }

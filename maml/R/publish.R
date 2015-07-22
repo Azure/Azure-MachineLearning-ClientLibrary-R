@@ -116,6 +116,10 @@ packDependencies <- function(functionName) {
     # Can nonfunction objects have dependencies???
     else if (!is.function(name)) {
       dependencies[[obj]] <- name
+      nameEnv <- environment(get(class(name)))
+      if (!(identical(nameEnv, NULL)) && !(identical(nameEnv, .BaseNamespaceEnv))) {
+        packages <- recurPkg(paste(getNamespaceName(nameEnv)), packages)
+      }
     }
 
     # grab user defined functions
@@ -386,6 +390,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
   # convert the payload to JSON as expected by API
   # TODO: consolidate json packages, i.e. use only one if possible
   body = RJSONIO::toJSON(req)
+  #print(sprintf(wrapper, length(outputSchema), paste(sprintf("\"%s\"", names(outputSchema)), collapse=","), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName))))
 
   # Response gatherer
   h = RCurl::basicTextGatherer()
