@@ -1,5 +1,5 @@
-dataframe <- read.csv("forestfires.csv")
-testConsumeDF <- consumeDataframe("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true",dataframe)
+
+# testConsumeDF <- consumeDataframe("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true",dataframe)
 
 
 testing <- publishWebService("add", "e2eTest2", list("icol1"="int"), list("ocol1"="int"), wsID, auth)
@@ -17,15 +17,20 @@ wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- matrix(ncol = %s, nro
 
 #Testing consumption functions
 #api keys
-testDiscoverSchema <- discoverSchema("0f2adea9926a4e7c9a636a39f2026fa0", "1a11ca46456a428a92f57638d20a72f9")
-#testconsumeSingleDT <- consumeSingleRows("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true",list( "X","Y","month","day","FFMC","DMC","DC","ISI","temp","RH","wind","rain","area"),list("0","0","jan","mon","0","0","0","0","0","0","0","0","0"))
-testconsumeSingleDT <- consumeSingleRows("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==",testDiscoverSchema[["requestUrlDataTable"]],testDiscoverSchema[["columnNames"]],list("0","0","jan","mon","0","0","0","0","0","0","0","0","0"))
+#setwd("C:/Users/t-ritra/Documents/Datasets")
+dataframe <- read.csv("forestfires.csv")
+services = getWebServices("0f2adea9926a4e7c9a636a39f2026fa0","dbd68b6401ba4df893f2ef51be3841b5", url = "https://metaanalytics001.cloudapp.net/workspaces/%s/webservices")
+serviceID = services[[1]]["Id"]
+endpoints = getEndpoints("0f2adea9926a4e7c9a636a39f2026fa0","dbd68b6401ba4df893f2ef51be3841b5", serviceID,url = "https://metaanalytics001.cloudapp.net/workspaces/%s/webservices/%s/endpoints")
+testDiscoverSchema <- discoverSchema("0f2adea9926a4e7c9a636a39f2026fa0", endpoints[[1]]$HelpLocation)
+#testconsumeSingleDT <- consumeSingleRows("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true&format=swagger",list( "X","Y","month","day","FFMC","DMC","DC","ISI","temp","RH","wind","rain","area"),list("0","0","jan","mon","0","0","0","0","0","0","0","0","0"))
+testconsumeSingleDT <- consumeSingleRows(endpoints[[1]]$PrimaryKey,testDiscoverSchema[["requestUrlDataTable"]],testDiscoverSchema[["columnNames"]],list("0","0","jan","mon","0","0","0","0","0","0","0","0","0"))
 #testConsumeFile <- consumeFile("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true&format=swagger","forestfires.csv")
-testConsumeFile <- consumeFile("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==",testDiscoverSchema[["requestUrl"]],"forestfires.csv")
+testConsumeFile <- consumeFile(endpoints[[1]]$PrimaryKey,testDiscoverSchema[["requestUrl"]],"forestfires.csv")
 #testConsumeDF <- consumeDataframe("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true&format=swagger",dataframe)
-testConsumeDF <- consumeDataframe("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==",testDiscoverSchema[["requestUrl"]],dataframe)
+testConsumeDF <- consumeDataframe(endpoints[[1]]$PrimaryKey,testDiscoverSchema[["requestUrl"]],dataframe)
 #testconsumeSingle <- consumeLists("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true&format=swagger",list( "X" = 0,"Y" = 0,"month" = "jan","day" = "mon","FFMC" = 0,"DMC" = 0,"DC" = 0,"ISI" = 0,"temp" = 0,"RH" = 0,"wind"=0,"rain" = 0,"area" = 0))
-testconsumeSingle <- consumeLists("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==",testDiscoverSchema[["requestUrl"]],testDiscoverSchema[["sampleInput"]])
+testconsumeSingle <- consumeLists(endpoints[[1]]$PrimaryKey,testDiscoverSchema[["requestUrl"]],testDiscoverSchema[["sampleInput"]])
 
 ##################################################################################
 # WRAPPER TESTING
