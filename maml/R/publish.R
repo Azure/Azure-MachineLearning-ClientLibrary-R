@@ -186,9 +186,12 @@ packDependencies <- function(functionName) {
       # did I miss anything? maybe extra files floating around
       file.remove(paste(pkg, "zip", sep="."))
     }
-    # delete the dependency rdta file
-    file.remove(guid)
-    file.remove(paste(guid,"zip",sep="."))
+    
+    if (length(dependencies) > 0) {
+      # delete the dependency rdta file
+      file.remove(guid)
+      file.remove(paste(guid,"zip",sep="."))
+    }
 
     # return the encoded zip as a string
     return(list(guid, zipEnc))
@@ -425,17 +428,17 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 
 # Update a web service using the service ID
 # Note: cannot change the service name
-updateWebService <- function(functionName, serviceGUID, inputSchema, outputSchema, wkID, authToken) {
-  
+updateWebService <- function(functionName, wsID, inputSchema, outputSchema, wkID, authToken) {
+
   # Make sure input schema matches function signature
   paramCheck(inputSchema, functionName)
-  
+
   # Accept SSL certificates issued by public Certificate Authorities
   options(RCurlOptions = list(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
-  
+
   # Get and encode the dependencies
   zipString = packDependencies(functionName)
-  
+
   # Build the body of the request, differing on whether or not there is a zip to upload
   # Probably a more elegant way to do this
   if (zipString[[2]] == "") {
@@ -463,20 +466,20 @@ updateWebService <- function(functionName, serviceGUID, inputSchema, outputSchem
       )
     )
   }
-  
+
   # convert the payload to JSON as expected by API
   # TODO: consolidate json packages, i.e. use only one if possible
   body = RJSONIO::toJSON(req)
   #print(sprintf(wrapper, length(outputSchema), paste(sprintf("\"%s\"", names(outputSchema)), collapse=","), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName))))
-  
+
   # Response gatherer
   h = RCurl::basicTextGatherer()
   h$reset()
-  
+
   # Generate unique guid
   #guid = gsub("-", "", uuid::UUIDgenerate(use.time=TRUE))
   guid = serviceGUID
-  
+
   # API call
   RCurl::httpPUT(url = sprintf(publishURL, wkID, guid), # defined above
                  httpheader=c('Authorization' = paste('Bearer', authToken, sep=' '),
@@ -484,17 +487,17 @@ updateWebService <- function(functionName, serviceGUID, inputSchema, outputSchem
                               'Accept' = 'application/json'),
                  content = body,
                  writefunction = h$update)
-  
+
   # TODO: format output
   newService <- RJSONIO::fromJSON(h$value())
-  
+
   # Use discovery functions to get default endpoint for immediate use
   # switch to getEndpoints() later
   defaultEP <- getEndpoints(wkID, authToken, newService["Id"], internalURL)
-  
+
   # Curry relevant parameters to consumption function
   #consumption <- functional::Curry(consumeLists, "api_key"=defaultEP[[1]]["PrimaryKey"], "requestURL"=paste(defaultEP[[1]]["ApiLocation"],"/execute?api-version=2.0&details=true",sep=""), "columnNames"=as.list(names(inputSchema)))
-  
+
   # currently returning list of webservice details, default endpoint details, consumption function, in that order
   return(list(newService, defaultEP))#, consumption))
 }
