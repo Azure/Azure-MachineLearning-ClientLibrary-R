@@ -16,11 +16,12 @@ library("httr")
 #' @return List containing the request URL of the webservice, column names of the data, sample input as well as the input schema
 ################################################################################################################################
 
-discoverSchema <- function(workspaceId, helpURL, scheme = "https", host = "requestresponse001.cloudapp.net:443", api_version = "2.0") {
-  endpointID = getEndpointFromUrl(helpURL)
+discoverSchema <- function(helpURL, scheme = "https", host = "requestresponse001.cloudapp.net:443", api_version = "2.0") {
+  endpointId = getDetailsFromUrl(helpURL)[[1]]
+  workspaceId = getDetailsFromUrl(helpURL)[[2]]
   # Construct swagger document URL using parameters
   # Use paste method without separator
-  swaggerURL = paste(scheme,"://", host, "/workspaces/", workspaceId, "/services/", endpointID,"/swagger.json?api-version=",api_version, sep = "")
+  swaggerURL = paste(scheme,"://", host, "/workspaces/", workspaceId, "/services/", endpointId,"/swagger.json?api-version=",api_version, sep = "")
   # Uses httr package to get the HTTP response from the swagger document URL
   httr::set_config(config(ssl_VERIFYHOST=FALSE,ssl_verifyPEER=FALSE), override=TRUE)
   response <- httr::GET(swaggerURL)
@@ -76,7 +77,7 @@ discoverSchema <- function(workspaceId, helpURL, scheme = "https", host = "reque
     executePath = "Path not found"
   }
   # Constructs the request URL with the parameters as well as execution path found. The separator is set to an empty string 
-  requestUrl = paste(scheme,"://", host, "/workspaces/", workspaceId, "/services/", endpointID, executePath, sep = "")
+  requestUrl = paste(scheme,"://", host, "/workspaces/", workspaceId, "/services/", endpointId, executePath, sep = "")
 
   # Access the HTTP method type e.g. GET/ POST and constructs an example request
   httpMethod = toupper(names(swagger$paths[[2]]))
@@ -370,10 +371,13 @@ callAPI <- function(apiKey, requestUrl, keyvalues,  globalParam, retryDelay) {
 }
 
 ########################################################### HELPER FUNCTION ###########################################################
-#' This function is a helper that takes in the help URL, and parses the endpoint from it
-#' This function also documents the assumption that the help URL will end in the format "endpoints/"endpointID/(other keywords)
+#' This function is a helper that takes in the help URL, and parses the endpoint and workspace from it
+#' This function also documents the assumption that the help URL will end in the format "endpoints/"endpointId/(other keywords)
+#' This function also documents the assumption that the help URL will 
 #######################################################################################################################################
 
-getEndpointFromUrl <- function(helpURL) {
-  return (strsplit(((strsplit(helpURL,"endpoints/"))[[1]][2]),"/")[[1]][[1]])
+getDetailsFromUrl <- function(helpURL) {
+  #Uses a strong split to extract the endpoint ID and the workspace ID
+  return (list((strsplit(((strsplit(helpURL,"endpoints/"))[[1]][2]),"/")[[1]][[1]]),(strsplit(((strsplit(helpURL,"/workspaces/"))[[1]][2]),"/")[[1]][[1]])))
+
 }

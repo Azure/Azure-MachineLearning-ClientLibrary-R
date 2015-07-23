@@ -24,7 +24,7 @@ dataframe <- read.csv("forestfires.csv")
 services = getWebServices(wkId, wkAuth, url = "https://metaanalytics001.cloudapp.net/workspaces/%s/webservices")
 serviceID = services[[1]]["Id"]
 endpoints = getEndpoints(wkId, wkAuth, serviceID,url = "https://metaanalytics001.cloudapp.net/workspaces/%s/webservices/%s/endpoints")
-testDiscoverSchema <- discoverSchema(wkId, endpoints[[1]]$HelpLocation)
+testDiscoverSchema <- discoverSchema(endpoints[[1]]$HelpLocation)
 #getendpointhl
 #testconsumeSingleDT <- consumeSingleRows("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true&format=swagger",list( "X","Y","month","day","FFMC","DMC","DC","ISI","temp","RH","wind","rain","area"),list("0","0","jan","mon","0","0","0","0","0","0","0","0","0"))
 testDiscoverSchema[["columnNames"]]
