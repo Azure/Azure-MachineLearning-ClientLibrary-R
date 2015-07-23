@@ -2,17 +2,19 @@
 % Please edit documentation in R/publish.R
 \name{packDependencies}
 \alias{packDependencies}
-\title{This is a helper function to extract object and package dependencies}
+\title{HELPER FUNCTION: Package Dependencies}
 \usage{
 packDependencies(functionName)
 }
 \arguments{
-\item{string}{functionName - function to package dependencies from}
+\item{closure}{functionName - function to package dependencies from}
 }
 \value{
 encoded zip - will return false if nothing was zipped
 }
 \description{
 This is a helper function to extract object and package dependencies
+then pack them into a .zip, then a base64 string
+packDependencies()
 }
 

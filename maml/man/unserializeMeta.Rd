@@ -13,7 +13,7 @@ unserializeMeta(output)
 output dataframe
 }
 \description{
-This is an internal funciton
+This is an internal function
 Take Output from function and save into output dataframe
 }
 

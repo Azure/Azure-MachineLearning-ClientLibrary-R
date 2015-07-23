@@ -2,7 +2,7 @@
 % Please edit documentation in R/discover.R
 \name{getWebServices}
 \alias{getWebServices}
-\title{Get a list of webservices available to a workspace}
+\title{Get Web Services}
 \usage{
 getWebServices(wkID, authToken, url = wsURL)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/discover.R
 \name{getEndpoints}
 \alias{getEndpoints}
-\title{Get the endpoints that are part of a web service}
+\title{Get Endpoints}
 \usage{
 getEndpoints(wkID, authToken, wsID, url = epURL)
 }
@@ -24,8 +24,7 @@ as a nested named list with the following fields:
 Get the endpoints that are part of a web service
 }
 \examples{
-DELETE TOKENS IN REAL VERSION
-endpoints = getEndpoints("c01fb89129aa4ef0a19affa7f95ecbbc", "523709d06661441bbf129d68f84cd6a4", "6a46d1f2a5e6406b8b1a5c563bf1cd10")
-defaultEP = endpoints[[1]]
+<< Please note that you will need to retrieve all of the signature details from your AzureML account >>
+endpoints = getEndpoints("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
 }
 

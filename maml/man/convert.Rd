@@ -2,7 +2,7 @@
 % Please edit documentation in R/publish.R
 \name{convert}
 \alias{convert}
-\title{This is a helper function to convert expected schema to API-expecting format}
+\title{HELPER FUNCTION: Convert Format}
 \usage{
 convert(argList)
 }

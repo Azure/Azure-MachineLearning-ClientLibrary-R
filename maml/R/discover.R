@@ -11,9 +11,16 @@ testURL = "https://hiteshsm.cloudapp.net/workspaces/%s/webservices/%s/endpoints"
 internalURL = "https://management.azureml-int.net/workspaces/%s/webservices/%s/endpoints"
 
 #############################################################
-# Framework for making an HTTP request to the URL specified
-# returns a list of lists, so that the elements can be accessed
-# via double bracket notation, e.g. results[[1]]
+#' @title Get FrameWork
+#' @description
+#' Framework for making an HTTP request to the URL specified
+#' returns a list of lists, so that the elements can be accessed
+#' via double bracket notation
+#' @param tUrl The URL from the published web service
+#' @param authToken The authentication token for the AzureML account being used
+#' @return prints the framework
+#' @examples
+#' results[[1]]
 #############################################################
 getFramework <- function(tUrl, authToken) {
   # Collectors for API response
@@ -39,7 +46,8 @@ getFramework <- function(tUrl, authToken) {
 
 
 #############################################################
-#' Get a list of webservices available to a workspace
+#' @title Get Web Services
+#' @description Get a list of webservices available to a workspace
 #'
 #' @param wkID The workspace ID
 #' @param authToken The primary authorization token
@@ -58,7 +66,8 @@ getWebServices <- function(wkID, authToken, url=wsURL) {
 
 
 #############################################################
-#' Get detailed information about a specific webservice
+#' @title Get Workspace Details
+#' @description Get detailed information about a specific webservice
 #'
 #' @param wkID The workspace ID
 #' @param authToken The primary authorization token
@@ -67,9 +76,8 @@ getWebServices <- function(wkID, authToken, url=wsURL) {
 #' with the following fields:
 #' "Id", "Name", "Description", "CreationTime", "WorkspaceId", "DefaultEndpointName"
 #' @examples
-#' DELETE TOKENS IN REAL VERSION
-#' service = getWSDetails("c01fb89129aa4ef0a19affa7f95ecbbc", "523709d06661441bbf129d68f84cd6a4", "6a46d1f2a5e6406b8b1a5c563bf1cd10")
-#' serviceID = service["Id"]
+#' << Please note that you will need to retrieve all of the signature details from your AzureML account >>
+#' services = getWebServices("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
 #############################################################
 getWSDetails <- function(wkID, authToken, wsID, url=wsURLdet) {
   return(getFramework(sprintf(url, wkID, wsID), authToken))
@@ -78,7 +86,8 @@ getWSDetails <- function(wkID, authToken, wsID, url=wsURLdet) {
 
 
 #############################################################
-#' Get the endpoints that are part of a web service
+#' @title Get Endpoints
+#' @description Get the endpoints that are part of a web service
 #'
 #' @param wkID The workspace ID
 #' @param authToken The primary authorization token
@@ -89,9 +98,8 @@ getWSDetails <- function(wkID, authToken, wsID, url=wsURLdet) {
 #' "HelpLocation", "PrimaryKey", "SecondaryKey", "ApiLocation", "Version",
 #' "MaxConcurrentCalls", "DiagnosticsTraceLevel", "ThrottleLevel"
 #' @examples
-#' DELETE TOKENS IN REAL VERSION
-#' endpoints = getEndpoints("c01fb89129aa4ef0a19affa7f95ecbbc", "523709d06661441bbf129d68f84cd6a4", "6a46d1f2a5e6406b8b1a5c563bf1cd10")
-#' defaultEP = endpoints[[1]]
+#' << Please note that you will need to retrieve all of the signature details from your AzureML account >>
+#' endpoints = getEndpoints("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
 #############################################################
 getEndpoints <- function(wkID, authToken, wsID, url=epURL) {
   return(getFramework(sprintf(url, wkID, wsID), authToken))
@@ -100,7 +108,8 @@ getEndpoints <- function(wkID, authToken, wsID, url=epURL) {
 
 
 #############################################################
-#' Get the details on a specific endpoint
+#' @title get EndPoint Details
+#' @description Get the details on a specific endpoint
 #'
 #' @param wkID The workspace ID
 #' @param authToken The primary authorization token
@@ -111,8 +120,8 @@ getEndpoints <- function(wkID, authToken, wsID, url=epURL) {
 #' "HelpLocation", "PrimaryKey", "SecondaryKey", "ApiLocation", "Version",
 #' "MaxConcurrentCalls", "DiagnosticsTraceLevel", "ThrottleLevel"
 #' @examples
-#' DELETE TOKENS IN REAL VERSION
-#' defaultEP = getEPDetails("c01fb89129aa4ef0a19affa7f95ecbbc", "523709d06661441bbf129d68f84cd6a4", "6a46d1f2a5e6406b8b1a5c563bf1cd10", "default")
+#' << Please note that you will need to retrieve all of the signature details from your AzureML account >>
+#' defaultEP = getEPDetails("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "default")
 #############################################################
 getEPDetails <- function(wkID, authToken, wsID, epID, url=epURLdet) {
   return(getFramework(sprintf(url, wkID, wsID, epID), authToken))
