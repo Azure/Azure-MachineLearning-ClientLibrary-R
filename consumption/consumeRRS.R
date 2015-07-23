@@ -17,7 +17,7 @@ library("httr")
 ################################################################################################################################
 
 discoverSchema <- function(workspaceId, helpURL, scheme = "https", host = "requestresponse001.cloudapp.net:443", api_version = "2.0") {
-  endpointID = (strsplit(helpURL,"endpoints/"))[[1]][2]
+  endpointID = getEndpointFromUrl(helpURL)
   # Construct swagger document URL using parameters
   # Use paste method without separator
   swaggerURL = paste(scheme,"://", host, "/workspaces/", workspaceId, "/services/", endpointID,"/swagger.json?api-version=",api_version, sep = "")
@@ -26,9 +26,9 @@ discoverSchema <- function(workspaceId, helpURL, scheme = "https", host = "reque
   response <- httr::GET(swaggerURL)
   # Automatically parses the content and gets the swagger document
   swagger <- httr::content(response)
-  
+
   # Accesses the input schema in the swagger document
-  inputSchema = swagger$definitions$ExecutionInputs$properties
+  inputSchema = swagger$definition$input1Item
   
   #Accesses the example in the swagger document and converts it to JSON 
   exampleJson <- rjson::toJSON(swagger$definitions$ExecutionRequest$example)
@@ -77,9 +77,7 @@ discoverSchema <- function(workspaceId, helpURL, scheme = "https", host = "reque
   }
   # Constructs the request URL with the parameters as well as execution path found. The separator is set to an empty string 
   requestUrl = paste(scheme,"://", host, "/workspaces/", workspaceId, "/services/", endpointID, executePath, sep = "")
-  # Constructs the request URL to send a request in the Data Table format with the parameters as well as execution path found. This excludes the suffix &format=swagger which is for key-value format requests
-  requestUrlDataTable = paste(scheme,"://", host, "/workspaces/", workspaceId, "/services/", endpointID, "/execute?api-version=2.0&details=true", sep = "")
-  
+
   # Access the HTTP method type e.g. GET/ POST and constructs an example request
   httpMethod = toupper(names(swagger$paths[[2]]))
   httpRequest = paste(httpMethod,requestUrl)
@@ -88,8 +86,7 @@ discoverSchema <- function(workspaceId, helpURL, scheme = "https", host = "reque
     consumeFile = paste("To score a file: consumeFile(apiKey, requestUrl, dataframe)")
     consumeDataFrame = paste("To score a dataframe: consumeDataframe(apiKey, requestUrl, scoreDataFrame)")
     consumeLists = paste("To score requests as lists in the key-value format: consumeLists(apiKey, requestUrl, ...)")
-    consumeSingleRows = paste("To score requests as lists in the data table format: consumeSingleRows(apiKey, requestUrl, columnNames, ...)")
-    cat("Sample functions to execute the web service and get a response synchronously:","\n", consumeFile,"\n", consumeDataFrame,"\n", consumeLists,"\n", consumeSingleRows,"\n","\n")
+    cat("Sample functions to execute the web service and get a response synchronously:","\n", consumeFile,"\n", consumeDataFrame,"\n", consumeLists,"\n","\n")
     
   } else {
     cat("Warning! There was no execution path found for this web service, hence a request URL cannot be constructed!","\n","\n")
@@ -107,7 +104,7 @@ discoverSchema <- function(workspaceId, helpURL, scheme = "https", host = "reque
   }
   
   #Returns what was discovered in the form of a list
-  return (list("requestUrl" = requestUrl, "requestUrlDataTable" = requestUrlDataTable, "columnNames" = columnNames, "sampleInput" = inputExample, "inputSchema" = inputSchema))
+  return (list("requestUrl" = requestUrl, "columnNames" = columnNames, "sampleInput" = inputExample, "inputSchema" = inputSchema))
 }
 
 ################################################################################################################################
@@ -161,17 +158,11 @@ consumeFile <- function(apiKey, requestUrl, inFileName, globalParam = setNames(l
       lastProc = i
       # Access output by converting from JSON into list and indexing into Results
       resultStored <- jsonlite::fromJSON(temp)
-      resultList = resultStored$Results
-      # Add every output from results to batchResults 
-      for(output in resultList) {
-        if(length(returnDataFrame) != 0 && length(batchResults) != 0) {
-          names(batchResults) <- names(output)
-        }
-        batchResults <- rbind(batchResults,data.frame(output))
-      }
+      resultList = resultStored$Results$output1
+      batchResults <- data.frame(resultList)
       # Force returnDataFrame to have the same column names to avoid errors
       if(length(returnDataFrame) != 0 && length(batchResults) != 0) {
-        names(returnDataFrame) <- names(batchResults)
+        names(returnDataFrame) <- names(resultList)
       }
       #Add batch results to the dataframe to be returned
       returnDataFrame <- rbind(returnDataFrame,batchResults)
@@ -191,56 +182,6 @@ consumeFile <- function(apiKey, requestUrl, inFileName, globalParam = setNames(l
   return (returnDataFrame)
 }
 
-################################################################################################################################
-#' This function takes in an API key, request URL, column names of the requests and requests as lists in the data table format as compulsory parameters.
-#' It scores single rows of requests and returns results in a data frame.
-#' It calls a helper function that sends requests to the server in the data table format.
-#' It processes requests in batches and stores the responses in order of batches in an array. It returns the results in a data frame.
-#' @param apiKey entered as a string
-#' @param requestUrl entered as a string or discovered through the discover schema method
-#' @param columnNames column names entered as a list or discovered through the discover schema method
-#' @param ... variable number of requests entered as rows of values in list format
-#' @param globalParam global parameters entered as a list, default value is an empty list
-#' @param retryDelay the time in seconds to delay before retrying in case of a server error, default value is 0.3 seconds
-#' @return returnDataFrame data frame containing results returned from web service call
-################################################################################################################################
-
-consumeSingleRows <- function(apiKey, requestUrl, columnNames, ..., globalParam="", retryDelay = 0.3) {
-  #Stops users if they miss out mandatory fields
-  
-  if (missing(apiKey)) {
-    stop("Need to specify API key")
-  }
-  
-  if (missing(requestUrl)) {
-    stop("Need to specify request URL")
-  }
-  if (missing(columnNames)) {
-    stop("Need to specify column names")
-  }
-  if(missing(globalParam)) {
-    globalParam = ""
-  }
-  # Store variable number of lists entered as a list of lists
-  requestsLists <- lapply(X=list(...), function(x) x)
-  # Make API call with parameters
-  result <- callDTAPI(apiKey, requestUrl, columnNames, requestsLists,  globalParam, retryDelay)
-
-  # Access output by converting from JSON into list and indexing into Results 
-  resultStored <- jsonlite::fromJSON(result)
-  resultList = resultStored$Results
-  # Store output results in a data frame
-  resultDataFrame = data.frame(stringsAsFactors=FALSE)
-  for(output in resultList) {
-    # Access the actual values
-    outputVal = output$value$Values
-    resultDataFrame <- rbind(resultDataFrame,data.frame(outputVal))
-    # Set column names
-    colnames(resultDataFrame) = output$value$ColumnNames
-  }
-
-  return(resultDataFrame)
-}
 
 ################################################################################################################################
 #' This function takes in an API key, request URL, requests as lists in the key value format as compulsory parameters.
@@ -335,17 +276,11 @@ consumeDataframe <- function(apiKey, requestUrl, scoreDataFrame, globalParam=set
       lastProc = i
       # Access output by converting from JSON into list and indexing into Results
       resultStored <- jsonlite::fromJSON(temp)
-      resultList = resultStored$Results
-      # Add every output from results to batchResults 
-      for(output in resultList) {
-        if(length(returnDataFrame) != 0 && length(batchResults) != 0) {
-          names(batchResults) <- names(output)
-        }
-        batchResults <- rbind(batchResults,data.frame(output))
-      }
+      resultList = resultStored$Results$output1
+      batchResults <- data.frame(resultList)
       # Force returnDataFrame to have the same column names to avoid errors
       if(length(returnDataFrame) != 0 && length(batchResults) != 0) {
-        names(returnDataFrame) <- names(batchResults)
+        names(returnDataFrame) <- names(resultList)
       }
       #Add batch results to the dataframe to be returned
       returnDataFrame <- rbind(returnDataFrame,batchResults)
@@ -360,82 +295,6 @@ consumeDataframe <- function(apiKey, requestUrl, scoreDataFrame, globalParam=set
   return(returnDataFrame)
 }
 
-########################################################### HELPER FUNCTION ###########################################################
-#' This function is a helper that takes in an API key, request URL, column names of the data, request in the data table format (in a lists of lists), global parameters of a web service, and delay time before retrying a call in case of a server error.
-#' It then obtains a response from Azure Machine Learning Studio in the JSON format and returns a response to the consumption functions that call it.
-#######################################################################################################################################
-
-callDTAPI <- function(apiKey, requestUrl, columnNames, requestList,  globalParam, retryDelay) {
-  # Set number of tries and HTTP status to 0
-  httpStatus = 0
-  tries = 0
-  # Limit number of API calls to 3
-  for(i in 1:3) {
-    # In case of server error or if first try,
-    if(tries == 0 || httpStatus >= 500) {
-      if(httpStatus >= 500) {
-        # Print headers and let user know you are retrying
-        print(paste("The request failed with status code:", httpStatus, sep=" "))
-        print("headers:")
-        print(headers)
-        print(sprintf("%s %f %s", "Retrying in ",retryDelay," seconds"))
-        # Delay by specified time in case of server error
-        Sys.sleep(retryDelay)
-      }
-      tries = tries + 1
-      # Load RCurl package functions
-      options(RCurlOptions = list(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
-      h = RCurl::basicTextGatherer()
-      hdr = RCurl::basicHeaderGatherer()
-      # Construct request payload
-      req = list(
-        Inputs = list(
-          "input1" = list(
-            "ColumnNames" = columnNames,
-            "Values" = requestList
-          )
-        )
-        ,GlobalParameters = globalParam
-      )
-      # Convert request payload to JSON
-      body = enc2utf8((rjson::toJSON(req)))
-      # Create authorization header
-      authz_hdr = paste('Bearer', apiKey, sep=' ')
-      
-      # Make call to API with necessary components
-      h$reset()
-      RCurl::curlPerform(url = requestUrl,
-                         httpheader=c('Content-Type' = "application/json", 'Authorization' = authz_hdr),
-                         postfields=body,
-                         writefunction = h$update,
-                         headerfunction = hdr$update,
-                         verbose = TRUE
-                         # Parameters below are needed if using test environment, but should not be included for security reasons                  
-                         ,ssl.verifypeer=FALSE,
-                         ssl.verifyhost = FALSE
-      )
-      # Gather headers
-      headers = hdr$value()
-      # Get HTTP status to decide whether to throw bad request or retry, or return etc.
-      httpStatus = headers["status"]
-      result = h$value()
-
-    }
-    # Return result if successful
-    if(httpStatus == 200) {
-      return(result)
-    } 
-    #if user error, print and return error details
-    else if ((httpStatus>= 400) && (500 > httpStatus))
-    {
-      print(paste("The request failed with status code:", httpStatus, sep=" "))
-      print("headers:")
-      print(headers)
-      break
-    }
-  }
-  return(result)
-}
 
 ########################################################### HELPER FUNCTION ###########################################################
 #' This function is a helper that takes in an API key, request URL, request in the key value format (in a lists of lists), global parameters of a web service, and delay time before retrying a call in case of a server error.
@@ -508,4 +367,13 @@ callAPI <- function(apiKey, requestUrl, keyvalues,  globalParam, retryDelay) {
     }
   }
   return(result)
+}
+
+########################################################### HELPER FUNCTION ###########################################################
+#' This function is a helper that takes in the help URL, and parses the endpoint from it
+#' This function also documents the assumption that the help URL will end in the format "endpoints/"endpointID/(other keywords)
+#######################################################################################################################################
+
+getEndpointFromUrl <- function(helpURL) {
+  return (strsplit(((strsplit(helpURL,"endpoints/"))[[1]][2]),"/")[[1]][[1]])
 }
