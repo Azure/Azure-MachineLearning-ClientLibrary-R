@@ -12,6 +12,7 @@ wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- matrix(ncol = %s, nro
 #' @description
 #' This is a helper function that will convert a function's source code to a string
 #' Also consider paste(body(fun())) or getAnywhere()
+#' @export internal
 #' @param x Name of the function to convert to a string
 #' @return function in string format
 #############################################################
@@ -91,6 +92,7 @@ getFunctionString <- function (x)
 #' This is a helper function to extract object and package dependencies
 #' then pack them into a .zip, then a base64 string
 #' packDependencies()
+#' @export internal
 #' @param closure functionName - function to package dependencies from
 #' @return encoded zip - will return false if nothing was zipped
 #############################################################
@@ -207,6 +209,7 @@ packDependencies <- function(functionName) {
 #' @description This is helper function to recursively gather dependencies from user defined-functions
 #' Similar structure to packDependencies()
 #' recurDep()
+#' @export internal
 #' @param string functionName - Name of function to recursively gather dependencies from
 #' @param list dependencies - List of package dependencies
 #' @param list packages - Name of available packages
@@ -240,6 +243,7 @@ recurDep <- function(functionName, dependencies, packages) {
 #' @title HELPER FUNCTION: Recursive Packaging
 #' @description This is helper function to recursively gather dependencies from user defined-functions
 #' recurPkg()
+#' @export internal
 #' @param string pkgName - Name of package to check for existence in list of packages
 #' @param list packages - Name of available packages
 #' @return list of packages
@@ -281,6 +285,7 @@ recurPkg <- function(pkgName, packages) {
 #############################################################
 #' @title HELPER FUNCTION: Convert Format
 #' @description This is a helper function to convert expected schema to API-expecting format
+#' @export internal
 #' @param list argList - List of expected input parameters
 #' @return Converted inputSchema to the proper format
 #############################################################
@@ -317,6 +322,7 @@ convert <- function(argList) {
 #############################################################
 #' @title HELPER FUNCTION: Parameter Check
 #' @description This is a helper function to check that the user has passed in all of the expected parameters.
+#' @export internal
 #' @param list userInput - List of expected input parameters
 #' @param string funcName - The function that is being published
 #' @return False if the input was not as expected/True if input matched expectation
