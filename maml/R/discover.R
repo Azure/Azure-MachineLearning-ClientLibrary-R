@@ -37,7 +37,9 @@ getFramework <- function(tUrl, authToken) {
               httpheader=c('Authorization' = auth, 'Content-Type' = "application/json", 'Accept' = "application/json"),
               writefunction = h$update,
               headerfunction = hdr$update,
-              verbose = TRUE)
+              verbose = TRUE,
+              ssl.verifyHost = FALSE,
+              ssl.verifyPeer = FALSE)
 
   # Print results
   return(RJSONIO::fromJSON(h$value()))
