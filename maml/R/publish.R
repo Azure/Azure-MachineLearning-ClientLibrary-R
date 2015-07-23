@@ -189,9 +189,12 @@ packDependencies <- function(functionName) {
       # did I miss anything? maybe extra files floating around
       file.remove(paste(pkg, "zip", sep="."))
     }
-    # delete the dependency rdta file
-    file.remove(guid)
-    file.remove(paste(guid,"zip",sep="."))
+    
+    if (length(dependencies) > 0) {
+      # delete the dependency rdta file
+      file.remove(guid)
+      file.remove(paste(guid,"zip",sep="."))
+    }
 
     # return the encoded zip as a string
     return(list(guid, zipEnc))
@@ -441,7 +444,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 }
 
 
-
+<<<<<<< HEAD
 #############################################################
 #' @title Update a Published Web Service
 #' @description
@@ -469,7 +472,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 #' # Let's say that predictTitanic was updated to add more functionality now and we want to republish
 #' TitanicService <- updateWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
 #############################################################
-updateWebService <- function(functionName, serviceGUID, inputSchema, outputSchema, wkID, authToken) {
+updateWebService <- function(functionName, wsID, inputSchema, outputSchema, wkID, authToken) {
 
   # Make sure input schema matches function signature
   paramCheck(inputSchema, functionName)

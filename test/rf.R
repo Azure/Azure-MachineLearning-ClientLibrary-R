@@ -1,3 +1,4 @@
+setwd("C://Users/t-alewa/Documents/Azure-MachineLearning-ClientLibrary-R/test")
 library(randomForest)
 dataset <- read.csv(file="rfData.csv")
 
@@ -12,3 +13,4 @@ predictCount <- function(season, holiday, workingday, weather, temp, atemp, humi
 irisService <- publishWebService("predictClass", "irisService7-21", list("sepalLength"="float", "sepalWidth"="float", "petalLength"="float", "petalWidth"="float"), list("class"="int"), wsID, wsAuth)
 endpoints <- irisService[[2]]
 response <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("sepalLength", "sepalWidth", "petalLength", "petalWidth"), list(5, 5, 4, 3), list(4.5, 6.5, 4.5, 2))
+
