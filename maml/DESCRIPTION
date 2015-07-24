@@ -1,6 +1,6 @@
 Package: maml
 Version: 0.1
-Date: 2015-07-14
+Date: 2015-07-24
 Type: Package
 Title: Publishes, discovers and consumes trained models to Microsoft Azure to make accessible as a web service
 Author@R: c(person("AzureML", "Maintainer", email = "AzureMLForCRAN@microsoft.com", role = c("aut", "cre")),
