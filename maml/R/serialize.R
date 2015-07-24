@@ -1,3 +1,9 @@
+#' @docType package
+#' @name serialize
+#' Before code is sent to the API, it needs to be serialized to help maintain its data types.
+#' This package provides the user with several different methods of serializing code.
+
+# package to include
 library(rjson)
 
 ################################################################
