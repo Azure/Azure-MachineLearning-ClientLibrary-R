@@ -14,7 +14,7 @@ Maintainer: AzureML Maintainer <AzureMLForCRAN@microsoft.com>
 Description: Provides an interface with Microsoft Azure to easily publish, consume, and discover models as a web service, will return URL or sample code to access newly created web service's API
 License: Microsoft
 LazyData: TRUE
-Imports:
+Imports: 
   RCurl,
   RJSONIO,
   uuid,
@@ -26,3 +26,4 @@ Imports:
   data.table,
   df2json,
   gbm
+Suggests: testthat

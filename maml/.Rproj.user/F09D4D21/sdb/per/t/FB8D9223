@@ -1,0 +1,17 @@
+{
+    "contents" : "Package: maml\nVersion: 0.1\nDate: 2015-07-14\nType: Package\nTitle: Publishes, discovers and consumes trained models to Microsoft Azure to make accessible as a web service\nAuthor@R: c(person(\"AzureML\", \"Maintainer\", email = \"AzureMLForCRAN@microsoft.com\", role = c(\"aut\", \"cre\")),\n  person(\"Brianna\", \"Gerads\", role = \"aut\"),\n  person(\"Ritika\", \"Ravichandra\",  role = \"aut\"),\n  person(\"Alex\", \"Wang\", role = \"aut\"))\nAuthor: Brianna Gerads [aut, cre],\n  Alex Wang [aut, cre],\n  Ritika Ravichandra [aut, cre]\nMaintainer: AzureML Maintainer <AzureMLForCRAN@microsoft.com>\nDescription: Provides an interface with Microsoft Azure to easily publish, consume, and discover models as a web service, will return URL or sample code to access newly created web service's API\nLicense: Microsoft\nLazyData: TRUE\nImports: \n  RCurl,\n  RJSONIO,\n  uuid,\n  jsonlite,\n  codetools,\n  base64enc,\n  functional,\n  httr,\n  data.table,\n  df2json,\n  gbm\nSuggests: testthat\n",
+    "created" : 1432926096077.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3192022791",
+    "id" : "FB8D9223",
+    "lastKnownWriteTime" : 1437761702,
+    "path" : "~/Azure-MachineLearning-ClientLibrary-R/maml/DESCRIPTION",
+    "project_path" : "DESCRIPTION",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "type" : "dcf"
+}

@@ -8,7 +8,7 @@ wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- matrix(ncol = %s, nro
 
 
 #############################################################
-#' @title Get Function Source Code as a String
+#' @title Get function source code as a string
 #' @description
 #' This is a helper function that will convert a function's source code to a string
 #' @export internal
@@ -83,10 +83,7 @@ getFunctionString <- function (x)
 
 
 #############################################################
-# TODO: add error handling at each step
-# TODO: suppress the red text?
-#############################################################
-#' @title HELPER FUNCTION: Package Dependencies
+#' @title Package a function's dependencies into a base64 encoded string
 #' @description
 #' This is a helper function to extract object and package dependencies
 #' then pack them into a .zip, then a base64 string
@@ -96,76 +93,107 @@ getFunctionString <- function (x)
 #' @return encoded zip - will return false if nothing was zipped
 #############################################################
 packDependencies <- function(functionName) {
-  # lists for storing objects and packages
-  dependencies = list()
-  packages = list()
 
-  # generate a GUID to act as a file name to store packages, R data
-  guid = gsub("-", "", uuid::UUIDgenerate(use.time=TRUE))
+  # Recursive step for package packaging
+  recurPkg <- function(pkgName, pkgList) {
+    # if the package isn't already in the list
+    if (!(pkgName %in% pkgList)) {
+      # add it
+      pkgList <- c(pkgName, pkgList)
 
-  # NOTE: will not work if the user function specifies the names directly, e.g. won't find rjson::toJSON
-  # from findGlobals man page: "R semantics only allow variables that might be local to be identified"
-  for (obj in codetools::findGlobals(get(functionName))) {
-    name = get(obj)
-
-    # filter out primitives and duplicates
-    if (is.primitive(name) || (obj %in% names(dependencies))) {
-      next
-    }
-
-    # get in-memory objects
-    else if (!is.function(name)) {
-      dependencies[[obj]] <- name
-      
-      # Use the object's class to find package dependencies
-      objClass <- class(name)
-      
-      # iterate through the class vector looking for packages
-      for (class in objClass) {
-        tryCatch({
-          # get the name of the package the class belongs to
-          nameEnv <- environment(get(class))
-          # filter out basic objects
-          if (!(identical(nameEnv, NULL)) && !(identical(nameEnv, .BaseNamespaceEnv))) {
-            packages <- recurPkg(paste(getNamespaceName(nameEnv)), packages)
+      # if the package is available on a repo
+      if (pkgName %in% row.names(available.packages())) {
+        # iterate through the dependencies and check if need to add them
+        for (pkg in strsplit(available.packages()[pkgName, "Depends"], split=", ")[[1]]) {
+          # filter out duplicates, R version dependencies, and base packages
+          if (!(pkg %in% pkgList) && !(grepl("R \\((.*)\\)", pkg)) && (pkg %in% row.names(available.packages()))) {
+            # recursively call recurPkg
+            pkgList <- recurPkg(pkg, pkgList)
           }
-        }, error = function(e) {
-          sprintf("%s not found", obj)
-        })
+        }
+        # iterate through imports
+        for (pkg in strsplit(available.packages()[pkgName, "Imports"], split=", ")[[1]]) {
+          # filter out duplicates, R version dependencies, and base packages
+          if (!(pkg %in% pkgList) && !(grepl("R \\((.*)\\)", pkg)) && (pkg %in% row.names(available.packages()))) {
+            # recursively call recurPkg
+            pkgList <- recurPkg(pkg, pkgList)
+          }
+        }
       }
     }
-
-    # grab user defined functions
-    else if (identical(environment(name), globalenv())) {
-      dependencies[[obj]] <- name
-      # recursively get dependencies
-      results <- recurDep(obj, dependencies, packages)
-      dependencies <- results$dependencies
-      packages <- results$packages
-    }
-
-    # get the names of packages of package functions
-    # filter out base functions
-    else if (paste(getNamespaceName(environment(name))) != "base") {
-      # recursively get packages
-      packages <- recurPkg(paste(getNamespaceName(environment(name))), packages)
-    }
-
-    # need an else branch?
+    # return updated list of packages
+    return(pkgList)
   }
 
-  # save current path to restore to later
+  # Recursive step for object packaging
+  # NOTE: will not work if the user function specifies the names directly, e.g. won't find rjson::toJSON
+  # from findGlobals man page: "R semantics only allow variables that might be local to be identified"
+  recurDep <- function(objName, depList, pkgList) {
+    # findGlobals() gets all external dependencies
+    # Iterate over them
+    for (obj in codetools::findGlobals(get(objName))) {
+      name = get(obj)
+
+      # filter out primitives and duplicates
+      if (is.primitive(name) || (obj %in% names(depList))) {
+        next
+      }
+      # non-function object dependencies
+      else if (!is.function(name)) {
+        depList[[obj]] <- name
+
+        # Use the object's class to find package dependencies
+        objClass <- class(name)
+
+        # iterate through the class vector looking for packages
+        for (class in objClass) {
+          tryCatch({
+            # get the name of the package the class belongs to
+            nameEnv <- environment(get(class))
+            # filter out basic environment
+            if (!(identical(nameEnv, NULL)) && !(identical(nameEnv, .BaseNamespaceEnv))) {
+              packages <- recurPkg(paste(getNamespaceName(nameEnv)), pkgList)
+            }
+          # if unable to find package, continue
+          }, error = function(e) {
+            sprintf("%s not found", obj)
+          })
+        }
+      }
+      # user defined functions
+      else if (identical(environment(name), globalenv())) {
+        depList[[obj]] <- name
+        results <- recurDep(obj, depList, pkgList)
+        depList <- results$dependencies
+        pkgList <- results$packages
+      }
+      # functions from packages
+      else if (paste(getNamespaceName(environment(name))) != "base") {
+        packages <- recurPkg(paste(getNamespaceName(environment(name))), pkgList)
+      }
+    }
+    return(list("dependencies"=depList, "packages"=pkgList))
+  }
+
+  # call recurDep on the desired function and with empty lists
+  results <- recurDep(functionName, list(), list())
+  dependencies <- results$dependencies
+  packages <- results$packages
+
+  # save current path to restore later
   start = getwd()
-  # go to package library, doing this to prevent zipping entire package
+  # go to package library, doing this to prevent zipping entire path to package
   toPack <- packages
   toZip = vector()
   for (i in 1:length(.libPaths())) {
     setwd(.libPaths()[i])
-    # try to find and zip up the packages
+    # try to find the package in the directory and zip it
     for (pkg in toPack) {
       if (file.exists(pkg)) {
+        # save it to original directory
         zip(paste(start, paste(pkg, "zip", sep="."), sep="/"), pkg)
         toZip <- c(toZip, paste(pkg, "zip", sep="."))
+        # remove the package from the list of packages to pack
         toPack <- toPack[toPack != pkg]
       }
     }
@@ -174,15 +202,19 @@ packDependencies <- function(functionName) {
     if (length(toPack) == 0) {
       break
     }
-    if (i == length(.libPaths())) {
-      # error: can't find packages
-      stop("Error: unable to locate packages. Please make sure the packages used are in at least one of the library paths.")
-    }
   }
+
   # go back to where the user started
   setwd(start)
 
-  # objects, functions, etc.
+  # make sure that all packages were found
+  if (length(toPack) > 0) {
+    stop("Error: unable to locate one or more packages. Please make sure the packages used are in at least one of the library paths.")
+  }
+
+  # generate a GUID to act as a file name to store packages, R data
+  guid = gsub("-", "", uuid::UUIDgenerate(use.time=TRUE))
+  # dump objects, functions, etc. into .rdta file
   if (length(dependencies) > 0) {
     # maybe can save directly as a .zip and skip the zip() call?
     save(dependencies, file=guid)
@@ -196,12 +228,11 @@ packDependencies <- function(functionName) {
 
     # delete the packages
     for (pkg in packages) {
-      # did I miss anything? maybe extra files floating around
       file.remove(paste(pkg, "zip", sep="."))
     }
-    
+
+    # delete the dependency rdta file
     if (length(dependencies) > 0) {
-      # delete the dependency rdta file
       file.remove(guid)
       file.remove(paste(guid,"zip",sep="."))
     }
@@ -209,88 +240,14 @@ packDependencies <- function(functionName) {
     # return the encoded zip as a string
     return(list(guid, zipEnc))
   }
-  # if nothing was zipped, return false
+
+  # if nothing was zipped, return empty string to indicate
+  # returning two things because unable to return variable amounts
   else {
     return(list(guid, ""))
   }
 }
 
-
-
-#############################################################
-#' @title HELPER FUNCTION: Recursive Dependencies
-#' @description This is helper function to recursively gather dependencies from user defined-functions
-#' Similar structure to packDependencies()
-#' recurDep()
-#' @export internal
-#' @param string functionName - Name of function to recursively gather dependencies from
-#' @param list dependencies - List of package dependencies
-#' @param list packages - Name of available packages
-#' @return list of packages and dependencies
-#############################################################
-recurDep <- function(functionName, dependencies, packages) {
-  for (obj in codetools::findGlobals(get(functionName))) {
-    name = get(obj)
-    if (is.primitive(name) || (obj %in% names(dependencies))) {
-      next
-    }
-    else if (!is.function(name)) {
-      dependencies[[obj]] <- name
-    }
-    else if (identical(environment(name), globalenv())) {
-      dependencies[[obj]] <- name
-      results <- recurDep(obj, dependencies, packages)
-      dependencies <- results$dependencies
-      packages <- results$packages
-    }
-    else if (paste(getNamespaceName(environment(name))) != "base") {
-      packages <- recurPkg(paste(getNamespaceName(environment(name))), packages)
-    }
-  }
-  return(list("dependencies"=dependencies, "packages"=packages))
-}
-
-
-
-#############################################################
-#' @title HELPER FUNCTION: Recursive Packaging
-#' @description This is helper function to recursively gather dependencies from user defined-functions
-#' recurPkg()
-#' @export internal
-#' @param string pkgName - Name of package to check for existence in list of packages
-#' @param list packages - Name of available packages
-#' @return list of packages
-#############################################################
-recurPkg <- function(pkgName, packages) {
-  # if the package isn't already in the list
-  if (!(pkgName %in% packages)) {
-    # add it
-    packages <- c(pkgName, packages)
-    pkgDeps <- available.packages()
-
-    # if the package is available on a repo
-    if (pkgName %in% row.names(available.packages())) {
-      # iterate through the dependencies and check if need to add them
-      for (pkg in strsplit(available.packages()[pkgName, "Depends"], split=", ")[[1]]) {
-        # filter out duplicates and R version dependencies
-        if (!(pkg %in% packages) && !(grepl("R \\((.*)\\)", pkg)) && (pkg %in% row.names(available.packages()))) {
-          # recursively call recurPkg
-          packages <- recurPkg(pkg, packages)
-        }
-      }
-      # iterate through imports
-      for (pkg in strsplit(available.packages()[pkgName, "Imports"], split=", ")[[1]]) {
-        # filter out duplicates and R version dependencies
-        if (!(pkg %in% packages) && !(grepl("R \\((.*)\\)", pkg)) && (pkg %in% row.names(available.packages()))) {
-          # recursively call recurPkg
-          packages <- recurPkg(pkg, packages)
-        }
-      }
-    }
-  }
-  # return updated list of packages
-  return(packages)
-}
 
 
 
@@ -328,7 +285,6 @@ convert <- function(argList) {
   }
   return(form)
 }
-
 
 
 
@@ -383,7 +339,7 @@ paramCheck <- function(userInput, funcName) {
 #############################################################
 publishWebService <- function(functionName, serviceName, inputSchema, outputSchema, wkID, authToken) {
 
-  # Make sure input schema matches function signature
+  # Make sure schema inputted matches function signature
   paramCheck(inputSchema, functionName)
 
   # Accept SSL certificates issued by public Certificate Authorities
@@ -428,7 +384,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
   h = RCurl::basicTextGatherer()
   h$reset()
 
-  # Generate unique guid
+  # Generate unique guid to serve as the web service ID
   guid = gsub("-", "", uuid::UUIDgenerate(use.time=TRUE))
 
   # API call
@@ -439,18 +395,19 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
                  content = body,
                  writefunction = h$update)
 
-  # TODO: format output
+  # Format output
   newService <- RJSONIO::fromJSON(h$value())
 
-  # Use discovery functions to get default endpoint for immediate use
-  # switch to getEndpoints() later
-  defaultEP <- getEndpoints(wkID, authToken, newService["Id"], internalURL)
+  # Use discovery functions to get endpoints for immediate use
+  # NOTE: switch from internal URL for production
+  endpoints <- getEndpoints(wkID, authToken, newService["Id"], internalURL)
+  # add suffix to the API location so it can actually be used
+  for (i in 1:length(endpoints)) {
+    endpoints[[i]]$ApiLocation <- paste(endpoints[[i]]$ApiLocation, "/execute?api-version=2.0&details=true",sep="")
+  }
 
-  # Curry relevant parameters to consumption function
-  #consumption <- functional::Curry(consumeLists, "api_key"=defaultEP[[1]]["PrimaryKey"], "requestURL"=paste(defaultEP[[1]]["ApiLocation"],"/execute?api-version=2.0&details=true",sep=""), "columnNames"=as.list(names(inputSchema)))
-
-  # currently returning list of webservice details, default endpoint details, consumption function, in that order
-  return(list(newService, defaultEP))#, consumption))
+  # currently returning list of webservice details (as a list) and endpoint details (as a list) in that order
+  return(list("serviceDetails"=newService, "endpoints"=endpoints))
 }
 
 
@@ -484,7 +441,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 #############################################################
 updateWebService <- function(functionName, wsID, inputSchema, outputSchema, wkID, authToken) {
 
-  # Make sure input schema matches function signature
+  # Make sure schema inputted matches function signature
   paramCheck(inputSchema, functionName)
 
   # Accept SSL certificates issued by public Certificate Authorities
@@ -523,34 +480,29 @@ updateWebService <- function(functionName, wsID, inputSchema, outputSchema, wkID
   # convert the payload to JSON as expected by API
   # TODO: consolidate json packages, i.e. use only one if possible
   body = RJSONIO::toJSON(req)
-  #print(sprintf(wrapper, length(outputSchema), paste(sprintf("\"%s\"", names(outputSchema)), collapse=","), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName))))
 
   # Response gatherer
   h = RCurl::basicTextGatherer()
   h$reset()
 
-  # Generate unique guid
-  #guid = gsub("-", "", uuid::UUIDgenerate(use.time=TRUE))
-  guid = serviceGUID
-
   # API call
-  RCurl::httpPUT(url = sprintf(publishURL, wkID, guid), # defined above
+  RCurl::httpPUT(url = sprintf(publishURL, wkID, wsID),
                  httpheader=c('Authorization' = paste('Bearer', authToken, sep=' '),
                               'Content-Type' = 'application/json',
                               'Accept' = 'application/json'),
                  content = body,
                  writefunction = h$update)
 
-  # TODO: format output
-  newService <- RJSONIO::fromJSON(h$value())
+  # Format output
+  updatedService <- RJSONIO::fromJSON(h$value())
 
   # Use discovery functions to get default endpoint for immediate use
-  # switch to getEndpoints() later
-  defaultEP <- getEndpoints(wkID, authToken, newService["Id"], internalURL)
+  # NOTE: switch from internal URL for production
+  endpoints <- getEndpoints(wkID, authToken, newService["Id"], internalURL)
+  for (i in 1:length(endpoints)) {
+    endpoints[[i]]$ApiLocation <- paste(endpoints[[i]]$ApiLocation, "/execute?api-version=2.0&details=true",sep="")
+  }
 
-  # Curry relevant parameters to consumption function
-  #consumption <- functional::Curry(consumeLists, "api_key"=defaultEP[[1]]["PrimaryKey"], "requestURL"=paste(defaultEP[[1]]["ApiLocation"],"/execute?api-version=2.0&details=true",sep=""), "columnNames"=as.list(names(inputSchema)))
-
-  # currently returning list of webservice details, default endpoint details, consumption function, in that order
-  return(list(newService, defaultEP))#, consumption))
+  # currently returning list of webservice details (as a list) and endpoint details (as a list) in that order
+  return(list("serviceDetails"=updatedService, "endpoints"=endpoints))
 }

@@ -22,4 +22,4 @@ irisService <- publishWebService("predictClass", "irisService7-21", list("sepalL
 
 # Consume web service
 endpoints <- irisService[[2]]
-response <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("sepalLength", "sepalWidth", "petalLength", "petalWidth"), list(5, 5, 4, 3), list(4.5, 6.5, 4.5, 2))
+response <- consumeDataTable(endpoints[[1]]["PrimaryKey"], endpoints[[1]]["ApiLocation"], list("sepalLength", "sepalWidth", "petalLength", "petalWidth"), list(5, 5, 4, 3), list(4.5, 6.5, 4.5, 2))

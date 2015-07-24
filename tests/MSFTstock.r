@@ -25,5 +25,5 @@ MSFTpredict <- function(close, volume) {
 MSFTonline <- publishWebService("MSFTpredict", "MSFTdemo", list("close"="float", "volume"="float"), list("number"="float"), wsID, wsAuth)
 
 # Consume web service
-endpoints <- MSFTonline[[2]]
-response <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("close", "volume"), list(25, 300), list(30, 100))
+endpoints <- getEndpoints(wsID, wsAuth, MSFTonline[[1]]$Id, url=internalURL)
+response <- consumeDataTable(endpoints[[1]]$PrimaryKey, endpoints[[1]]$ApiLocation, list("close", "volume"), list(25, 300), list(30, 100))

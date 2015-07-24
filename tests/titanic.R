@@ -12,15 +12,15 @@ train <- read.csv(file="train.csv")
 # Preprocessing
 #y variable
 survived <- train$Survived
-#id 
+#id
 passengerId <- test$PassengerId
 #remove from the training sample
 train = train[,-2]
 end_trn = nrow(train)
 #combine the two sets
 train <- rbind(train, test)
-#Age replace with mean 
-train$Age[is.na(train$Age)] <- 30 
+#Age replace with mean
+train$Age[is.na(train$Age)] <- 30
 end = nrow(train)
 #remove columns
 train = train[,c(-1,-3,-8,-10,-11)]
@@ -68,10 +68,10 @@ endpoints <- getEndpoints(wsID, wsAuth, TitanicService[[1]]["Id"], internalURL)
 # Alternatively,
 endpoints <- TitanicService[[2]]
 # First, consume with inputs as a list
-response <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("1", "male", "20", "2", "0", "8.50"), list("1", "female", "20", "1", "0", "8.50"))
-response2 <- consumeDataTable(endpoints[[1]]["PrimaryKey"], paste(endpoints[[1]]["ApiLocation"], "/execute?api-version=2.0&details=true",sep=""), list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("2", "male", "50", "1", "0", "8.50"), list("2", "female", "50", "1", "0", "8.50"))
+response <- consumeDataTable(endpoints[[1]]["PrimaryKey"], endpoints[[1]]["ApiLocation"], list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("1", "male", "20", "2", "0", "8.50"), list("1", "female", "20", "1", "0", "8.50"))
+response2 <- consumeDataTable(endpoints[[1]]["PrimaryKey"], endpoints[[1]]["ApiLocation"], list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("2", "male", "50", "1", "0", "8.50"), list("2", "female", "50", "1", "0", "8.50"))
 
 # consume with inputs as dataframe
 # creating test data.frame
 demoDF <- data.frame("Pclass"=c(1,2,1), "Sex"=c("male","female","male"), "Age"=c("8","20", "30"), "Parch"=c(1,1,1), "SibSp"=c(1,3,1), "Fare"=c(10,7.5, 9))
-responseDF <- consumeDataframe(TitanicService[[2]][[1]]$PrimaryKey, paste(TitanicService[[2]][[1]]$ApiLocation,"/execute?api-version=2.0&details=true",sep=""), demoDF)
+responseDF <- consumeDataframe(TitanicService[[2]][[1]]$PrimaryKey, TitanicService[[2]][[1]]$ApiLocation, demoDF)

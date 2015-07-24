@@ -1,0 +1,18 @@
+{
+    "contents" : "test_that(\"publishWebService() returns a working web service\", {\n\n})\n\ntest_that(\"Discovery functions allow discovery of endpoints to consume web service\", {\n\n})\n\ntest_that(\"Consumption functions are working and returning correct values\", {\n\n})\n",
+    "created" : 1437769657112.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "697681638",
+    "id" : "9B98A23A",
+    "lastKnownWriteTime" : 1437778028,
+    "path" : "~/Azure-MachineLearning-ClientLibrary-R/maml/tests/testthat/testETE.R",
+    "project_path" : "tests/testthat/testETE.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

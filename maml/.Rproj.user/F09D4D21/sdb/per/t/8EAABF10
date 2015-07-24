@@ -1,0 +1,18 @@
+{
+    "contents" : "test_that(\"Can discover all endpoints of all web services available starting from workspace ID\", {\n\n})\n\ntest_that(\"API location is returned and able to be used immediately\", {\n\n})\n\ntest_that(\"Discovery function handle various HTTP codes and give useful feedback\", {\n\n})\n",
+    "created" : 1437769636549.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3912721011",
+    "id" : "8EAABF10",
+    "lastKnownWriteTime" : 1437778109,
+    "path" : "~/Azure-MachineLearning-ClientLibrary-R/maml/tests/testthat/testDiscover.R",
+    "project_path" : "tests/testthat/testDiscover.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

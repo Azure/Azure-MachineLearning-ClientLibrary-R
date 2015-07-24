@@ -1,0 +1,18 @@
+{
+    "contents" : "add <- function (x, y) {\n  print(\"This will add x and y\")\n  return(x + y)\n}\n\ntest_that(\"Wrapper code (less maml.input/output) correctly applies function to output\", {\n\n})\n\ntest_that(\"GetFunctionString gets a function source code with no quotes or newlines\", {\n  expect_equal(getFunctionString(add), \"function (x, y) \\r\\n{\\r\\n    print(\\\"This will add x and y\\\")\\r\\n    return(x + y)\\r\\n}\")\n})\n\ntest_that(\"packDependencies returns a zip file encoded as a base64 string\", {\n\n})\n\ntest_that(\"packDependencies handles recursive packaging\", {\n\n})\n\ntest_that(\"packDepedencies cleans up after itself, even in case of error\", {\n\n})\n\ntest_that(\"publishWebService returns a working web service\", {\n\n})\n\ntest_that(\"publishWebService handles bad input correctly\", {\n  expect_error(, \"Data type not supported\")\n  expect_error(, \"inputSchema length doesn't match function signature\")\n})\n\ntest_that(\"publishWebService handles various HTTP error codes correctly\", {\n\n})\n\ntest_that(\"updateWebService correctly updates a web service\", {\n\n})\n\n",
+    "created" : 1437769434324.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "202783970",
+    "id" : "A57F8A33",
+    "lastKnownWriteTime" : 1437778739,
+    "path" : "~/Azure-MachineLearning-ClientLibrary-R/maml/tests/testthat/testPublish.R",
+    "project_path" : "tests/testthat/testPublish.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

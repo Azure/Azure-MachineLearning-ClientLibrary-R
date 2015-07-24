@@ -104,7 +104,11 @@ getWSDetails <- function(wkID, authToken, wsID, url=wsURLdet) {
 #' endpoints = getEndpoints("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
 #############################################################
 getEndpoints <- function(wkID, authToken, wsID, url=epURL) {
-  return(getFramework(sprintf(url, wkID, wsID), authToken))
+  endpoints <- getFramework(sprintf(url, wkID, wsID), authToken)
+  for (i in 1:length(endpoints)) {
+    endpoints[[i]]$ApiLocation <- paste(endpoints[[i]]$ApiLocation, "/execute?api-version=2.0&details=true",sep="")
+  }
+  return(endpoints)
 }
 
 
@@ -126,5 +130,7 @@ getEndpoints <- function(wkID, authToken, wsID, url=epURL) {
 #' defaultEP = getEPDetails("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "default")
 #############################################################
 getEPDetails <- function(wkID, authToken, wsID, epID, url=epURLdet) {
-  return(getFramework(sprintf(url, wkID, wsID, epID), authToken))
+  endpoint <- getFramework(sprintf(url, wkID, wsID, epID), authToken)
+  endpoint[[1]]$ApiLocation <- paste(endpoint[[1]]$ApiLocation, "/execute?api-version=2.0&details=true",sep="")
+  return(endpoint)
 }
