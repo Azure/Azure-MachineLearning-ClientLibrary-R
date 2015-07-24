@@ -1,3 +1,19 @@
+#' @docType package
+#' @name consume
+#' Before consuming a function, the user can call the discoverSchema function using the request URL and
+#' view the input schema as well as an example of the input to the web service.
+#' While consuming a web service, the user currently has the option to score either a CSV file, data frame or
+#' individual requests. With either option, the user simply has to make a single-line function call and the
+#' scored probabilities are returned to the user in a data frame. There are three functions that the user can
+#' choose from. All 3 functions take in the API key and request URL. The consumeLists function takes in a variable
+#' number of requests entered in data table format. The option to enter the requests in key-value format is currently
+#' being added. The consumeFile function takes in the file name of the file to score, while the consumeDataFrame
+#' function takes in a data frame to score. Users also have the option of varying global parameters, delay time
+#' before retrying a server call in case of a server error, batch size of each request sent to the server and name
+#' of file that results are outputted to. Hence, the user can consume a web service from AzureML regardless of the
+#' format in which their data is stored in a single-line function.
+
+# packages to include
 library("RCurl")
 library("rjson")
 library("data.table")
@@ -228,7 +244,7 @@ consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam=setNames
       colnames(df) <- "Scored probabilities"
 
       #      print("passed")
-      print(sprintf("%i out of %i processed", i, length(values))
+      print(sprintf("%i out of %i processed", i, length(values)))
       valuebatch = list()
       counter = 0
     }
