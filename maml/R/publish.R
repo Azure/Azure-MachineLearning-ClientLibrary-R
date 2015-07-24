@@ -1,3 +1,14 @@
+#' @docType package
+#' @name publish
+#' Publishing is a simple one call function for the user. Upon calling, the user simply needs to provide
+#' the workspace identification information, the function they want published and the name they want this
+#' service to be saved as. The publish function call will handle the API call for the user and any consumption
+#' that may need to be done related to this function. Once the call is finished, the function will return a
+#' list with the web service details, the endpoint detains and the consumption function to the user.
+#' There is also an update publish call so that the user can republish a function without creating a new instance.
+
+
+
 #############################################################
 # String constants
 #############################################################
@@ -116,10 +127,10 @@ packDependencies <- function(functionName) {
     # get in-memory objects
     else if (!is.function(name)) {
       dependencies[[obj]] <- name
-      
+
       # Use the object's class to find package dependencies
       objClass <- class(name)
-      
+
       # iterate through the class vector looking for packages
       for (class in objClass) {
         tryCatch({
@@ -150,8 +161,6 @@ packDependencies <- function(functionName) {
       # recursively get packages
       packages <- recurPkg(paste(getNamespaceName(environment(name))), packages)
     }
-
-    # need an else branch?
   }
 
   # save current path to restore to later
@@ -199,7 +208,7 @@ packDependencies <- function(functionName) {
       # did I miss anything? maybe extra files floating around
       file.remove(paste(pkg, "zip", sep="."))
     }
-    
+
     if (length(dependencies) > 0) {
       # delete the dependency rdta file
       file.remove(guid)
@@ -547,9 +556,6 @@ updateWebService <- function(functionName, wsID, inputSchema, outputSchema, wkID
   # Use discovery functions to get default endpoint for immediate use
   # switch to getEndpoints() later
   defaultEP <- getEndpoints(wkID, authToken, newService["Id"], internalURL)
-
-  # Curry relevant parameters to consumption function
-  #consumption <- functional::Curry(consumeLists, "api_key"=defaultEP[[1]]["PrimaryKey"], "requestURL"=paste(defaultEP[[1]]["ApiLocation"],"/execute?api-version=2.0&details=true",sep=""), "columnNames"=as.list(names(inputSchema)))
 
   # currently returning list of webservice details, default endpoint details, consumption function, in that order
   return(list(newService, defaultEP))#, consumption))

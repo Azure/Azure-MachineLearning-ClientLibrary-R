@@ -1,3 +1,13 @@
+#' @docType package
+#' @name discover
+#' The discovery code allows the user to retrieve a list of the web services available in
+#' their workspace given that they provide the workspace ID and the authorization token
+#' (both of which can be found in settings on the AzureML webpage). A user can also get
+#' detailed information about a specific web service, retrieve its endpoints, and the
+#' details of a specific endpoint.
+
+
+
 #############################################################
 # API URLs
 #############################################################
