@@ -11,7 +11,6 @@ wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- matrix(ncol = %s, nro
 #' @title Get Function Source Code as a String
 #' @description
 #' This is a helper function that will convert a function's source code to a string
-#' Also consider paste(body(fun())) or getAnywhere()
 #' @export internal
 #' @param x Name of the function to convert to a string
 #' @return function in string format
@@ -106,7 +105,6 @@ packDependencies <- function(functionName) {
 
   # NOTE: will not work if the user function specifies the names directly, e.g. won't find rjson::toJSON
   # from findGlobals man page: "R semantics only allow variables that might be local to be identified"
-  # CONSIDER: how robust is this filtering? need to verify
   for (obj in codetools::findGlobals(get(functionName))) {
     name = get(obj)
 
@@ -116,12 +114,24 @@ packDependencies <- function(functionName) {
     }
 
     # get in-memory objects
-    # Can nonfunction objects have dependencies???
     else if (!is.function(name)) {
       dependencies[[obj]] <- name
-      nameEnv <- environment(get(class(name)))
-      if (!(identical(nameEnv, NULL)) && !(identical(nameEnv, .BaseNamespaceEnv))) {
-        packages <- recurPkg(paste(getNamespaceName(nameEnv)), packages)
+      
+      # Use the object's class to find package dependencies
+      objClass <- class(name)
+      
+      # iterate through the class vector looking for packages
+      for (class in objClass) {
+        tryCatch({
+          # get the name of the package the class belongs to
+          nameEnv <- environment(get(class))
+          # filter out basic objects
+          if (!(identical(nameEnv, NULL)) && !(identical(nameEnv, .BaseNamespaceEnv))) {
+            packages <- recurPkg(paste(getNamespaceName(nameEnv)), packages)
+          }
+        }, error = function(e) {
+          sprintf("%s not found", obj)
+        })
       }
     }
 
@@ -444,7 +454,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 }
 
 
-<<<<<<< HEAD
+
 #############################################################
 #' @title Update a Published Web Service
 #' @description
@@ -469,7 +479,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 #' predictTitanic(1, "male", 20, 2, 0, 8.50)
 #' # Publish the function
 #' TitanicService <- publishWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
-#' # Let's say that predictTitanic was updated to add more functionality now and we want to republish
+#' # Let's say that predictTitanic was changed and we want to republish
 #' TitanicService <- updateWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
 #############################################################
 updateWebService <- function(functionName, wsID, inputSchema, outputSchema, wkID, authToken) {
