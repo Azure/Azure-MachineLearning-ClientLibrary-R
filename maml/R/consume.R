@@ -244,11 +244,8 @@ consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam=setNames
       colnames(df) <- "Scored probabilities"
 
       #      print("passed")
-<<<<<<< HEAD
+
       sprintf("%i out of %i processed", i, length(values))
-=======
-      print(sprintf("%i out of %i processed", i, length(values)))
->>>>>>> a8474fd93f6dfb00d91b912c12d964345d297367
       valuebatch = list()
       counter = 0
     }

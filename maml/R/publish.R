@@ -180,7 +180,7 @@ packDependencies <- function(functionName) {
       }
       # functions from packages
       else if (paste(getNamespaceName(environment(name))) != "base") {
-        packages <- recurPkg(paste(getNamespaceName(environment(name))), pkgList)
+        pkgList <- recurPkg(paste(getNamespaceName(environment(name))), pkgList)
       }
     }
     return(list("dependencies"=depList, "packages"=pkgList))

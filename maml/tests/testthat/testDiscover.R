@@ -6,6 +6,7 @@ webservices = getWebServices(testID, testAuth)
 testWS = getWSDetails(testID, testAuth, webservices[[1]]$Id)
 endpoints = getEndpoints(testID, testAuth, testWS$Id)
 testEP = getEPDetails(testID, testAuth, testWS$Id, endpoints$Name)
+response <- consumeDataTable(endpoints[[1]]$PrimaryKey, endpoints[[1]]$ApiLocation, list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list(1, "male", 20, 2, 0, 8.50), list(1, "female", 20, 1, 0, 8.50))
 
 
 test_that("Can discover any endpoints of any web services available starting from workspace ID", {

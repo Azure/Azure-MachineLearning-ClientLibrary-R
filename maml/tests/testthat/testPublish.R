@@ -1,3 +1,6 @@
+testID = "37310abb304e4f56bdb66d279477e0be"
+testAuth = "ccfe0f6e9c684345a634bdae0b48c4e9"
+
 add <- function (x, y) {
   print("This will add x and y")
   return(x + y)
@@ -28,8 +31,8 @@ test_that("publishWebService returns a working web service", {
 })
 
 test_that("publishWebService handles bad input correctly", {
-  expect_error(, "Data type not supported")
-  expect_error(, "inputSchema length doesn't match function signature")
+#  expect_error(, "Data type not supported")
+#  expect_error(, "inputSchema length doesn't match function signature")
 })
 
 test_that("publishWebService handles various HTTP error codes correctly", {
