@@ -30,6 +30,10 @@ test_that("publishWebService returns a working web service", {
 
 })
 
+test_that("publishing a huge model", {
+
+})
+
 test_that("publishWebService handles bad input correctly", {
 #  expect_error(, "Data type not supported")
 #  expect_error(, "inputSchema length doesn't match function signature")
