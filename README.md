@@ -58,53 +58,54 @@ The package includes a number of convenience functions to consume a web service 
 
 ## Example
 
-`# End to end demo using Titanic survival classifier
-`# Import data
-`test <- read.csv(file="test.csv")
-`train <- read.csv(file="train.csv")
-`# Data wrangling
-`survived <- train$Survived
-`passengerId <- test$PassengerId
-`train = train[,-2]
-`end_trn = nrow(train)
-`train <- rbind(train, test)
-`train$Age[is.na(train$Age)] <- 30
-`end = nrow(train)
-`train = train[,c(-1,-3,-8,-10,-11)]
-`# Train a gbm model
-`library(gbm)
-`set.seed(123)
-`pr=0
-`tr=0
-`n.models = 5
-`ntrees=2000
-`for(i in 1:n.models){
-`  GBM.model = gbm.fit(
-`    x=train[1:end_trn,], y = survived,
-`    distribution= "gaussian",
-`    n.trees = ntrees,
-`    shrinkage = 0.01,
-`    interaction.depth = 25,
-`    n.minobsinnode = 5,
-`    verbose = TRUE)
-`}
-`# define a function to make predictions using the trained model
-`predictTitanic <- function (Pclass, Sex, Age, SibSp, Parch, Fare) {
-`  return(round(predict.gbm(object=GBM.model, newdata=data.frame("Pclass"=Pclass, "Sex"=Sex, "Age"=Age, "SibSp"=SibSp, "Parch"=Parch, "Fare"=Fare), 2000)))
-`}
-`# Sample local call
-`predictTitanic(1, "male", 20, 2, 0, 8.50)
-`# Publish the function
-`TitanicService <- publishWebService("predictTitanic", "TitanicDemoR", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
-`# Discover the endpoints
-`endpoints <- getEndpoints(wsID, wsAuth, TitanicService[[1]]["Id"], internalURL)
-`# Alternatively,
-`endpoints <- TitanicService[[2]]
-`# Consume the new web service
-`# First, consume with inputs as a list
-`response <- consumeDataTable(endpoints[[1]]$PrimaryKey, endpoints[[1]]$ApiLocation, list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list(1, "male", 20, 2, 0, 8.50), list(1, "female", 20, 1, 0, 8.50))
-`# Next, consume with inputs as dataframe
-`demoDF <- data.frame("Pclass"=c(1,2,1), "Sex"=c("male","female","male"), "Age"=c(8,20, 30), "Parch"=c(1,1,1), "SibSp"=c(1,3,1), "Fare"=c(10,7.5, 9))
-`responseDF <- consumeDataframe(TitanicService[[2]][[1]]$PrimaryKey, paste(TitanicService[[2]][[1]]$ApiLocation,"/execute?api-version=2.0&details=true",sep=""), demoDF)
-
+```
+# End to end demo using Titanic survival classifier
+# Import data
+test <- read.csv(file="test.csv")
+train <- read.csv(file="train.csv")
+# Data wrangling
+survived <- train$Survived
+passengerId <- test$PassengerId
+train = train[,-2]
+end_trn = nrow(train)
+train <- rbind(train, test)
+train$Age[is.na(train$Age)] <- 30
+end = nrow(train)
+train = train[,c(-1,-3,-8,-10,-11)]
+# Train a gbm model
+library(gbm)
+set.seed(123)
+pr=0
+tr=0
+n.models = 5
+ntrees=2000
+for(i in 1:n.models){
+  GBM.model = gbm.fit(
+    x=train[1:end_trn,], y = survived,
+    distribution= "gaussian",
+    n.trees = ntrees,
+    shrinkage = 0.01,
+    interaction.depth = 25,
+    n.minobsinnode = 5,
+    verbose = TRUE)
+}
+# define a function to make predictions using the trained model
+predictTitanic <- function (Pclass, Sex, Age, SibSp, Parch, Fare) {
+  return(round(predict.gbm(object=GBM.model, newdata=data.frame("Pclass"=Pclass, "Sex"=Sex, "Age"=Age, "SibSp"=SibSp, "Parch"=Parch, "Fare"=Fare), 2000)))
+}
+# Sample local call
+predictTitanic(1, "male", 20, 2, 0, 8.50)
+# Publish the function
+TitanicService <- publishWebService("predictTitanic", "TitanicDemoR", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
+# Discover the endpoints
+endpoints <- getEndpoints(wsID, wsAuth, TitanicService[[1]]["Id"], internalURL)
+# Alternatively,
+endpoints <- TitanicService[[2]]
+# Consume the new web service
+# First, consume with inputs as a list
+response <- consumeDataTable(endpoints[[1]]$PrimaryKey, endpoints[[1]]$ApiLocation, list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list(1, "male", 20, 2, 0, 8.50), list(1, "female", 20, 1, 0, 8.50))
+# Next, consume with inputs as dataframe
+demoDF <- data.frame("Pclass"=c(1,2,1), "Sex"=c("male","female","male"), "Age"=c(8,20, 30), "Parch"=c(1,1,1), "SibSp"=c(1,3,1), "Fare"=c(10,7.5, 9))
+responseDF <- consumeDataframe(TitanicService[[2]][[1]]$PrimaryKey, paste(TitanicService[[2]][[1]]$ApiLocation,"/execute?api-version=2.0&details=true",sep=""), demoDF)
+```
 Further examples can be found in the demo folder of the repository.
