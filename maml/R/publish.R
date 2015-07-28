@@ -105,7 +105,6 @@ getFunctionString <- function (x)
 #############################################################
 packDependencies <- function(functionName) {
 
-<<<<<<< HEAD
   # Recursive step for package packaging
   recurPkg <- function(pkgName, pkgList) {
     # if the package isn't already in the list
@@ -121,23 +120,6 @@ packDependencies <- function(functionName) {
           if (!(pkg %in% pkgList) && !(grepl("R \\((.*)\\)", pkg)) && (pkg %in% row.names(available.packages()))) {
             # recursively call recurPkg
             pkgList <- recurPkg(pkg, pkgList)
-=======
-    # get in-memory objects
-    else if (!is.function(name)) {
-      dependencies[[obj]] <- name
-
-      # Use the object's class to find package dependencies
-      objClass <- class(name)
-
-      # iterate through the class vector looking for packages
-      for (class in objClass) {
-        tryCatch({
-          # get the name of the package the class belongs to
-          nameEnv <- environment(get(class))
-          # filter out basic objects
-          if (!(identical(nameEnv, NULL)) && !(identical(nameEnv, .BaseNamespaceEnv))) {
-            packages <- recurPkg(paste(getNamespaceName(nameEnv)), packages)
->>>>>>> a8474fd93f6dfb00d91b912c12d964345d297367
           }
         }
         # iterate through imports
@@ -201,10 +183,7 @@ packDependencies <- function(functionName) {
         packages <- recurPkg(paste(getNamespaceName(environment(name))), pkgList)
       }
     }
-<<<<<<< HEAD
     return(list("dependencies"=depList, "packages"=pkgList))
-=======
->>>>>>> a8474fd93f6dfb00d91b912c12d964345d297367
   }
 
   # call recurDep on the desired function and with empty lists
@@ -263,10 +242,7 @@ packDependencies <- function(functionName) {
       file.remove(paste(pkg, "zip", sep="."))
     }
 
-<<<<<<< HEAD
     # delete the dependency rdta file
-=======
->>>>>>> a8474fd93f6dfb00d91b912c12d964345d297367
     if (length(dependencies) > 0) {
       file.remove(guid)
       file.remove(paste(guid,"zip",sep="."))
@@ -532,20 +508,9 @@ updateWebService <- function(functionName, wsID, inputSchema, outputSchema, wkID
   updatedService <- RJSONIO::fromJSON(h$value())
 
   # Use discovery functions to get default endpoint for immediate use
-<<<<<<< HEAD
   # NOTE: switch from internal URL for production
   endpoints <- getEndpoints(wkID, authToken, newService["Id"], internalURL)
   for (i in 1:length(endpoints)) {
     endpoints[[i]]$ApiLocation <- paste(endpoints[[i]]$ApiLocation, "/execute?api-version=2.0&details=true",sep="")
   }
-
-  # currently returning list of webservice details (as a list) and endpoint details (as a list) in that order
-  return(list("serviceDetails"=updatedService, "endpoints"=endpoints))
-=======
-  # switch to getEndpoints() later
-  defaultEP <- getEndpoints(wkID, authToken, newService["Id"], internalURL)
-
-  # currently returning list of webservice details, default endpoint details, consumption function, in that order
-  return(list(newService, defaultEP))#, consumption))
->>>>>>> a8474fd93f6dfb00d91b912c12d964345d297367
 }

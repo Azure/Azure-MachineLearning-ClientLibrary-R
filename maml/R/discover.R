@@ -20,6 +20,9 @@ epURLdet = "https://management-tm.azureml.net/workspaces/%s/webservices/%s/endpo
 testURL = "https://hiteshsm.cloudapp.net/workspaces/%s/webservices/%s/endpoints"
 internalURL = "https://management.azureml-int.net/workspaces/%s/webservices/%s/endpoints"
 
+internalURL = "https://management.azureml-int.net"
+prodURL = "https://management-tm.azureml.net"
+
 #############################################################
 #' @title Get FrameWork
 #' @description
@@ -52,6 +55,11 @@ getFramework <- function(tUrl, authToken) {
               ssl.verifyPeer = FALSE)
 
   # Print results
+  # Error handle response not long enough (no webservices)
+  if (h$value() == "") {
+    return(-1)
+  }
+
   return(RJSONIO::fromJSON(h$value()))
 }
 
@@ -71,8 +79,12 @@ getFramework <- function(tUrl, authToken) {
 #' services = getWebServices("c01fb89129aa4ef0a19affa7f95ecbbc", "523709d06661441bbf129d68f84cd6a4")
 #' serviceID = services[[1]]["Id"]
 #############################################################
-getWebServices <- function(wkID, authToken, url=wsURL) {
-  return(getFramework(sprintf(url, wkID), authToken))
+getWebServices <- function(wkID, authToken, url=prodURL) {
+  response = getFramework(sprintf(paste(url,"/workspaces/%s/webservices",sep=""), wkID), authToken)
+  if (response == -1) {
+    stop("Error: no web services found", call. = TRUE)
+  }
+  return(response)
 }
 
 
@@ -91,8 +103,8 @@ getWebServices <- function(wkID, authToken, url=wsURL) {
 #' << Please note that you will need to retrieve all of the signature details from your AzureML account >>
 #' services = getWebServices("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
 #############################################################
-getWSDetails <- function(wkID, authToken, wsID, url=wsURLdet) {
-  return(getFramework(sprintf(url, wkID, wsID), authToken))
+getWSDetails <- function(wkID, authToken, wsID, url=prodURL) {
+  return(getFramework(sprintf(paste(url, "/workspaces/%s/webservices/%s", sep=""), wkID, wsID), authToken))
 }
 
 
@@ -113,8 +125,9 @@ getWSDetails <- function(wkID, authToken, wsID, url=wsURLdet) {
 #' << Please note that you will need to retrieve all of the signature details from your AzureML account >>
 #' endpoints = getEndpoints("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
 #############################################################
-getEndpoints <- function(wkID, authToken, wsID, url=epURL) {
-  endpoints <- getFramework(sprintf(url, wkID, wsID), authToken)
+getEndpoints <- function(wkID, authToken, wsID, url=prodURL) {
+  endpoints <- getFramework(sprintf(paste(url, "/workspaces/%s/webservices/%s/endpoints", sep=""), wkID, wsID), authToken)
+  # for convenience because by default the repsonse doesn't include the full API location
   for (i in 1:length(endpoints)) {
     endpoints[[i]]$ApiLocation <- paste(endpoints[[i]]$ApiLocation, "/execute?api-version=2.0&details=true",sep="")
   }
@@ -124,13 +137,13 @@ getEndpoints <- function(wkID, authToken, wsID, url=epURL) {
 
 
 #############################################################
-#' @title get EndPoint Details
+#' @title get Endpoint Details
 #' @description Get the details on a specific endpoint
 #'
 #' @param wkID The workspace ID
 #' @param authToken The primary authorization token
 #' @param wsID The webservice ID
-#' @param epID The endpoint name
+#' @param epName The endpoint name
 #' @return Returns a named list representing the endpoint with the following fields:
 #' "Name", "Description", "CreationTime", "WorkspaceId", "WebServiceId",
 #' "HelpLocation", "PrimaryKey", "SecondaryKey", "ApiLocation", "Version",
@@ -139,8 +152,10 @@ getEndpoints <- function(wkID, authToken, wsID, url=epURL) {
 #' << Please note that you will need to retrieve all of the signature details from your AzureML account >>
 #' defaultEP = getEPDetails("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "default")
 #############################################################
-getEPDetails <- function(wkID, authToken, wsID, epID, url=epURLdet) {
-  endpoint <- getFramework(sprintf(url, wkID, wsID, epID), authToken)
-  endpoint[[1]]$ApiLocation <- paste(endpoint[[1]]$ApiLocation, "/execute?api-version=2.0&details=true",sep="")
+getEPDetails <- function(wkID, authToken, wsID, epName, url=prodURL) {
+  sprintf(paste(url, "/workspaces/%s/webservices/%s/endpoints/%s", sep=""), wkID, wsID, epName)
+  endpoint <- getFramework(sprintf(paste(url, "/workspaces/%s/webservices/%s/endpoints/%s", sep=""), wkID, wsID, epName), authToken)
+  # for convenience because by default the repsonse doesn't include the full API location
+  endpoint$ApiLocation <- paste(endpoint$ApiLocation, "/execute?api-version=2.0&details=true",sep="")
   return(endpoint)
 }
