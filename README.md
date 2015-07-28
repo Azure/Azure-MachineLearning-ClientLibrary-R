@@ -11,8 +11,10 @@ This is a technology preview. The APIs used by the package are still subject to 
 
 Currently the package lives only on this GitHub repo. You can install the package and the dependencies via the following lines in R:
 
-`install.packages(c("RCurl", "RJSONIO", "uuid", "jsonlite", "codetools", "base64enc", "httr", "data.table", "df2json", "rjson", "devtools"), repos = "http://cran.r-project.org")
-`devtools::install_github("Azure-MachineLearning-ClientLibrary-R", "Azure", subdir="maml")
+```
+install.packages(c("RCurl", "RJSONIO", "uuid", "jsonlite", "codetools", "base64enc", "httr", "data.table", "df2json", "rjson", "devtools"), repos = "http://cran.r-project.org")
+devtools::install_github("Azure-MachineLearning-ClientLibrary-R", "Azure", subdir="maml")
+```
 
 Also, you will need to install [R tools](https://cran.r-project.org/bin/windows/Rtools/) and make sure that a zipper is included in your PATH variable (instructions [here](http://stackoverflow.com/questions/29129681/create-zip-file-error-running-command-had-status-127))
 
@@ -34,7 +36,9 @@ The primary functionality implemented by this package is the capability to publi
 
 The publish function takes in the name of the function to be published as a string, the name to be displayed on Azure, your workspace ID, and your authorization token. The function also requires the input and output schemas of the function to be published, which is a list of the format
 
-`list("arg1"=<type>, "arg2"=<type>, ...)
+```
+list("arg1"=<type>, "arg2"=<type>, ...)
+```
 
 The publish function is can take in an arbitrary function, using arbitrary packages and models.
 
@@ -42,7 +46,9 @@ The publish function will return a lists of lists. The first list contains the d
 
 You are also able to update your function with one line. Note that this also requires passing the input and output schemas of the function.
 
-`updateWebService(functionName, webServiceID, inputSchema, outputScema, wkID, authToken)
+```
+updateWebService(functionName, webServiceID, inputSchema, outputScema, wkID, authToken)
+```
 
 The return value is the same as that of publishWebService()
 
@@ -53,19 +59,23 @@ This package allows you to start with a workspace ID and discover all web servic
 
 While we currently using internal APIs, in order to discover your web service published through this package, please use the optional parameters "url=internalURL". Otherwise, for discovery in the production environment, simply leave that parameter out.
 
-`getWebServices(workspaceID, authToken, url=internalURL)
-`getWSDetails(wkID, authToken, webserviceID, url)
-`getEndpoints(wID, authToken, wsID, url)
-`getEPDetails(wkID, authToken, wsID, endpointName, url)
+```
+getWebServices(workspaceID, authToken, url=internalURL)
+getWSDetails(wkID, authToken, webserviceID, url)
+getEndpoints(wID, authToken, wsID, url)
+getEPDetails(wkID, authToken, wsID, endpointName, url)
+```
 
 
 ## Consuming a web service
 
 The package includes a number of convenience functions to consume a web service via a number of different input formats.
 
-`consumeFile(api_key, requestURL, infileName, globalParam = "", outfileName = "results.txt", batchSize = 250, retryDelay = 0.3)
-`consumeLists(api_key, requestURL, columnNames, ..., globalParam="", retryDelay = 0.3)
-`consumeDataframe(api_key, requestURL, valuesDF, globalParam="", batchSize = 250, retryDelay = 0.3)
+```
+consumeFile(api_key, requestURL, infileName, globalParam = "", outfileName = "results.txt", batchSize = 250, retryDelay = 0.3)
+consumeLists(api_key, requestURL, columnNames, ..., globalParam="", retryDelay = 0.3)
+consumeDataframe(api_key, requestURL, valuesDF, globalParam="", batchSize = 250, retryDelay = 0.3)
+```
 
 
 ## Example
