@@ -32,7 +32,9 @@ We expect to migrate to the production version of Azure within a few weeks.
 
 The primary functionality implemented by this package is the capability to publish a model from R to Azure Machine Learning without having to copy and paste your R script to the Machine Learning Studio UI. Publishing a function is now a simple one line function call.
 
-`publishWebService(functionName, serviceName, inputSchema, outputSchema, wkID, authToken)
+```
+publishWebService(functionName, serviceName, inputSchema, outputSchema, wkID, authToken)
+```
 
 The publish function takes in the name of the function to be published as a string, the name to be displayed on Azure, your workspace ID, and your authorization token. The function also requires the input and output schemas of the function to be published, which is a list of the format
 
