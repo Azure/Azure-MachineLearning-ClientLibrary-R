@@ -163,7 +163,7 @@ packDependencies <- function(functionName) {
             nameEnv <- environment(get(class))
             # filter out basic environment
             if (!(identical(nameEnv, NULL)) && !(identical(nameEnv, .BaseNamespaceEnv))) {
-              packages <- recurPkg(paste(getNamespaceName(nameEnv)), pkgList)
+              pkgList <- recurPkg(paste(getNamespaceName(nameEnv)), pkgList)
             }
           # if unable to find package, continue
           }, error = function(e) {
