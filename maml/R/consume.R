@@ -251,7 +251,10 @@ consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam=setNames
     }
     counter = counter + 1
   }
-  colnames(df) <- "Scored probabilities"
+  if(ncol(df) != 0) {
+    colnames(df) <- "Scored probabilities"
+  }
+  
   return(df)
   #   resultStored <- jsonlite::fromJSON(resultStored)
   #   resultDF <- data.frame(matrix(resultStored$Results$output1$value$Values))

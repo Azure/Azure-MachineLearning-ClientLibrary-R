@@ -7,11 +7,14 @@
 # Currently using identification for an account on studio.azureml-int.net
 # If you would like to see the web services published, please create an account there
 # and substitute in your identification
-wsID = "3612640f27234eb7b2b91ac62e8b4a40"
-wsAuth = "abcbe14a958a40978f93aa0e0e71f5be"
+
+wsID = "3612640f27234eb7b2b91ac62e8b4a40" #Replace with own workspace ID 
+wsAuth = "abcbe14a958a40978f93aa0e0e71f5be" #Replace with own workspace authorization token 
 
 require(randomForest) || install.packages("randomForest")
 library(randomForest)
+
+
 BikeShare <- read.csv(file="bikes.csv")
 
 # Train the model
@@ -28,17 +31,3 @@ predictBikeCount <- function(dateTime, month, hr, hldy, wkdy, weather, temp, hum
                                       "temp"=temp, "hum"=hum, "windspeed"=wndspd, "casual"=casual, "registered"=registered, "cnt"=cnt,
                                       "isWorking"=isWorking, "monthCount"=mthCnt, "dayWeek"=dayWeek, "workTime"=wrkTime, "xformHr"=xformHr)))
 }
-
-# Publish web service
-bikeCount <- publishWebService("predictBikeCount", "bikeCount", list("dateTime"="date-time", "month"="int", "hr"="int", "hldy"="int", "wkdy"="int", "weather"="int",
-                                                                     "temp"="int", "hum"="int", "wndspd"="int", "casual"="int", "registered"="int", "cnt"="int",
-                                                                     "isWorking"="int", "mthCnt"="int", "dayWeek"="int", "wrkTime"="int", "xformHr"="int"),
-                               list("count"="int"), wsID, wsAuth)
-
-# Consume web service
-endpoints <- bikeCount[[2]]
-response <- consumeDataTable(endpoints[[1]]$PrimaryKey, endpoints[[1]]$ApiLocation,
-                             list("dateTime", "month", "hr", "hldy", "wkdy", "weather",
-                              "temp", "hum", "wndspd", "casual", "registered", "cnt",
-                              "isWorking", "mthCnt", "dayWeek", "wrkTime", "xformHr"),
-                             list("1/1/12 12:00:00", 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
