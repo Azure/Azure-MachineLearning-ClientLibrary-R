@@ -1,13 +1,14 @@
 ## GBM model for Titanic dataset ##
+install.packages("gbm")
+library(gbm)
 
 # Credentialing
-setwd("C://Users/t-alewa/Documents/Azure-MachineLearning-ClientLibrary-R/test")
-wsID = "3612640f27234eb7b2b91ac62e8b4a40"
-wsAuth = "abcbe14a958a40978f93aa0e0e71f5be"
+wsID = "3612640f27234eb7b2b91ac62e8b4a40" #Replace with own workspace ID 
+wsAuth = "abcbe14a958a40978f93aa0e0e71f5be" #Replace with own workspace authorization token 
 
 # Load data
-test <- read.csv(file="test.csv")
-train <- read.csv(file="train.csv")
+test <- read.csv(file="titanicTest.csv")
+train <- read.csv(file="titanicTrain.csv")
 
 # Preprocessing
 #y variable
@@ -27,7 +28,6 @@ train = train[,c(-1,-3,-8,-10,-11)]
 head(train)
 
 # Train model
-library(gbm)
 set.seed(123)
 pr=0
 tr=0
@@ -59,19 +59,3 @@ summary(GBM.model2)
 predictTitanicSurvival <- function (Pclass, Sex, Age, SibSp, Parch, Fare) {
   return(predict.gbm(object=GBM.model2, newdata=data.frame("Pclass"=Pclass, "Sex"=Sex, "Age"=Age, "SibSp"=SibSp, "Parch"=Parch, "Fare"=Fare), 2000))
 }
-
-# Publish web service
-TitanicService <- publishWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
-
-# Consume web service
-endpoints <- getEndpoints(wsID, wsAuth, TitanicService[[1]]["Id"], internalURL)
-# Alternatively,
-endpoints <- TitanicService[[2]]
-# First, consume with inputs as a list
-response <- consumeDataTable(endpoints[[1]]["PrimaryKey"], endpoints[[1]]["ApiLocation"], list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("1", "male", "20", "2", "0", "8.50"), list("1", "female", "20", "1", "0", "8.50"))
-response2 <- consumeDataTable(endpoints[[1]]["PrimaryKey"], endpoints[[1]]["ApiLocation"], list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list("2", "male", "50", "1", "0", "8.50"), list("2", "female", "50", "1", "0", "8.50"))
-
-# consume with inputs as dataframe
-# creating test data.frame
-demoDF <- data.frame("Pclass"=c(1,2,1), "Sex"=c("male","female","male"), "Age"=c("8","20", "30"), "Parch"=c(1,1,1), "SibSp"=c(1,3,1), "Fare"=c(10,7.5, 9))
-responseDF <- consumeDataframe(TitanicService[[2]][[1]]$PrimaryKey, TitanicService[[2]][[1]]$ApiLocation, demoDF)
