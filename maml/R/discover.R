@@ -81,7 +81,7 @@ getFramework <- function(tUrl, authToken) {
 #############################################################
 getWebServices <- function(wkID, authToken, url=prodURL) {
   response = getFramework(sprintf(paste(url,"/workspaces/%s/webservices",sep=""), wkID), authToken)
-  if (response == -1) {
+  if (!is.list(response)) {
     stop("Error: no web services found", call. = TRUE)
   }
   return(response)
