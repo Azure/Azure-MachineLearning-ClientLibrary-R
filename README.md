@@ -42,7 +42,7 @@ The publish function takes in the name of the function to be published as a stri
 list("arg1"=<type>, "arg2"=<type>, ...)
 ```
 
-The publish function is can take in an arbitrary function, using arbitrary packages and models.
+The publish function can take in a function that uses arbitrary packages. However, the function can only take in as input primitive data types, meaning that functions that take in dataframes, lists, or other complex objects are currently not supported.
 
 The publish function will return a lists of lists. The first list contains the details of the web service. The second list contains a list of the endpoints of the web service. Please refer to the example for how to programmatically use the return values to consume the new web service.
 
