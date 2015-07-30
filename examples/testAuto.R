@@ -1,4 +1,4 @@
-install.packages("testit")
+require(testit) || install.packages(testit)
 library("testit")
 
 wsID = "3612640f27234eb7b2b91ac62e8b4a40" #Replace with own workspace ID
@@ -31,7 +31,7 @@ irisWebService <- publishWebService("predictClass", "TestIris", list("sepalLengt
 irisEndpoints <- irisWebService[[2]]
 
 #Consume single request
-irisConsumeSingleRows <- consumeDataTable(irisEndpoints[[1]]["PrimaryKey"], irisEndpoints[[1]]$ApiLocation, list("sepalLength", "sepalWidth", "petalLength", "petalWidth"), list(5, 5, 4, 3), list(4.5, 6.5, 4.5, 2))
+irisConsumeSingleRows <- consumeDataTable(irisEndpoints[[1]]$PrimaryKey, irisEndpoints[[1]]$ApiLocation, list("sepalLength", "sepalWidth", "petalLength", "petalWidth"), list(5, 5, 4, 3), list(4.5, 6.5, 4.5, 2))
 
 #Consume data frame
 irisDF <- data.frame("sepalLength"=c(1,2,3), "sepalWidth"=c(4,5,6), "petalLength"=c(7,8,9), "petalWidth"=c(10,11,12))
