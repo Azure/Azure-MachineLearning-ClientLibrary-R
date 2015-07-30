@@ -18,22 +18,22 @@ wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- matrix(ncol = %s, nro
 #Testing consumption functions
 #api keys
 #setwd("C:/Users/t-ritra/Documents/Datasets")
-wkId = "0f2adea9926a4e7c9a636a39f2026fa0"
-wkAuth = "dbd68b6401ba4df893f2ef51be3841b5"
+# wkId = "b2dcb353526144ab835d88a4e48e99f5"
+# wkAuth = "c87ef875171c418da034400d8a957d59"
 dataframe <- read.csv("forestfires.csv")
-services = getWebServices(wkId, wkAuth, url = "https://metaanalytics001.cloudapp.net/workspaces/%s/webservices")
+services = getWebServices(wkId, wkAuth, url = "https://management.azureml.net")
 serviceID = services[[1]]["Id"]
-endpoints = getEndpoints(wkId, wkAuth, serviceID,url = "https://metaanalytics001.cloudapp.net/workspaces/%s/webservices/%s/endpoints")
+endpoints = getEndpoints(wkId, wkAuth, serviceID,url = "https://management.azureml.net")
 testDiscoverSchema <- discoverSchema(endpoints[[1]]$HelpLocation)
 #getendpointhl
 #testconsumeSingleDT <- consumeSingleRows("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true&format=swagger",list( "X","Y","month","day","FFMC","DMC","DC","ISI","temp","RH","wind","rain","area"),list("0","0","jan","mon","0","0","0","0","0","0","0","0","0"))
 testDiscoverSchema[["columnNames"]]
 # testconsumeSingleDT <- consumeSingleRows(endpoints[[1]]$PrimaryKey,testDiscoverSchema[["requestUrlDataTable"]],testDiscoverSchema[["columnNames"]],list("0","0","jan","mon","0","0","0","0","0","0","0","0","0"))
-#testConsumeFile <- consumeFile("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true&format=swagger","forestfires.csv")
+#testconsumeFile <- consumeFile("4qdwfDTfxniDgMprPJKyBaL/kEklBZCvLjiLOW+ih/jeWCcQypKK7XBru3+96yDGlcxV5MChAylUh1f7fYBHsQ==","https://ussouthcentral.services.azureml.net/workspaces/b2dcb353526144ab835d88a4e48e99f5/services/8209da2ca28748029a8c05ae58c6244e/execute?api-version=2.0&details=true&format=swagger","forestfires.csv")
 testConsumeFile <- consumeFile(endpoints[[1]]$PrimaryKey,testDiscoverSchema[["requestUrl"]],"forestfires.csv")
-#testConsumeDF <- consumeDataframe("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true&format=swagger",dataframe)
+# testconsumeDF <- consumeDataframe("4qdwfDTfxniDgMprPJKyBaL/kEklBZCvLjiLOW+ih/jeWCcQypKK7XBru3+96yDGlcxV5MChAylUh1f7fYBHsQ==","https://ussouthcentral.services.azureml.net/workspaces/b2dcb353526144ab835d88a4e48e99f5/services/8209da2ca28748029a8c05ae58c6244e/execute?api-version=2.0&details=true&format=swagger",dataframe)
 testConsumeDF <- consumeDataframe(endpoints[[1]]$PrimaryKey,testDiscoverSchema[["requestUrl"]],dataframe)
-#testconsumeSingle <- consumeLists("Hv5kVkT5Lt6stj+jqGVE836j2E2VTkhPo3Sb0h/J7ulxWeU/MMNqE5O08shGqLwuaZRIfZmPdlrQC+2IANxp6w==","https://requestresponse001.cloudapp.net/workspaces/0f2adea9926a4e7c9a636a39f2026fa0/services/1a11ca46456a428a92f57638d20a72f9/execute?api-version=2.0&details=true&format=swagger",list( "X" = 0,"Y" = 0,"month" = "jan","day" = "mon","FFMC" = 0,"DMC" = 0,"DC" = 0,"ISI" = 0,"temp" = 0,"RH" = 0,"wind"=0,"rain" = 0,"area" = 0))
+#testconsumeSingle <- consumeLists("4qdwfDTfxniDgMprPJKyBaL/kEklBZCvLjiLOW+ih/jeWCcQypKK7XBru3+96yDGlcxV5MChAylUh1f7fYBHsQ==","https://ussouthcentral.services.azureml.net/workspaces/b2dcb353526144ab835d88a4e48e99f5/services/8209da2ca28748029a8c05ae58c6244e/execute?api-version=2.0&details=true&format=swagger",list( "X" = 0,"Y" = 0,"month" = "jan","day" = "mon","FFMC" = 0,"DMC" = 0,"DC" = 0,"ISI" = 0,"temp" = 0,"RH" = 0,"wind"=0,"rain" = 0,"area" = 0))
 testconsumeSingle <- consumeLists(endpoints[[1]]$PrimaryKey,testDiscoverSchema[["requestUrl"]],testDiscoverSchema[["sampleInput"]])
 
 ##################################################################################
