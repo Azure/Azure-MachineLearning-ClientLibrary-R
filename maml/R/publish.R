@@ -429,7 +429,11 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 updateWebService <- function(functionName, serviceName, wsID, inputSchema, outputSchema, wkID, authToken) {
 
   # Make sure schema inputted matches function signature
-  paramCheck(inputSchema, functionName)
+  if (length(formals(functionName)) != length(inputSchema)) {
+    stop(sprintf("Input schema does not contain the proper input. You provided %s inputs and %s were expected",length(inputSchema),length(formals(functionName))), call. = TRUE)
+  }
+  inputSchema <- publishPreprocess(inputSchema)
+  outputSchema <- publishPreprocess(outputSchema)
 
   # Accept SSL certificates issued by public Certificate Authorities
   options(RCurlOptions = list(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
@@ -443,8 +447,8 @@ updateWebService <- function(functionName, serviceName, wsID, inputSchema, outpu
       "Name" = serviceName,
       "Type" = "Code",
       "CodeBundle" = list(
-        "InputSchema" = convert(inputSchema),
-        "OutputSchema" = convert(inputSchema),
+        "InputSchema" = inputSchema,
+        "OutputSchema" = outputSchema,
         "Language" = "r-3.1-64",
         "SourceCode" = sprintf(wrapper, length(outputSchema), paste(sprintf("\"%s\"", names(outputSchema)), collapse=","), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName)))
       )
@@ -455,8 +459,8 @@ updateWebService <- function(functionName, serviceName, wsID, inputSchema, outpu
       "Name" = serviceName,
       "Type" = "Code",
       "CodeBundle" = list(
-        "InputSchema" = convert(inputSchema),
-        "OutputSchema" = convert(outputSchema),
+        "InputSchema" = inputSchema,
+        "OutputSchema" = outputSchema,
         "Language" = "r-3.1-64",
         "SourceCode" = sprintf(wrapper, length(outputSchema), paste(sprintf("\"%s\"", names(outputSchema)), collapse=","), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName))),
         "ZipContents" = zipString[[2]]

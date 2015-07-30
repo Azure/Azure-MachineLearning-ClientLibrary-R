@@ -5,8 +5,7 @@ import(RCurl,
   jsonlite,
   codetools,
   base64enc,
-  functional,
   httr,
   data.table,
-  df2json,
-  gbm)
+  df2json
+  )
