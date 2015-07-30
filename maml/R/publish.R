@@ -250,6 +250,7 @@ packDependencies <- function(functionName) {
 
     # return the encoded zip as a string
     return(list(guid, zipEnc))
+    #return(list(guid))
   }
 
   # if nothing was zipped, return empty string to indicate
@@ -270,7 +271,7 @@ packDependencies <- function(functionName) {
 #' @param list argList - List of expected input parameters
 #' @return Converted inputSchema to the proper format
 #############################################################
-convert <- function(argList) {
+publishPreprocess <- function(argList) {
   form <- list()
   for (arg in names(argList)) {
     type = argList[[arg]]
@@ -295,30 +296,6 @@ convert <- function(argList) {
     }
   }
   return(form)
-}
-
-
-
-#############################################################
-#' @title HELPER FUNCTION: Parameter Check
-#' @description This is a helper function to check that the user has passed in all of the expected parameters.
-#' @export internal
-#' @param list userInput - List of expected input parameters
-#' @param string funcName - The function that is being published
-#' @return False if the input was not as expected/True if input matched expectation
-#############################################################
-paramCheck <- function(userInput, funcName) {
-  numParamsEXPECTED <- length(formals(funcName))
-  numParamsPASSED <- length(userInput)
-
-  if (numParamsPASSED != numParamsEXPECTED) {
-    errorWarning <- paste("Error: Your input Schema does not contain the proper input. You provided ", numParamsPASSED," inputs and ", numParamsEXPECTED," were expected",sep="")
-    stop(errorWarning, call. = TRUE)
-    return(FALSE)
-  }
-  else {
-    return(TRUE)
-  }
 }
 
 
@@ -351,7 +328,11 @@ paramCheck <- function(userInput, funcName) {
 publishWebService <- function(functionName, serviceName, inputSchema, outputSchema, wkID, authToken) {
 
   # Make sure schema inputted matches function signature
-  paramCheck(inputSchema, functionName)
+  if (length(formals(functionName)) != length(inputSchema)) {
+    stop(sprintf("Input schema does not contain the proper input. You provided %s inputs and %s were expected",length(inputSchema),length(formals(functionName))), call. = TRUE)
+  }
+  inputSchema <- publishPreprocess(inputSchema)
+  outputSchema <- publishPreprocess(outputSchema)
 
   # Accept SSL certificates issued by public Certificate Authorities
   options(RCurlOptions = list(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
@@ -365,8 +346,8 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
       "Name" = serviceName,
       "Type" = "Code",
       "CodeBundle" = list(
-        "InputSchema" = convert(inputSchema),
-        "OutputSchema" = convert(inputSchema),
+        "InputSchema" = inputSchema,
+        "OutputSchema" = outputSchema,
         "Language" = "r-3.1-64",
         "SourceCode" = sprintf(wrapper, length(outputSchema), paste(sprintf("\"%s\"", names(outputSchema)), collapse=","), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName)))
       )
@@ -377,8 +358,8 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
       "Name" = serviceName,
       "Type" = "Code",
       "CodeBundle" = list(
-        "InputSchema" = convert(inputSchema),
-        "OutputSchema" = convert(outputSchema),
+        "InputSchema" = inputSchema,
+        "OutputSchema" = outputSchema,
         "Language" = "r-3.1-64",
         "SourceCode" = sprintf(wrapper, length(outputSchema), paste(sprintf("\"%s\"", names(outputSchema)), collapse=","), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName))),
         "ZipContents" = zipString[[2]]
@@ -450,7 +431,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 #' # Let's say that predictTitanic was changed and we want to republish
 #' TitanicService <- updateWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
 #############################################################
-updateWebService <- function(functionName, wsID, inputSchema, outputSchema, wkID, authToken) {
+updateWebService <- function(functionName, serviceName, wsID, inputSchema, outputSchema, wkID, authToken) {
 
   # Make sure schema inputted matches function signature
   paramCheck(inputSchema, functionName)
@@ -509,7 +490,7 @@ updateWebService <- function(functionName, wsID, inputSchema, outputSchema, wkID
 
   # Use discovery functions to get default endpoint for immediate use
   # NOTE: switch from internal URL for production
-  endpoints <- getEndpoints(wkID, authToken, newService["Id"], internalURL)
+  endpoints <- getEndpoints(wkID, authToken, updatedService["Id"], internalURL)
   for (i in 1:length(endpoints)) {
     endpoints[[i]]$ApiLocation <- paste(endpoints[[i]]$ApiLocation, "/execute?api-version=2.0&details=true",sep="")
   }

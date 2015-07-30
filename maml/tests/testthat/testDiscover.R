@@ -1,15 +1,16 @@
-# Whose credentials / account should I be using?
-testID = "37310abb304e4f56bdb66d279477e0be"
-testAuth = "ccfe0f6e9c684345a634bdae0b48c4e9"
+test_that("Can discover endpoints starting from workspace ID", {
+  skip_on_cran() # requires internet connection
 
-webservices = getWebServices(testID, testAuth)
-testWS = getWSDetails(testID, testAuth, webservices[[1]]$Id)
-endpoints = getEndpoints(testID, testAuth, testWS$Id)
-testEP = getEPDetails(testID, testAuth, testWS$Id, endpoints$Name)
-response <- consumeDataTable(endpoints[[1]]$PrimaryKey, endpoints[[1]]$ApiLocation, list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list(1, "male", 20, 2, 0, 8.50), list(1, "female", 20, 1, 0, 8.50))
+  testID = "37310abb304e4f56bdb66d279477e0be"
+  testAuth = "ccfe0f6e9c684345a634bdae0b48c4e9"
+  webservices <- getWebServices(testID, testAuth)
+  Sys.sleep(1)
+  testWS <- getWSDetails(testID, testAuth, webservices[[1]]$Id)
+  Sys.sleep(1)
+  endpoints <- getEndpoints(testID, testAuth, testWS$Id)
+  Sys.sleep(1)
+  testEP <- getEPDetails(testID, testAuth, testWS$Id, endpoints[[1]]$Name)
 
-
-test_that("Can discover any endpoints of any web services available starting from workspace ID", {
   expect_equal(length(webservices), 1)
   expect_equal(length(testWS), 7)
   expect_equal(length(endpoints),1)
@@ -20,10 +21,24 @@ test_that("Can discover any endpoints of any web services available starting fro
   expect_equal(endpoints[[1]]$Name, testEP$Name)
 })
 
-test_that("API location is returned and able to be used immediately", {
 
+test_that("API location is returned and able to be used immediately", {
+  skip_on_cran() # requires internet connection
+
+  testID = "37310abb304e4f56bdb66d279477e0be"
+  testAuth = "ccfe0f6e9c684345a634bdae0b48c4e9"
+  webservices <- getWebServices(testID, testAuth)
+  Sys.sleep(1)
+  endpoints <- getEndpoints(testID, testAuth, webservices[[1]]$Id)
+  Sys.sleep(1)
+  response <- consumeDataTable(endpoints[[1]]$PrimaryKey, endpoints[[1]]$ApiLocation, list("FlowerId", "SepalLength", "SepalWidth", "PetalLength", "PetalWidth", "Species"), list(1, 6.5, 5.5, 3.5, 4.5, 0))
+
+  expect_true(is.data.frame(response))
+  expect_equal(as.numeric(response[1,8]), 1)
 })
 
-test_that("Discovery function handle various HTTP error codes and give useful feedback", {
 
+test_that("Discovery function handles error correctly", {
+  skip_on_cran()
+  expect_error(getWebServices("foo", testAuth), "InvalidWorkspaceIdInvalid workspace ID provided. Verify the workspace ID is correct and try again.")
 })

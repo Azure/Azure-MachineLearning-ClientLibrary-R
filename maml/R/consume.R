@@ -75,7 +75,7 @@ consumeFile <- function(api_key, requestURL, infileName, globalParam = setNames(
       }
       df <- rbind(df,resultDF)
 
-      print(sprintf("%i %s %i %s", i,"out of",nrow(valuesDF),"processed"))
+      sprintf("%i out of %i processed", i,nrow(valuesDF))
       valuebatch = data.frame(stringsAsFactors=FALSE)
       counter = 0
     }
@@ -254,7 +254,7 @@ consumeDataframe <- function(api_key, requestURL, valuesDF, globalParam=setNames
   if(ncol(df) != 0) {
     colnames(df) <- "Scored probabilities"
   }
-  
+
   return(df)
   #   resultStored <- jsonlite::fromJSON(resultStored)
   #   resultDF <- data.frame(matrix(resultStored$Results$output1$value$Values))

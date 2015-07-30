@@ -16,14 +16,16 @@ install.packages(c("RCurl", "RJSONIO", "uuid", "jsonlite", "codetools", "base64e
 devtools::install_github("Azure-MachineLearning-ClientLibrary-R", "Azure", subdir="maml")
 ```
 
-Also, you will need to install [R tools](https://cran.r-project.org/bin/windows/Rtools/) and make sure that a zipper is included in your PATH variable (instructions [here](http://stackoverflow.com/questions/29129681/create-zip-file-error-running-command-had-status-127))
+Also, you will need to install [R tools](https://cran.r-project.org/bin/windows/Rtools/) and 
+make sure that a zipper is included in your PATH variable (instructions [here](http://stackoverflow.com/questions/29129681/create-zip-file-error-running-command-had-status-127))
 
 We plan on releasing the package to CRAN eventually.
 
 
 ## Using the package
 
-Currently the APIs we are using are only deployed internally, so please go [here](studio.azureml-int.net) and create an account. After logging in, under the "Settings" tab, copy and paste your workspace ID from the "Name" sub-tab into your R console. From the "Authorization Tokens" sub-tab, copy your primary authorization token into your R console. You will need this information to access all package functionality.
+Currently the APIs we are using are only deployed internally, so please go [here](studio.azureml-int.net) and create an account. 
+After logging in, under the "Settings" tab, copy and paste your workspace ID from the "Name" sub-tab into your R console. From the "Authorization Tokens" sub-tab, copy your primary authorization token into your R console. You will need this information to access all package functionality.
 
 We expect to migrate to the production version of Azure within a few weeks.
 
@@ -42,7 +44,8 @@ The publish function takes in the name of the function to be published as a stri
 list("arg1"=<type>, "arg2"=<type>, ...)
 ```
 
-The publish function can take in a function that uses arbitrary packages. However, the function can only take in as input primitive data types, meaning that functions that take in dataframes, lists, or other complex objects are currently not supported.
+The publish function can take in a function that uses arbitrary packages. However, the function can only take in as input primitive data types, meaning that functions that take in dataframes, lists, or other complex objects are currently not supported. 
+We are currently working to extend functionality to be able to handle complex data types, as well as infer the signature of user functions, so users won't need to manually enter the schemas.
 
 The publish function will return a lists of lists. The first list contains the details of the web service. The second list contains a list of the endpoints of the web service. Please refer to the example for how to programmatically use the return values to consume the new web service.
 

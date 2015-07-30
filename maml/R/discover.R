@@ -54,13 +54,17 @@ getFramework <- function(tUrl, authToken) {
               ssl.verifyHost = FALSE,
               ssl.verifyPeer = FALSE)
 
-  # Print results
   # Error handle response not long enough (no webservices)
   if (h$value() == "") {
     return(-1)
   }
+  response = RJSONIO::fromJSON(h$value())
+  # Error handling
+  if ('error' %in% names(response)) {
+    stop(response$error)
+  }
 
-  return(RJSONIO::fromJSON(h$value()))
+  return(response)
 }
 
 
@@ -82,7 +86,7 @@ getFramework <- function(tUrl, authToken) {
 getWebServices <- function(wkID, authToken, url=prodURL) {
   response = getFramework(sprintf(paste(url,"/workspaces/%s/webservices",sep=""), wkID), authToken)
   if (!is.list(response)) {
-    stop("Error: no web services found", call. = TRUE)
+    stop("No web services found", call. = TRUE)
   }
   return(response)
 }
@@ -126,12 +130,12 @@ getWSDetails <- function(wkID, authToken, wsID, url=prodURL) {
 #' endpoints = getEndpoints("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
 #############################################################
 getEndpoints <- function(wkID, authToken, wsID, url=prodURL) {
-  endpoints <- getFramework(sprintf(paste(url, "/workspaces/%s/webservices/%s/endpoints", sep=""), wkID, wsID), authToken)
+  response <- getFramework(sprintf(paste(url, "/workspaces/%s/webservices/%s/endpoints", sep=""), wkID, wsID), authToken)
   # for convenience because by default the repsonse doesn't include the full API location
-  for (i in 1:length(endpoints)) {
-    endpoints[[i]]$ApiLocation <- paste(endpoints[[i]]$ApiLocation, "/execute?api-version=2.0&details=true",sep="")
+  for (i in 1:length(response)) {
+    response[[i]]$ApiLocation <- paste(response[[i]]$ApiLocation, "/execute?api-version=2.0&details=true",sep="")
   }
-  return(endpoints)
+  return(response)
 }
 
 
