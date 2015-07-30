@@ -53,6 +53,7 @@ The R datatypes supported are as follows:
 - uint16, int16, uint32, int32, uint64, int64
 - int
 - bool
+
 If using a factor variable, it is recommend you use strings instead, e.g. "male" and "female"
 We are currently working to extend functionality to be able to handle complex data types, as well as infer the signature of user functions, so users won't need to manually enter the schemas.
 
