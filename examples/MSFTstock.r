@@ -8,8 +8,8 @@
 # If you would like to see the web services published, please create an account there
 # and substitute in your identification
 
-wsID = "3612640f27234eb7b2b91ac62e8b4a40" #Replace with own workspace ID 
-wsAuth = "abcbe14a958a40978f93aa0e0e71f5be" #Replace with own workspace authorization token 
+wsID = "37310abb304e4f56bdb66d279477e0be" #Replace with own workspace ID
+wsAuth = "ccfe0f6e9c684345a634bdae0b48c4e9" #Replace with own workspace authorization token
 
 require(quantmod) || install.packages(quantmod)
 library(quantmod)
@@ -30,3 +30,15 @@ summary(model)
 MSFTpredict <- function(close, volume) {
   return(predict(model, data.frame("MSFT.Close"=close, "MSFT.Volume"=volume)))
 }
+
+#Publish MSFT prediction function
+msftWebService <- publishWebService("MSFTpredict", "MSFTdemo", list("close"="float", "volume"="float"), list("number"="float"), wsID, wsAuth)
+
+# Discover endpoints
+msftEndpoints <- msftWebService[[2]]
+
+#
+msftConsumeSingleRows <- consumeDataTable(msftEndpoints[[1]]["PrimaryKey"], msftEndpoints[[1]]$ApiLocation, list("close", "volume"), list(25, 300), list(30, 100))
+
+msftDF <- data.frame("close"=c(107,208,300), "volume"=c(400,569,665))
+msftConsumeDF <- consumeDataframe(msftWebService[[2]][[1]]$PrimaryKey, msftWebService[[2]][[1]]$ApiLocation, msftDF)

@@ -14,8 +14,8 @@ train <- read.csv(file="titanicTrain.csv")
 # Currently using identification for an account on studio.azureml-int.net
 # If you would like to see the web services published, please create an account there
 # and substitute in your identification
-wsID = "3612640f27234eb7b2b91ac62e8b4a40" #Replace with own workspace ID 
-wsAuth = "abcbe14a958a40978f93aa0e0e71f5be" #Replace with own workspace authorization token 
+wsID = "37310abb304e4f56bdb66d279477e0be" #Replace with own workspace ID
+wsAuth = "ccfe0f6e9c684345a634bdae0b48c4e9" #Replace with own workspace authorization token
 
 
 # Preprocessing
@@ -68,3 +68,19 @@ summary(GBM.model2)
 predictTitanicSurvival <- function (Pclass, Sex, Age, SibSp, Parch, Fare) {
   return(predict.gbm(object=GBM.model2, newdata=data.frame("Pclass"=Pclass, "Sex"=Sex, "Age"=Age, "SibSp"=SibSp, "Parch"=Parch, "Fare"=Fare), 2000))
 }
+
+#Test titanic model
+titanicWebService <- publishWebService("predictTitanicSurvival", "TestTitanic", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
+
+# Use getEndpoints method
+# endpoints <- getEndpoints(wsID, wsAuth, titanicWebService[[1]]["Id"], internalURL)
+# Access results from return value of publish method
+titanicEndpoints <- titanicWebService[[2]]
+
+#May take long since servers are getting warmed up
+titanicConsumeSingleRows <- consumeDataTable(titanicEndpoints[[1]]["PrimaryKey"], titanicEndpoints[[1]]$ApiLocation, list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list(1, "male", 20, 2, 0, 8.50), list(1, "female", 20, 1, 0, 8.50))
+
+# consume with inputs as dataframe
+# creating test data.frame
+titanicDF <- data.frame("Pclass"=c(1,2,1), "Sex"=c("male","female","male"), "Age"=c(8,20, 30), "Parch"=c(1,1,1), "SibSp"=c(1,3,1), "Fare"=c(10,7.5, 9))
+TitanicConsumeDF <- consumeDataframe(titanicWebService[[2]][[1]]$PrimaryKey, titanicWebService[[2]][[1]]$ApiLocation, titanicDF)
