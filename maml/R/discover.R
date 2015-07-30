@@ -50,9 +50,7 @@ getFramework <- function(tUrl, authToken) {
               httpheader=c('Authorization' = auth, 'Content-Type' = "application/json", 'Accept' = "application/json"),
               writefunction = h$update,
               headerfunction = hdr$update,
-              verbose = TRUE,
-              ssl.verifyHost = FALSE,
-              ssl.verifyPeer = FALSE)
+              verbose = TRUE)
 
   # Error handle response not long enough (no webservices)
   if (h$value() == "") {
