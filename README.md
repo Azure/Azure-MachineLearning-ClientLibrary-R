@@ -45,6 +45,15 @@ list("arg1"=<type>, "arg2"=<type>, ...)
 ```
 
 The publish function can take in a function that uses arbitrary packages. However, the function can only take in as input primitive data types, meaning that functions that take in dataframes, lists, or other complex objects are currently not supported. 
+The R datatypes supported are as follows:
+- float, double
+- date-time
+- string
+- time-span
+- uint16, int16, uint32, int32, uint64, int64
+- int
+- bool
+If using a factor variable, it is recommend you use strings instead, e.g. "male" and "female"
 We are currently working to extend functionality to be able to handle complex data types, as well as infer the signature of user functions, so users won't need to manually enter the schemas.
 
 The publish function will return a lists of lists. The first list contains the details of the web service. The second list contains a list of the endpoints of the web service. Please refer to the example for how to programmatically use the return values to consume the new web service.
