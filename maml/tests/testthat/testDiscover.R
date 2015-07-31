@@ -1,8 +1,8 @@
 test_that("Can discover endpoints starting from workspace ID", {
   skip_on_cran() # requires internet connection
 
-  testID = "37310abb304e4f56bdb66d279477e0be"
-  testAuth = "ccfe0f6e9c684345a634bdae0b48c4e9"
+  testID = ""
+  testAuth = ""
   webservices <- getWebServices(testID, testAuth)
   Sys.sleep(1)
   testWS <- getWSDetails(testID, testAuth, webservices[[1]]$Id)
@@ -25,8 +25,8 @@ test_that("Can discover endpoints starting from workspace ID", {
 test_that("API location is returned and able to be used immediately", {
   skip_on_cran() # requires internet connection
 
-  testID = "37310abb304e4f56bdb66d279477e0be"
-  testAuth = "ccfe0f6e9c684345a634bdae0b48c4e9"
+  testID = ""
+  testAuth = ""
   webservices <- getWebServices(testID, testAuth)
   Sys.sleep(1)
   endpoints <- getEndpoints(testID, testAuth, webservices[[1]]$Id)

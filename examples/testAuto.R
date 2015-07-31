@@ -1,10 +1,3 @@
-require(testit) || install.packages(testit)
-library("testit")
-
-wsID = "3612640f27234eb7b2b91ac62e8b4a40" #Replace with own workspace ID
-wsAuth = "abcbe14a958a40978f93aa0e0e71f5be" #Replace with own workspace authorization token
-
-
 ########################################################### TITANIC TESTS ###########################################################
 
 #Test titanic model

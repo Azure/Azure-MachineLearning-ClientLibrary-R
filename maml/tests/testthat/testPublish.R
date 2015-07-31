@@ -23,8 +23,8 @@ test_that("packDependencies handles recursive packaging", {
 
 test_that("publishWebService returns a working web service", {
   skip_on_cran()
-  testID = "37310abb304e4f56bdb66d279477e0be"
-  testAuth = "ccfe0f6e9c684345a634bdae0b48c4e9"
+  testID = ""
+  testAuth = ""
   require(quantmod) || install.packages(quantmod)
   library(quantmod)
 
@@ -68,8 +68,8 @@ test_that("publishWebService handles various errors correctly", {
 
 test_that("updateWebService correctly updates a web service", {
   skip_on_cran()
-  testID = "37310abb304e4f56bdb66d279477e0be"
-  testAuth = "ccfe0f6e9c684345a634bdae0b48c4e9"
+  testID = ""
+  testAuth = ""
   add1 <- function (x) {
     return(x + 1)
   }

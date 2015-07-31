@@ -8,8 +8,8 @@
 # If you would like to see the web services published, please create an account there
 # and substitute in your identification
 
-wsID = "37310abb304e4f56bdb66d279477e0be" #Replace with own workspace ID
-wsAuth = "ccfe0f6e9c684345a634bdae0b48c4e9" #Replace with own workspace authorization token
+wsID = "" #Replace with own workspace ID
+wsAuth = "" #Replace with own workspace authorization token
 
 require(randomForest) || install.packages("randomForest")
 library(randomForest)
