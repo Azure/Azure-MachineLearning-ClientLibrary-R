@@ -54,7 +54,7 @@ The R datatypes supported are as follows:
 - int
 - bool
 
-If using a factor variable, it is recommend you use strings instead, e.g. "male" and "female"
+If using a factor variable, it is recommend you use strings instead, e.g. "male" and "female".
 We are currently working to extend functionality to be able to handle complex data types, as well as infer the signature of user functions, so users won't need to manually enter the schemas.
 
 The publish function will return a lists of lists. The first list contains the details of the web service. The second list contains a list of the endpoints of the web service. Please refer to the example for how to programmatically use the return values to consume the new web service.
@@ -95,8 +95,14 @@ consumeDataframe(api_key, requestURL, valuesDF, globalParam="", batchSize = 250,
 
 ## Example
 
+The below example demonstrates how to use the various functions included in this package. The script uses the datasets contained in /demo
+
 ```
 # End to end demo using Titanic survival classifier
+# Store your workspace ID and authorization token
+wsID <- "abcdefghijklmnop"
+wsAuth <- "abcdefghijklmnop"
+
 # Import data
 test <- read.csv(file="test.csv")
 train <- read.csv(file="train.csv")
@@ -128,6 +134,7 @@ for(i in 1:n.models){
     n.minobsinnode = 5,
     verbose = TRUE)
 }
+
 # define a function to make predictions using the trained model
 predictTitanic <- function (Pclass, Sex, Age, SibSp, Parch, Fare) {
   return(round(predict.gbm(object=GBM.model, newdata=data.frame("Pclass"=Pclass, "Sex"=Sex, "Age"=Age, "SibSp"=SibSp, "Parch"=Parch, "Fare"=Fare), 2000)))
@@ -149,7 +156,8 @@ endpoints <- TitanicService[[2]]
 response <- consumeDataTable(endpoints[[1]]$PrimaryKey, endpoints[[1]]$ApiLocation, list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list(1, "male", 20, 2, 0, 8.50), list(1, "female", 20, 1, 0, 8.50))
 # Next, consume with inputs as dataframe
 demoDF <- data.frame("Pclass"=c(1,2,1), "Sex"=c("male","female","male"), "Age"=c(8,20, 30), "Parch"=c(1,1,1), "SibSp"=c(1,3,1), "Fare"=c(10,7.5, 9))
-responseDF <- consumeDataframe(TitanicService[[2]][[1]]$PrimaryKey, paste(TitanicService[[2]][[1]]$ApiLocation,"/execute?api-version=2.0&details=true",sep=""), demoDF)
+responseDF <- consumeDataframe(TitanicService[[2]][[1]]$PrimaryKey, TitanicService[[2]][[1]]$ApiLocation, demoDF)
 ```
 
-Further examples can be found in the demo folder of the repository.
+Further examples can be found in the /examples folder of the repository. Each example includes a script and an accompanying dataset. To run the script, load the package and store your workspace ID and authorization token.
+Then run the script in order line by line.
