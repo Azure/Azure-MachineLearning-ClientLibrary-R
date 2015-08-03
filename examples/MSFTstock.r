@@ -1,8 +1,6 @@
 ## Linear model for MSFT stock dataset ##
 
 # You can use the setwd() command to change your working directory. Examples below
-#setwd("C://Users/t-alewa/Documents/Azure-MachineLearning-ClientLibrary-R/examples")
-#setwd("C://Users/t-ritra/Documents/Github/Azure-MachineLearning-ClientLibrary-R/test")
 
 # Currently using identification for an account on studio.azureml-int.net
 # If you would like to see the web services published, please create an account there

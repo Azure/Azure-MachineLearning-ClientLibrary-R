@@ -69,6 +69,7 @@ getFramework <- function(tUrl, authToken) {
 
 #############################################################
 #' @title Get Web Services
+#' @export
 #' @description Get a list of webservices available to a workspace
 #'
 #' @param wkID The workspace ID
@@ -93,6 +94,7 @@ getWebServices <- function(wkID, authToken, url=prodURL) {
 
 #############################################################
 #' @title Get Workspace Details
+#' @export
 #' @description Get detailed information about a specific webservice
 #'
 #' @param wkID The workspace ID
@@ -102,7 +104,6 @@ getWebServices <- function(wkID, authToken, url=prodURL) {
 #' with the following fields:
 #' "Id", "Name", "Description", "CreationTime", "WorkspaceId", "DefaultEndpointName"
 #' @examples
-#' << Please note that you will need to retrieve all of the signature details from your AzureML account >>
 #' services = getWebServices("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
 #############################################################
 getWSDetails <- function(wkID, authToken, wsID, url=prodURL) {
@@ -113,6 +114,7 @@ getWSDetails <- function(wkID, authToken, wsID, url=prodURL) {
 
 #############################################################
 #' @title Get Endpoints
+#' @export
 #' @description Get the endpoints that are part of a web service
 #'
 #' @param wkID The workspace ID
@@ -124,7 +126,6 @@ getWSDetails <- function(wkID, authToken, wsID, url=prodURL) {
 #' "HelpLocation", "PrimaryKey", "SecondaryKey", "ApiLocation", "Version",
 #' "MaxConcurrentCalls", "DiagnosticsTraceLevel", "ThrottleLevel"
 #' @examples
-#' << Please note that you will need to retrieve all of the signature details from your AzureML account >>
 #' endpoints = getEndpoints("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
 #############################################################
 getEndpoints <- function(wkID, authToken, wsID, url=prodURL) {
@@ -140,6 +141,7 @@ getEndpoints <- function(wkID, authToken, wsID, url=prodURL) {
 
 #############################################################
 #' @title get Endpoint Details
+#' @export
 #' @description Get the details on a specific endpoint
 #'
 #' @param wkID The workspace ID
@@ -151,7 +153,6 @@ getEndpoints <- function(wkID, authToken, wsID, url=prodURL) {
 #' "HelpLocation", "PrimaryKey", "SecondaryKey", "ApiLocation", "Version",
 #' "MaxConcurrentCalls", "DiagnosticsTraceLevel", "ThrottleLevel"
 #' @examples
-#' << Please note that you will need to retrieve all of the signature details from your AzureML account >>
 #' defaultEP = getEPDetails("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "default")
 #############################################################
 getEPDetails <- function(wkID, authToken, wsID, epName, url=prodURL) {

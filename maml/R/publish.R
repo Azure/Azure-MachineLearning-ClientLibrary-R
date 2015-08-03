@@ -21,7 +21,6 @@ wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- matrix(ncol = %s, nro
 #' @title Get function source code as a string
 #' @description
 #' This is a helper function that will convert a function's source code to a string
-#' @export internal
 #' @param x Name of the function to convert to a string
 #' @return function in string format
 #############################################################
@@ -98,7 +97,6 @@ getFunctionString <- function (x)
 #' This is a helper function to extract object and package dependencies
 #' then pack them into a .zip, then a base64 string
 #' packDependencies()
-#' @export internal
 #' @param closure functionName - function to package dependencies from
 #' @return encoded zip - will return false if nothing was zipped
 #############################################################
@@ -266,7 +264,6 @@ packDependencies <- function(functionName) {
 #############################################################
 #' @title HELPER FUNCTION: Convert Format
 #' @description This is a helper function to convert expected schema to API-expecting format
-#' @export internal
 #' @param list argList - List of expected input parameters
 #' @return Converted inputSchema to the proper format
 #############################################################
@@ -301,6 +298,7 @@ publishPreprocess <- function(argList) {
 
 #############################################################
 #' @title Publish Web Service
+#' @export
 #' @description
 #' This function publishes code given a valid workspace ID and authentication token. The function expects the function name, service name, and
 #' the input and output schemas from the user.
@@ -401,6 +399,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 
 #############################################################
 #' @title Update a Published Web Service
+#' @export
 #' @description
 #' This function updates published code given a valid workspace ID and authentication token. The function expects the function name, service id, and
 #' the input and output schemas from the user.

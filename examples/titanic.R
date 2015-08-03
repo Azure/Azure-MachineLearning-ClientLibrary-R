@@ -7,9 +7,7 @@ library(gbm)
 test <- read.csv(file="titanicTest.csv")
 train <- read.csv(file="titanicTrain.csv")
 
-# You can use the setwd() command to change your working directory. Examples below
-#setwd("C://Users/t-alewa/Documents/Azure-MachineLearning-ClientLibrary-R/examples")
-#setwd("C://Users/t-ritra/Documents/Github/Azure-MachineLearning-ClientLibrary-R/test")
+# You can use the setwd() command to change your working directory.
 
 # Currently using identification for an account on studio.azureml-int.net
 # If you would like to see the web services published, please create an account there
