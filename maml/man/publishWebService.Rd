@@ -31,13 +31,4 @@ the input and output schemas from the user.
 The user can expect a list of the web service details, the default endpoint details and the consumption function and use this information to access
 the published function.
 }
-\examples{
-# create a function to make predictions using the trained model
-# For this example we will use the Titanic
-I.e. predictTitanic <- function (Pclass, Sex, Age, SibSp, Parch, Fare)
-# Sample local call
-predictTitanic(1, "male", 20, 2, 0, 8.50)
-#Publish the function
-TitanicService <- publishWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
-}
 

@@ -2,9 +2,9 @@
 % Please edit documentation in R/discover.R
 \name{getEPDetails}
 \alias{getEPDetails}
-\title{get EndPoint Details}
+\title{get Endpoint Details}
 \usage{
-getEPDetails(wkID, authToken, wsID, epID, url = epURLdet)
+getEPDetails(wkID, authToken, wsID, epName, url = prodURL)
 }
 \arguments{
 \item{wkID}{The workspace ID}
@@ -13,7 +13,7 @@ getEPDetails(wkID, authToken, wsID, epID, url = epURLdet)
 
 \item{wsID}{The webservice ID}
 
-\item{epID}{The endpoint name}
+\item{epName}{The endpoint name}
 }
 \value{
 Returns a named list representing the endpoint with the following fields:
@@ -23,9 +23,5 @@ Returns a named list representing the endpoint with the following fields:
 }
 \description{
 Get the details on a specific endpoint
-}
-\examples{
-<< Please note that you will need to retrieve all of the signature details from your AzureML account >>
-defaultEP = getEPDetails("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "default")
 }
 

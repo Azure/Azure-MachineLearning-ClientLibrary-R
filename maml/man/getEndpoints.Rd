@@ -4,7 +4,7 @@
 \alias{getEndpoints}
 \title{Get Endpoints}
 \usage{
-getEndpoints(wkID, authToken, wsID, url = epURL)
+getEndpoints(wkID, authToken, wsID, url = prodURL)
 }
 \arguments{
 \item{wkID}{The workspace ID}
@@ -22,9 +22,5 @@ as a nested named list with the following fields:
 }
 \description{
 Get the endpoints that are part of a web service
-}
-\examples{
-<< Please note that you will need to retrieve all of the signature details from your AzureML account >>
-endpoints = getEndpoints("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
 }
 

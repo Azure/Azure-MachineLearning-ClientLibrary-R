@@ -1,5 +1,7 @@
 ################################################################################################################################
 #' This function discovers using the workspace ID and web service ID, information specific to the consumption functions
+#' @title Discover function schema
+#' @export
 #' @param helpURL help page URL
 #' @param scheme the URI scheme
 #' @param host optional parameter that defaults to ussouthcentral.services.azureml.net

@@ -1,10 +1,12 @@
-#' @docType package
-#' @name discover
-#' The discovery code allows the user to retrieve a list of the web services available in
-#' their workspace given that they provide the workspace ID and the authorization token
-#' (both of which can be found in settings on the AzureML webpage). A user can also get
-#' detailed information about a specific web service, retrieve its endpoints, and the
-#' details of a specific endpoint.
+# The discovery code allows the user to retrieve a list of the web services available in
+# their workspace given that they provide the workspace ID and the authorization token
+# (both of which can be found in settings on the AzureML webpage). A user can also get
+# detailed information about a specific web service, retrieve its endpoints, and the
+# details of a specific endpoint.
+# @docType package
+# @name maml
+#NULL
+
 
 
 
@@ -32,8 +34,6 @@ prodURL = "https://management-tm.azureml.net"
 #' @param tUrl The URL from the published web service
 #' @param authToken The authentication token for the AzureML account being used
 #' @return prints the framework
-#' @examples
-#' results[[1]]
 #############################################################
 getFramework <- function(tUrl, authToken) {
   # Collectors for API response
@@ -77,10 +77,9 @@ getFramework <- function(tUrl, authToken) {
 #' @return Returns a list of lists, where each web service is represented
 #' as a nested named list with the following fields:
 #' "Id", "Name", "Description", "CreationTime", "WorkspaceId", "DefaultEndpointName"
-#' @examples
-#' DELETE TOKENS IN REAL VERSION
-#' services = getWebServices("c01fb89129aa4ef0a19affa7f95ecbbc", "523709d06661441bbf129d68f84cd6a4")
-#' serviceID = services[[1]]["Id"]
+# @examples
+# services = getWebServices("c01fb89129aa4ef0a19affa7f95ecbbc", "523709d06661441bbf129d68f84cd6a4")
+# serviceID = services[[1]]["Id"]
 #############################################################
 getWebServices <- function(wkID, authToken, url=prodURL) {
   response = getFramework(sprintf(paste(url,"/workspaces/%s/webservices",sep=""), wkID), authToken)
@@ -103,8 +102,8 @@ getWebServices <- function(wkID, authToken, url=prodURL) {
 #' @return Returns a named list representing the web service
 #' with the following fields:
 #' "Id", "Name", "Description", "CreationTime", "WorkspaceId", "DefaultEndpointName"
-#' @examples
-#' services = getWebServices("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
+# @examples
+# services = getWebServices("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
 #############################################################
 getWSDetails <- function(wkID, authToken, wsID, url=prodURL) {
   return(getFramework(sprintf(paste(url, "/workspaces/%s/webservices/%s", sep=""), wkID, wsID), authToken))
@@ -125,8 +124,8 @@ getWSDetails <- function(wkID, authToken, wsID, url=prodURL) {
 #' "Name", "Description", "CreationTime", "WorkspaceId", "WebServiceId",
 #' "HelpLocation", "PrimaryKey", "SecondaryKey", "ApiLocation", "Version",
 #' "MaxConcurrentCalls", "DiagnosticsTraceLevel", "ThrottleLevel"
-#' @examples
-#' endpoints = getEndpoints("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
+# @examples
+# endpoints = getEndpoints("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
 #############################################################
 getEndpoints <- function(wkID, authToken, wsID, url=prodURL) {
   response <- getFramework(sprintf(paste(url, "/workspaces/%s/webservices/%s/endpoints", sep=""), wkID, wsID), authToken)
@@ -152,8 +151,8 @@ getEndpoints <- function(wkID, authToken, wsID, url=prodURL) {
 #' "Name", "Description", "CreationTime", "WorkspaceId", "WebServiceId",
 #' "HelpLocation", "PrimaryKey", "SecondaryKey", "ApiLocation", "Version",
 #' "MaxConcurrentCalls", "DiagnosticsTraceLevel", "ThrottleLevel"
-#' @examples
-#' defaultEP = getEPDetails("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "default")
+# @examples
+# defaultEP = getEPDetails("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "default")
 #############################################################
 getEPDetails <- function(wkID, authToken, wsID, epName, url=prodURL) {
   sprintf(paste(url, "/workspaces/%s/webservices/%s/endpoints/%s", sep=""), wkID, wsID, epName)

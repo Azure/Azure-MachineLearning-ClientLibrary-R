@@ -2,7 +2,7 @@
 % Please edit documentation in R/publish.R
 \name{packDependencies}
 \alias{packDependencies}
-\title{HELPER FUNCTION: Package Dependencies}
+\title{Package a function's dependencies into a base64 encoded string}
 \usage{
 packDependencies(functionName)
 }

@@ -19,7 +19,4 @@ Framework for making an HTTP request to the URL specified
 returns a list of lists, so that the elements can be accessed
 via double bracket notation
 }
-\examples{
-results[[1]]
-}
 

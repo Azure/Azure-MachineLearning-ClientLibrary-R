@@ -4,8 +4,8 @@
 \alias{updateWebService}
 \title{Update a Published Web Service}
 \usage{
-updateWebService(functionName, serviceGUID, inputSchema, outputSchema, wkID,
-  authToken)
+updateWebService(functionName, serviceName, wsID, inputSchema, outputSchema,
+  wkID, authToken)
 }
 \arguments{
 \item{string}{functionName - The function that is being updated}
@@ -31,15 +31,5 @@ This function updates published code given a valid workspace ID and authenticati
 the input and output schemas from the user.
 The user can expect a list of the web service details, the default endpoint details and the consumption function and use this information to access
 the published function.
-}
-\examples{
-# create a function to make predictions using the trained model
-I.e. predictTitanic <- function (Pclass, Sex, Age, SibSp, Parch, Fare)
-# Sample local call
-predictTitanic(1, "male", 20, 2, 0, 8.50)
-# Publish the function
-TitanicService <- publishWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
-# Let's say that predictTitanic was updated to add more functionality now and we want to republish
-TitanicService <- updateWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
 }
 

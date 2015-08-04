@@ -2,7 +2,7 @@
 % Please edit documentation in R/publish.R
 \name{getFunctionString}
 \alias{getFunctionString}
-\title{Get Function Source Code as a String}
+\title{Get function source code as a string}
 \usage{
 getFunctionString(x)
 }
@@ -14,6 +14,5 @@ function in string format
 }
 \description{
 This is a helper function that will convert a function's source code to a string
-Also consider paste(body(fun())) or getAnywhere()
 }
 

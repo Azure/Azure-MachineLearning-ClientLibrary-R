@@ -2,7 +2,7 @@
 % Please edit documentation in R/consume.R
 \name{discoverSchema}
 \alias{discoverSchema}
-\title{This function discovers using the workspace ID and web service ID, information specific to the consumption functions}
+\title{Discover function schema}
 \usage{
 discoverSchema(helpURL, scheme = "https",
   host = "ussouthcentral.services.azureml.net", api_version = "2.0")

@@ -4,7 +4,7 @@
 \alias{getWSDetails}
 \title{Get Workspace Details}
 \usage{
-getWSDetails(wkID, authToken, wsID, url = wsURLdet)
+getWSDetails(wkID, authToken, wsID, url = prodURL)
 }
 \arguments{
 \item{wkID}{The workspace ID}
@@ -20,9 +20,5 @@ with the following fields:
 }
 \description{
 Get detailed information about a specific webservice
-}
-\examples{
-<< Please note that you will need to retrieve all of the signature details from your AzureML account >>
-services = getWebServices("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
 }
 

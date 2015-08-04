@@ -1,11 +1,11 @@
-#' @docType package
-#' @name publish
-#' Publishing is a simple one call function for the user. Upon calling, the user simply needs to provide
-#' the workspace identification information, the function they want published and the name they want this
-#' service to be saved as. The publish function call will handle the API call for the user and any consumption
-#' that may need to be done related to this function. Once the call is finished, the function will return a
-#' list with the web service details, the endpoint detains and the consumption function to the user.
-#' There is also an update publish call so that the user can republish a function without creating a new instance.
+# Publishing is a simple one call function for the user. Upon calling, the user simply needs to provide
+# the workspace identification information, the function they want published and the name they want this
+# service to be saved as. The publish function call will handle the API call for the user and any consumption
+# that may need to be done related to this function. Once the call is finished, the function will return a
+# list with the web service details, the endpoint detains and the consumption function to the user.
+# There is also an update publish call so that the user can republish a function without creating a new instance.
+# @docType package
+# @name publish
 
 
 
@@ -22,7 +22,7 @@ wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- matrix(ncol = %s, nro
 #' @description
 #' This is a helper function that will convert a function's source code to a string
 #' @param x Name of the function to convert to a string
-#' @return function in string format
+#' @return source code of the function as a string
 #############################################################
 getFunctionString <- function (x)
 {
@@ -97,8 +97,8 @@ getFunctionString <- function (x)
 #' This is a helper function to extract object and package dependencies
 #' then pack them into a .zip, then a base64 string
 #' packDependencies()
-#' @param closure functionName - function to package dependencies from
-#' @return encoded zip - will return false if nothing was zipped
+#' @param functionName  function to package dependencies from
+#' @return list containing the guid for the rdta file and the encoded zip
 #############################################################
 packDependencies <- function(functionName) {
 
@@ -313,14 +313,14 @@ publishPreprocess <- function(argList) {
 #' @param string wkID - The workspace ID
 #' @param string authToken - The primary authorization token
 #' @return List of webservice details, default endpoint details, and the consumption function
-#' @examples
-#' # create a function to make predictions using the trained model
-#' # For this example we will use the Titanic
-#' I.e. predictTitanic <- function (Pclass, Sex, Age, SibSp, Parch, Fare)
-#' # Sample local call
-#' predictTitanic(1, "male", 20, 2, 0, 8.50)
-#' #Publish the function
-#' TitanicService <- publishWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
+# @examples
+# # create a function to make predictions using the trained model
+# # For this example we will use the Titanic
+# I.e. predictTitanic <- function (Pclass, Sex, Age, SibSp, Parch, Fare)
+# # Sample local call
+# predictTitanic(1, "male", 20, 2, 0, 8.50)
+# #Publish the function
+# TitanicService <- publishWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
 #############################################################
 publishWebService <- function(functionName, serviceName, inputSchema, outputSchema, wkID, authToken) {
 
@@ -415,15 +415,12 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 #' @param string wkID - The workspace ID
 #' @param string authToken - The primary authorization token
 #' @return List of webservice details, default endpoint details, and the consumption function
-#' @examples
-#' # create a function to make predictions using the trained model
-#' I.e. predictTitanic <- function (Pclass, Sex, Age, SibSp, Parch, Fare)
-#' # Sample local call
-#' predictTitanic(1, "male", 20, 2, 0, 8.50)
-#' # Publish the function
-#' TitanicService <- publishWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
-#' # Let's say that predictTitanic was changed and we want to republish
-#' TitanicService <- updateWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
+# @examples
+# I.e. predictTitanic <- function (Pclass, Sex, Age, SibSp, Parch, Fare)
+# predictTitanic(1, "male", 20, 2, 0, 8.50)
+# TitanicService <- publishWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
+# Let's say that predictTitanic was changed and we want to republish
+# TitanicService <- updateWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
 #############################################################
 updateWebService <- function(functionName, serviceName, wsID, inputSchema, outputSchema, wkID, authToken) {
 
