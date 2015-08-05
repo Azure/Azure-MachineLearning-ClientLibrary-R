@@ -2,33 +2,50 @@
 % Please edit documentation in R/discover.R
 \name{getEndpoints}
 \alias{getEndpoints}
-\title{Get Endpoints.
-Get the endpoints that are part of a web service}
+\title{Get Web Service Endpoints.}
 \usage{
 getEndpoints(wkID, authToken, wsID, url = prodURL)
 }
 \arguments{
-\item{wkID}{The workspace ID}
+\item{wkID}{workspace ID}
 
-\item{authToken}{The primary authorization token}
+\item{authToken}{primary authorization token}
 
-\item{wsID}{The webservice ID}
+\item{wsID}{webservice ID}
 }
 \value{
 Returns a list of lists, where each endpoint is represented
 as a nested named list with the following fields:
-"Name", "Description", "CreationTime", "WorkspaceId", "WebServiceId",
-"HelpLocation", "PrimaryKey", "SecondaryKey", "ApiLocation", "Version",
-"MaxConcurrentCalls", "DiagnosticsTraceLevel", "ThrottleLevel"
+
+\itemize{
+ \item Name
+ \item Description
+ \item CreationTime
+ \item WorkspaceId
+ \item WebServiceId
+ \item HelpLocation
+ \item PrimaryKey
+ \item SecondaryKey
+ \item ApiLocation
+ \item Version
+ \item MaxConcurrentCalls
+ \item DiagnosticsTraceLevel
+ \item ThrottleLevel
+ }
 }
 \description{
-Get Endpoints.
-Get the endpoints that are part of a web service
+Get the API endpoints that belong to a Microsoft Azure Machine Learning web service.
+}
+\examples{
+\dontrun{
+endpoints <- getEndpoints("wkId", "authToken", "wsID")
+apiURL <- endpoints[[1]]$HelpLocation
+pKey <- endpoints[[1]]$PrimaryKey
+}
 }
 \seealso{
-For publishing to AzureML, see \code{\link{publishWebService}}
-
-Other Discovery functions: \code{\link{getEPDetails}};
-  \code{\link{getWSDetails}}; \code{\link{getWebServices}}
+Other discovery: \code{\link{getEPDetails}};
+  \code{\link{getFramework}}; \code{\link{getWSDetails}};
+  \code{\link{getWebServices}}
 }
 

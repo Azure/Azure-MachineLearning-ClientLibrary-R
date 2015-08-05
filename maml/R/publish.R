@@ -1,29 +1,18 @@
-# Publishing is a simple one call function for the user. Upon calling, the user simply needs to provide
-# the workspace identification information, the function they want published and the name they want this
-# service to be saved as. The publish function call will handle the API call for the user and any consumption
-# that may need to be done related to this function. Once the call is finished, the function will return a
-# list with the web service details, the endpoint detains and the consumption function to the user.
-# There is also an update publish call so that the user can republish a function without creating a new instance.
-# @docType package
-# @name publish
-
-
-
-#############################################################
-# String constants
-#############################################################
+# String constants --------------------------------------------------------
 publishURL <- "https://management.azureml.net/workspaces/%s/webservices/%s"
 wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- matrix(ncol = %s, nrow = nrow(inputDF))\r\ncolnames(outputDF) <- list(%s)\r\noutputDF <- data.frame(outputDF)\r\nfor (file in list.files(\"src\")) {\r\n  if (file == \"%s\") {\r\n    load(\"src/%s\")\r\n    for (item in names(dependencies)) {\r\n      assign(item, dependencies[[item]])\r\n    }\r\n  }\r\n  else {\r\n    if (!(file %%in%% installed.packages()[,\"Package\"])) {\r\n      install.packages(paste(\"src\", file, sep=\"/\"), lib=\".\", repos=NULL, verbose=TRUE)\r\n    }\r\n    library(strsplit(file, \"\\\\.\")[[1]][[1]], character.only=TRUE)\r\n  }\r\n}\r\naction <- %s\r\nfor (i in 1:nrow(inputDF)) {\r\n  outputDF[i,] <- do.call(\"action\", as.list(inputDF[i,]))\r\n}\r\nmaml.mapOutputPort(\"outputDF\")"
 
 
 
-#############################################################
-#' @title Get function source code as a string
-#' @description
-#' This is a helper function that will convert a function's source code to a string
-#' @param x Name of the function to convert to a string
+# Functions ---------------------------------------------------------------
+#' Get function source code
+#'
+#' Returns the source code of a function as a string
+#'
+#' @param x name of the function to convert to a string
 #' @return source code of the function as a string
-#############################################################
+#'
+#' @keywords internal
 getFunctionString <- function (x)
 {
   if (tryCatch(!is.character(x), error = function(e) TRUE))
@@ -85,21 +74,19 @@ getFunctionString <- function (x)
   #don't show the full response!
   #res
   # Might return multiple objects in a list, currently returning first object (BIG ASSUMPTION)
-  #return(objs[1])
   return(gsub("\n", "\r\n", gsub("\"", "\\\"", objs[1])))
 }
 
 
 
-#############################################################
-#' @title Package a function's dependencies into a base64 encoded string
-#' @description
-#' This is a helper function to extract object and package dependencies
-#' then pack them into a .zip, then a base64 string
-#' packDependencies()
+#' Package a function's dependencies into a base64 encoded string
+#'
+#' Find a function's in-memory and package dependencies, and turn them into a base-64 encoded zip file. This string is used in the publish API call to upload dependencies to the server.
+#'
 #' @param functionName  function to package dependencies from
 #' @return list containing the guid for the rdta file and the encoded zip
-#############################################################
+#'
+#' @keywords internal
 packDependencies <- function(functionName) {
 
   # Recursive step for package packaging
@@ -259,14 +246,14 @@ packDependencies <- function(functionName) {
 
 
 
-
-
-#############################################################
-#' @title HELPER FUNCTION: Convert Format
-#' @description This is a helper function to convert expected schema to API-expecting format
-#' @param list argList - List of expected input parameters
-#' @return Converted inputSchema to the proper format
-#############################################################
+#' Convert input schema to API expected format.
+#'
+#' Helper function to convert the user-friendly input and output schema parameters to the publishWebService() function to the format expected by the API.
+#'
+#' @param argList list of expected input parameters in the format expected by \code{\link{publishWebService}}
+#' @return list of the format expected by the API
+#'
+#' @keywords internal
 publishPreprocess <- function(argList) {
   form <- list()
   for (arg in names(argList)) {
@@ -296,32 +283,25 @@ publishPreprocess <- function(argList) {
 
 
 
-#############################################################
-#' @title Publish Web Service
+#' Publish a function to Microsoft Azure
+#'
+#' Publish a function to Microsoft Azure as a web service. The web service can then be consumed within R, Visual Studio, Excel, etc. as long as the user has the API key and location. The function to be published can use arbitrary objects and packages. Currently, the function to be published can only take in primitive data types as input, i.e. no data frames or lists, but support for those functions will be added in the future.
+#'
 #' @export
-#' @description
-#' This function publishes code given a valid workspace ID and authentication token. The function expects the function name, service name, and
-#' the input and output schemas from the user.
-#' The user can expect a list of the web service details, the default endpoint details and the consumption function and use this information to access
-#' the published function.
-#' @param string functionName - The function that is being published
-#' @param string serviceName - The name they would like the function published under
-#' @param list inputSchema - List of expected input parameters
-#' expecting inputSchema = list("arg1"="type", "arg2"="type", ...)
-#' @param list outputSchema - List of expected output
-#' expecting outputSchema = list("output1"="type", "output2"="type", ...)
-#' @param string wkID - The workspace ID
-#' @param string authToken - The primary authorization token
-#' @return List of webservice details, default endpoint details, and the consumption function
-# @examples
-# # create a function to make predictions using the trained model
-# # For this example we will use the Titanic
-# I.e. predictTitanic <- function (Pclass, Sex, Age, SibSp, Parch, Fare)
-# # Sample local call
-# predictTitanic(1, "male", 20, 2, 0, 8.50)
-# #Publish the function
-# TitanicService <- publishWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
-#############################################################
+#'
+#' @param functionName function name as a string to be published
+#' @param serviceName name of the new web service
+#' @param inputSchema list of input parameters of format \code{list("arg1"="type", "arg2"="type", ...)}
+#' @param outputSchema list of outputs of format \code{list("output1"="type", "output2"="type", ...)}
+#' @param wkID the workspace ID
+#' @param authToken primary authorization token
+#' @return nested list, the first element is a list containing information about the new web service, the second element is a list of its endpoints
+#'
+#' @family publish
+#' @examples
+#' \dontrun{
+#' TitanicService <- publishWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
+#' }
 publishWebService <- function(functionName, serviceName, inputSchema, outputSchema, wkID, authToken) {
 
   # Make sure schema inputted matches function signature
@@ -397,14 +377,12 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 
 
 
-#############################################################
-#' @title Update a Published Web Service
+#' Update a Published Web Service
+#'
+#' This function updates published code given a valid workspace ID and authentication token. The function expects the function name, service id, and the input and output schemas from the user. The user can expect a list of the web service details, the default endpoint details and the consumption function and use this information to access the published function.
+#'
 #' @export
-#' @description
-#' This function updates published code given a valid workspace ID and authentication token. The function expects the function name, service id, and
-#' the input and output schemas from the user.
-#' The user can expect a list of the web service details, the default endpoint details and the consumption function and use this information to access
-#' the published function.
+#'
 #' @param string functionName - The function that is being updated
 #' @param string serviceGUID - The name they would like the function published under
 #' ((Note: cannot change the service name))
@@ -415,13 +393,9 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 #' @param string wkID - The workspace ID
 #' @param string authToken - The primary authorization token
 #' @return List of webservice details, default endpoint details, and the consumption function
+#'
 # @examples
-# I.e. predictTitanic <- function (Pclass, Sex, Age, SibSp, Parch, Fare)
-# predictTitanic(1, "male", 20, 2, 0, 8.50)
-# TitanicService <- publishWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
-# Let's say that predictTitanic was changed and we want to republish
 # TitanicService <- updateWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
-#############################################################
 updateWebService <- function(functionName, serviceName, wsID, inputSchema, outputSchema, wkID, authToken) {
 
   # Make sure schema inputted matches function signature
@@ -485,9 +459,6 @@ updateWebService <- function(functionName, serviceName, wsID, inputSchema, outpu
 
   # Use discovery functions to get default endpoint for immediate use
   endpoints <- getEndpoints(wkID, authToken, updatedService["Id"])
-#  for (i in 1:length(endpoints)) {
-#    endpoints[[i]]$ApiLocation <- paste(endpoints[[i]]$ApiLocation, "/execute?api-version=2.0&details=true",sep="")
-#  }
 
   return(list("serviceDetails"=updatedService, "endpoints"=endpoints))
 }

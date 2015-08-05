@@ -2,19 +2,19 @@
 % Please edit documentation in R/discover.R
 \name{getWSDetails}
 \alias{getWSDetails}
-\title{Get Workspace Details.}
+\title{Get Web Service Details.}
 \usage{
 getWSDetails(wkID, authToken, wsID, url = prodURL)
 }
 \arguments{
-\item{wkID}{The workspace ID}
+\item{wkID}{workspace ID}
 
-\item{authToken}{The primary authorization token}
+\item{authToken}{primary authorization token}
 
-\item{wsID}{The webservice ID}
+\item{wsID}{webservice ID}
 }
 \value{
-Returns a list of lists, where each web service is represented as a nested named list with the following fields:
+Returns a list with the following fields:
 
 \itemize{
   \item Id
@@ -26,15 +26,11 @@ Returns a list of lists, where each web service is represented as a nested named
 }
 }
 \description{
-Get detailed information about a specific webservice
-}
-\examples{
-\dontrun{
-services = getWebServices("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
-}
+Get detailed information about a specific Microsoft Azure Machine Learning web service specified by the web service ID.
 }
 \seealso{
-Other Discovery functions: \code{\link{getEPDetails}};
-  \code{\link{getEndpoints}}; \code{\link{getWebServices}}
+Other discovery: \code{\link{getEPDetails}};
+  \code{\link{getEndpoints}}; \code{\link{getFramework}};
+  \code{\link{getWebServices}}
 }
 

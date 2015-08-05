@@ -2,17 +2,23 @@
 % Please edit documentation in R/publish.R
 \name{publishPreprocess}
 \alias{publishPreprocess}
-\title{HELPER FUNCTION: Convert Format}
+\title{Convert input schema to API expected format.}
 \usage{
 publishPreprocess(argList)
 }
 \arguments{
-\item{list}{argList - List of expected input parameters}
+\item{argList}{list of expected input parameters in the format expected by \code{\link{publishWebService}}}
 }
 \value{
-Converted inputSchema to the proper format
+list of the format expected by the API
 }
 \description{
-This is a helper function to convert expected schema to API-expecting format
+Helper function to convert the user-friendly input and output schema parameters to the publishWebService() function to the format expected by the API.
 }
+\seealso{
+Other publish: \code{\link{getFunctionString}};
+  \code{\link{packDependencies}};
+  \code{\link{publishWebService}}
+}
+\keyword{internal}
 

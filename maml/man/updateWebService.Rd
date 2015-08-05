@@ -27,9 +27,6 @@ expecting outputSchema = list("output1"="type", "output2"="type", ...)}
 List of webservice details, default endpoint details, and the consumption function
 }
 \description{
-This function updates published code given a valid workspace ID and authentication token. The function expects the function name, service id, and
-the input and output schemas from the user.
-The user can expect a list of the web service details, the default endpoint details and the consumption function and use this information to access
-the published function.
+This function updates published code given a valid workspace ID and authentication token. The function expects the function name, service id, and the input and output schemas from the user. The user can expect a list of the web service details, the default endpoint details and the consumption function and use this information to access the published function.
 }
 

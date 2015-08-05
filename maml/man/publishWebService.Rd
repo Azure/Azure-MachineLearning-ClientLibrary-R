@@ -2,33 +2,38 @@
 % Please edit documentation in R/publish.R
 \name{publishWebService}
 \alias{publishWebService}
-\title{Publish Web Service}
+\title{Publish a function to Microsoft Azure}
 \usage{
 publishWebService(functionName, serviceName, inputSchema, outputSchema, wkID,
   authToken)
 }
 \arguments{
-\item{string}{functionName - The function that is being published}
+\item{functionName}{function name as a string to be published}
 
-\item{string}{serviceName - The name they would like the function published under}
+\item{serviceName}{name of the new web service}
 
-\item{list}{inputSchema - List of expected input parameters
-expecting inputSchema = list("arg1"="type", "arg2"="type", ...)}
+\item{inputSchema}{list of input parameters of format \code{list("arg1"="type", "arg2"="type", ...)}}
 
-\item{list}{outputSchema - List of expected output
-expecting outputSchema = list("output1"="type", "output2"="type", ...)}
+\item{outputSchema}{list of outputs of format \code{list("output1"="type", "output2"="type", ...)}}
 
-\item{string}{wkID - The workspace ID}
+\item{wkID}{the workspace ID}
 
-\item{string}{authToken - The primary authorization token}
+\item{authToken}{primary authorization token}
 }
 \value{
-List of webservice details, default endpoint details, and the consumption function
+nested list, the first element is a list containing information about the new web service, the second element is a list of its endpoints
 }
 \description{
-This function publishes code given a valid workspace ID and authentication token. The function expects the function name, service name, and
-the input and output schemas from the user.
-The user can expect a list of the web service details, the default endpoint details and the consumption function and use this information to access
-the published function.
+Publish a function to Microsoft Azure as a web service. The web service can then be consumed within R, Visual Studio, Excel, etc. as long as the user has the API key and location. The function to be published can use arbitrary objects and packages. Currently, the function to be published can only take in primitive data types as input, i.e. no data frames or lists, but support for those functions will be added in the future.
+}
+\examples{
+\dontrun{
+TitanicService <- publishWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
+}
+}
+\seealso{
+Other publish: \code{\link{getFunctionString}};
+  \code{\link{packDependencies}};
+  \code{\link{publishPreprocess}}
 }
 

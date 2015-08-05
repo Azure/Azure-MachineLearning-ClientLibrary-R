@@ -2,20 +2,25 @@
 % Please edit documentation in R/discover.R
 \name{getFramework}
 \alias{getFramework}
-\title{Get FrameWork.}
+\title{Abstraction for making GET requests.}
 \usage{
 getFramework(tUrl, authToken)
 }
 \arguments{
-\item{tUrl}{The URL from the published web service}
+\item{tUrl}{API URL}
 
-\item{authToken}{The authentication token for the AzureML account being used}
+\item{authToken}{authentication token}
 }
 \value{
-prints the framework
+the response as a named list
 }
 \description{
-Framework for making an HTTP request to the URL specified returns a list of lists, so that the elements can be accessed via double bracket notation
+Framework for making GET requests to the Azure management APIs.
+}
+\seealso{
+Other discovery: \code{\link{getEPDetails}};
+  \code{\link{getEndpoints}}; \code{\link{getWSDetails}};
+  \code{\link{getWebServices}}
 }
 \keyword{Internal}
 

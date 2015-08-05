@@ -1,6 +1,3 @@
-
-
-
 # API URLs ----------------------------------------------------------------
 
 wsURL = "https://management-tm.azureml.net/workspaces/%s/webservices"
@@ -16,20 +13,20 @@ internalURL = "https://management.azureml-int.net"
 prodURL = "https://management-tm.azureml.net"
 
 
-#  ------------------------------------------------------------------------
 
-#' Get FrameWork.
-#' 
-#' Framework for making an HTTP request to the URL specified returns a list of lists, so that the elements can be accessed via double bracket notation
-#' 
-#' @param tUrl The URL from the published web service
-#' @param authToken The authentication token for the AzureML account being used
-#' 
-#' @family discovery internal functions
-#' 
+# Functions ---------------------------------------------------------------
+
+#' Abstraction for making GET requests.
+#'
+#' Framework for making GET requests to the Azure management APIs.
+#'
+#' @param tUrl API URL
+#' @param authToken authentication token
+#'
+#' @return the response as a named list
+#'
+#' @family discovery
 #' @keywords Internal
-#' 
-#' @return prints the framework
 getFramework <- function(tUrl, authToken) {
   # Collectors for API response
   h = RCurl::basicTextGatherer()
@@ -62,19 +59,17 @@ getFramework <- function(tUrl, authToken) {
 
 
 
-#' Get Web Services.
-#' 
-#' Get a list of webservices available to a workspace
-
+#' Get Available Web Services.
+#'
+#' Get a list of webservices available to the Microsoft Azure Machine Learning workspace specified by the workspace ID.
+#'
 #' @export
 #'
-#' @param wkID The workspace ID
-#' @param authToken The primary authorization token
-#' 
-#' @family Discovery functions
-#' 
+#' @param wkID workspace ID
+#' @param authToken primary authorization token
+#'
 #' @return Returns a list of lists, where each web service is represented as a nested named list with the following fields:
-#' 
+#'
 #' \itemize{
 #'   \item Id
 #'   \item Name
@@ -83,10 +78,14 @@ getFramework <- function(tUrl, authToken) {
 #'   \item WorkspaceId
 #'   \item DefaultEndpointName
 #' }
-#' 
-# @examples
-# services = getWebServices("c01fb89129aa4ef0a19affa7f95ecbbc", "523709d06661441bbf129d68f84cd6a4")
-# serviceID = services[[1]]["Id"]
+#'
+#' @family discovery
+#'
+#' @examples
+#' \dontrun{
+#' services = getWebServices("wsID", "authToken")
+#' serviceID = services[[1]]["Id"]
+#' }
 getWebServices <- function(wkID, authToken, url=prodURL) {
   response = getFramework(sprintf(paste(url,"/workspaces/%s/webservices",sep=""), wkID), authToken)
   if (!is.list(response)) {
@@ -97,19 +96,17 @@ getWebServices <- function(wkID, authToken, url=prodURL) {
 
 
 
-#' Get Workspace Details.
-#' 
-#' Get detailed information about a specific webservice
-
+#' Get Web Service Details.
+#'
+#' Get detailed information about a specific Microsoft Azure Machine Learning web service specified by the web service ID.
+#'
 #' @export
-#' 
-#' @family Discovery functions
-#' 
+#'
 #' @inheritParams getWebServices
-#' @param wsID The webservice ID
-#' 
-#' @return Returns a list of lists, where each web service is represented as a nested named list with the following fields:
-#' 
+#' @param wsID webservice ID
+#'
+#' @return Returns a list with the following fields:
+#'
 #' \itemize{
 #'   \item Id
 #'   \item Name
@@ -118,35 +115,49 @@ getWebServices <- function(wkID, authToken, url=prodURL) {
 #'   \item WorkspaceId
 #'   \item DefaultEndpointName
 #' }
-#' @examples
-#' \dontrun{
-#' services = getWebServices("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
-#' }
+#'
+#' @family discovery
 getWSDetails <- function(wkID, authToken, wsID, url=prodURL) {
   return(getFramework(sprintf(paste(url, "/workspaces/%s/webservices/%s", sep=""), wkID, wsID), authToken))
 }
 
 
 
-#' Get Endpoints.
-
-#' Get the endpoints that are part of a web service
-#' 
+#' Get Web Service Endpoints.
+#'
+#' Get the API endpoints that belong to a Microsoft Azure Machine Learning web service.
+#'
 #' @export
-#' 
+#'
 #' @inheritParams getWSDetails
-#' 
-#' @seealso For publishing to AzureML, see \code{\link{publishWebService}}
-#' @family Discovery functions
-#' 
 #'
 #' @return Returns a list of lists, where each endpoint is represented
 #' as a nested named list with the following fields:
-#' "Name", "Description", "CreationTime", "WorkspaceId", "WebServiceId",
-#' "HelpLocation", "PrimaryKey", "SecondaryKey", "ApiLocation", "Version",
-#' "MaxConcurrentCalls", "DiagnosticsTraceLevel", "ThrottleLevel"
-# @examples
-# endpoints = getEndpoints("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
+#'
+#' \itemize{
+#'  \item Name
+#'  \item Description
+#'  \item CreationTime
+#'  \item WorkspaceId
+#'  \item WebServiceId
+#'  \item HelpLocation
+#'  \item PrimaryKey
+#'  \item SecondaryKey
+#'  \item ApiLocation
+#'  \item Version
+#'  \item MaxConcurrentCalls
+#'  \item DiagnosticsTraceLevel
+#'  \item ThrottleLevel
+#'  }
+#'
+#' @family discovery
+#'
+#' @examples
+#' \dontrun{
+#' endpoints <- getEndpoints("wkId", "authToken", "wsID")
+#' apiURL <- endpoints[[1]]$HelpLocation
+#' pKey <- endpoints[[1]]$PrimaryKey
+#' }
 getEndpoints <- function(wkID, authToken, wsID, url=prodURL) {
   response <- getFramework(sprintf(paste(url, "/workspaces/%s/webservices/%s/endpoints", sep=""), wkID, wsID), authToken)
   # for convenience because by default the repsonse doesn't include the full API location
@@ -159,22 +170,33 @@ getEndpoints <- function(wkID, authToken, wsID, url=prodURL) {
 
 
 #' Get Endpoint Details.
-#' 
-#' Get the details on a specific endpoint
-#' 
+#'
+#' Get detailed information about a specific endpoint for a web service specified by the web service ID
+#'
 #' @export
-#' 
-#' @family Discovery functions
 #'
 #' @inheritParams getWSDetails
-#' @param epName The endpoint name
-#' 
-#' @return Returns a named list representing the endpoint with the following fields:
-#' "Name", "Description", "CreationTime", "WorkspaceId", "WebServiceId",
-#' "HelpLocation", "PrimaryKey", "SecondaryKey", "ApiLocation", "Version",
-#' "MaxConcurrentCalls", "DiagnosticsTraceLevel", "ThrottleLevel"
-# @examples
-# defaultEP = getEPDetails("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456", "default")
+#' @param epName endpoint name
+#'
+#' @return Returns a list with the following fields:
+#'
+#' \itemize{
+#'  \item Name
+#'  \item Description
+#'  \item CreationTime
+#'  \item WorkspaceId
+#'  \item WebServiceId
+#'  \item HelpLocation
+#'  \item PrimaryKey
+#'  \item SecondaryKey
+#'  \item ApiLocation
+#'  \item Version
+#'  \item MaxConcurrentCalls
+#'  \item DiagnosticsTraceLevel
+#'  \item ThrottleLevel
+#'  }
+#'
+#' @family discovery
 getEPDetails <- function(wkID, authToken, wsID, epName, url=prodURL) {
   sprintf(paste(url, "/workspaces/%s/webservices/%s/endpoints/%s", sep=""), wkID, wsID, epName)
   endpoint <- getFramework(sprintf(paste(url, "/workspaces/%s/webservices/%s/endpoints/%s", sep=""), wkID, wsID, epName), authToken)

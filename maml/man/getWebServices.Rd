@@ -2,14 +2,14 @@
 % Please edit documentation in R/discover.R
 \name{getWebServices}
 \alias{getWebServices}
-\title{Get Web Services.}
+\title{Get Available Web Services.}
 \usage{
 getWebServices(wkID, authToken, url = prodURL)
 }
 \arguments{
-\item{wkID}{The workspace ID}
+\item{wkID}{workspace ID}
 
-\item{authToken}{The primary authorization token}
+\item{authToken}{primary authorization token}
 }
 \value{
 Returns a list of lists, where each web service is represented as a nested named list with the following fields:
@@ -24,10 +24,17 @@ Returns a list of lists, where each web service is represented as a nested named
 }
 }
 \description{
-Get a list of webservices available to a workspace
+Get a list of webservices available to the Microsoft Azure Machine Learning workspace specified by the workspace ID.
+}
+\examples{
+\dontrun{
+services = getWebServices("wsID", "authToken")
+serviceID = services[[1]]["Id"]
+}
 }
 \seealso{
-Other Discovery functions: \code{\link{getEPDetails}};
-  \code{\link{getEndpoints}}; \code{\link{getWSDetails}}
+Other discovery: \code{\link{getEPDetails}};
+  \code{\link{getEndpoints}}; \code{\link{getFramework}};
+  \code{\link{getWSDetails}}
 }
 

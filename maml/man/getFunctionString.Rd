@@ -2,17 +2,23 @@
 % Please edit documentation in R/publish.R
 \name{getFunctionString}
 \alias{getFunctionString}
-\title{Get function source code as a string}
+\title{Get function source code}
 \usage{
 getFunctionString(x)
 }
 \arguments{
-\item{x}{Name of the function to convert to a string}
+\item{x}{name of the function to convert to a string}
 }
 \value{
 source code of the function as a string
 }
 \description{
-This is a helper function that will convert a function's source code to a string
+Returns the source code of a function as a string
 }
+\seealso{
+Other publish: \code{\link{packDependencies}};
+  \code{\link{publishPreprocess}};
+  \code{\link{publishWebService}}
+}
+\keyword{internal}
 

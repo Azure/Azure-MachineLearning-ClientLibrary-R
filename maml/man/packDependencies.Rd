@@ -13,8 +13,12 @@ packDependencies(functionName)
 list containing the guid for the rdta file and the encoded zip
 }
 \description{
-This is a helper function to extract object and package dependencies
-then pack them into a .zip, then a base64 string
-packDependencies()
+Find a function's in-memory and package dependencies, and turn them into a base-64 encoded zip file. This string is used in the publish API call to upload dependencies to the server.
 }
+\seealso{
+Other publish: \code{\link{getFunctionString}};
+  \code{\link{publishPreprocess}};
+  \code{\link{publishWebService}}
+}
+\keyword{internal}
 

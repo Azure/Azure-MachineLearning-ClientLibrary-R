@@ -7,25 +7,39 @@
 getEPDetails(wkID, authToken, wsID, epName, url = prodURL)
 }
 \arguments{
-\item{wkID}{The workspace ID}
+\item{wkID}{workspace ID}
 
-\item{authToken}{The primary authorization token}
+\item{authToken}{primary authorization token}
 
-\item{wsID}{The webservice ID}
+\item{wsID}{webservice ID}
 
-\item{epName}{The endpoint name}
+\item{epName}{endpoint name}
 }
 \value{
-Returns a named list representing the endpoint with the following fields:
-"Name", "Description", "CreationTime", "WorkspaceId", "WebServiceId",
-"HelpLocation", "PrimaryKey", "SecondaryKey", "ApiLocation", "Version",
-"MaxConcurrentCalls", "DiagnosticsTraceLevel", "ThrottleLevel"
+Returns a list with the following fields:
+
+\itemize{
+ \item Name
+ \item Description
+ \item CreationTime
+ \item WorkspaceId
+ \item WebServiceId
+ \item HelpLocation
+ \item PrimaryKey
+ \item SecondaryKey
+ \item ApiLocation
+ \item Version
+ \item MaxConcurrentCalls
+ \item DiagnosticsTraceLevel
+ \item ThrottleLevel
+ }
 }
 \description{
-Get the details on a specific endpoint
+Get detailed information about a specific endpoint for a web service specified by the web service ID
 }
 \seealso{
-Other Discovery functions: \code{\link{getEndpoints}};
-  \code{\link{getWSDetails}}; \code{\link{getWebServices}}
+Other discovery: \code{\link{getEndpoints}};
+  \code{\link{getFramework}}; \code{\link{getWSDetails}};
+  \code{\link{getWebServices}}
 }
 
