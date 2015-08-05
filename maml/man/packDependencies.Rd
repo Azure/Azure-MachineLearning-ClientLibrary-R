@@ -7,10 +7,10 @@
 packDependencies(functionName)
 }
 \arguments{
-\item{closure}{functionName - function to package dependencies from}
+\item{functionName}{function to package dependencies from}
 }
 \value{
-encoded zip - will return false if nothing was zipped
+list containing the guid for the rdta file and the encoded zip
 }
 \description{
 This is a helper function to extract object and package dependencies
