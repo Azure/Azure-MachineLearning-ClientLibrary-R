@@ -2,7 +2,7 @@
 % Please edit documentation in R/discover.R
 \name{getWSDetails}
 \alias{getWSDetails}
-\title{Get Workspace Details}
+\title{Get Workspace Details.}
 \usage{
 getWSDetails(wkID, authToken, wsID, url = prodURL)
 }
@@ -14,11 +14,27 @@ getWSDetails(wkID, authToken, wsID, url = prodURL)
 \item{wsID}{The webservice ID}
 }
 \value{
-Returns a named list representing the web service
-with the following fields:
-"Id", "Name", "Description", "CreationTime", "WorkspaceId", "DefaultEndpointName"
+Returns a list of lists, where each web service is represented as a nested named list with the following fields:
+
+\itemize{
+  \item Id
+  \item Name
+  \item Description
+  \item CreationTime
+  \item WorkspaceId
+  \item DefaultEndpointName
+}
 }
 \description{
 Get detailed information about a specific webservice
+}
+\examples{
+\dontrun{
+services = getWebServices("abcdefghijklmnopqrstuvwxyz123456", "abcdefghijklmnopqrstuvwxyz123456")
+}
+}
+\seealso{
+Other Discovery functions: \code{\link{getEPDetails}};
+  \code{\link{getEndpoints}}; \code{\link{getWebServices}}
 }
 
