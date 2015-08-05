@@ -3,13 +3,10 @@ Version: 0.1
 Date: 2015-07-24
 Type: Package
 Title: Publishes, discovers and consumes trained models to Microsoft Azure to make accessible as a web service
-Author@R: c(person("AzureML", "Maintainer", email = "AzureMLForCRAN@microsoft.com", role = c("aut", "cre")),
+Authors@R: c(person("AzureML", "Maintainer", email = "AzureMLForCRAN@microsoft.com", role = c("aut", "cre")),
   person("Brianna", "Gerads", role = "aut"),
   person("Ritika", "Ravichandra",  role = "aut"),
   person("Alex", "Wang", role = "aut"))
-Author: Brianna Gerads [aut, cre],
-  Alex Wang [aut, cre],
-  Ritika Ravichandra [aut, cre]
 Maintainer: AzureML Maintainer <AzureMLForCRAN@microsoft.com>
 Description: Provides an interface with Microsoft Azure to easily publish, consume, and discover models as a web service, will return URL or sample code to access newly created web service's API
 License: MIT
