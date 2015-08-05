@@ -10,6 +10,8 @@ getWebServices(wkID, authToken, url = prodURL)
 \item{wkID}{workspace ID}
 
 \item{authToken}{primary authorization token}
+
+\item{url}{the API url to make the call to, by default hits the Azure management API}
 }
 \value{
 Returns a list of lists, where each web service is represented as a nested named list with the following fields:

@@ -8,8 +8,9 @@ Authors@R: c(person("AzureML", "Maintainer", email = "AzureMLForCRAN@microsoft.c
   person("Ritika", "Ravichandra",  role = "aut"),
   person("Alex", "Wang", role = "aut"))
 Maintainer: AzureML Maintainer <AzureMLForCRAN@microsoft.com>
-Description: Provides an interface with Microsoft Azure to easily publish, consume, and discover models as a web service, will return URL or sample code to access newly created web service's API
-License: MIT
+Description: Provides an interface with Microsoft Azure to easily publish,
+  consume, and discover models as a web service.
+License: MIT + file LICENSE
 LazyData: TRUE
 Imports:
   RCurl,

@@ -15,10 +15,5 @@ list containing the guid for the rdta file and the encoded zip
 \description{
 Find a function's in-memory and package dependencies, and turn them into a base-64 encoded zip file. This string is used in the publish API call to upload dependencies to the server.
 }
-\seealso{
-Other publish: \code{\link{getFunctionString}};
-  \code{\link{publishPreprocess}};
-  \code{\link{publishWebService}}
-}
 \keyword{internal}
 

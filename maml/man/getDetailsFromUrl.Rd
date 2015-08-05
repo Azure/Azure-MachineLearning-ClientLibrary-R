@@ -8,6 +8,9 @@ This function also documents the assumption that the help URL will}
 \usage{
 getDetailsFromUrl(helpURL)
 }
+\arguments{
+\item{helpURL}{the URL of a help page}
+}
 \description{
 This function is a helper that takes in the help URL, and parses the endpoint and workspace from it
 This function also documents the assumption that the help URL will end in the format "endpoints/"endpointId/(other keywords)

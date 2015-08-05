@@ -15,10 +15,5 @@ list of the format expected by the API
 \description{
 Helper function to convert the user-friendly input and output schema parameters to the publishWebService() function to the format expected by the API.
 }
-\seealso{
-Other publish: \code{\link{getFunctionString}};
-  \code{\link{packDependencies}};
-  \code{\link{publishWebService}}
-}
 \keyword{internal}
 

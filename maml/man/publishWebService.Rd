@@ -26,14 +26,7 @@ nested list, the first element is a list containing information about the new we
 \description{
 Publish a function to Microsoft Azure as a web service. The web service can then be consumed within R, Visual Studio, Excel, etc. as long as the user has the API key and location. The function to be published can use arbitrary objects and packages. Currently, the function to be published can only take in primitive data types as input, i.e. no data frames or lists, but support for those functions will be added in the future.
 }
-\examples{
-\dontrun{
-TitanicService <- publishWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
-}
-}
 \seealso{
-Other publish: \code{\link{getFunctionString}};
-  \code{\link{packDependencies}};
-  \code{\link{publishPreprocess}}
+Other publish: \code{\link{updateWebService}}
 }
 

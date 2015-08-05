@@ -18,7 +18,7 @@ discoverSchema <- function(helpURL, scheme = "https", host = "ussouthcentral.ser
 
 
   # Uses httr package to get the HTTP response from the swagger document URL
-  httr::set_config(config(ssl_VERIFYHOST=FALSE,ssl_verifyPEER=FALSE), override=TRUE)
+  httr::set_config(httr::config(ssl_VERIFYHOST=FALSE,ssl_verifyPEER=FALSE), override=TRUE)
   response <- httr::GET(swaggerURL)
   # Automatically parses the content and gets the swagger document
   swagger <- httr::content(response)
@@ -291,6 +291,12 @@ consumeDataframe <- function(apiKey, requestUrl, scoreDataFrame, globalParam=set
 ########################################################### HELPER FUNCTION ###########################################################
 #' This function is a helper that takes in an API key, request URL, request in the key value format (in a lists of lists), global parameters of a web service, and delay time before retrying a call in case of a server error.
 #' It then obtains a response from Azure Machine Learning Studio in the JSON format and returns a response to the consumption functions that call it.
+#' @param apiKey primary API key
+#' @param requestUrl API URL
+#' @param keyvalues the data to be passed to the web service
+#' @param globalParam the global parameters for the web service
+#' @param retryDelay number of seconds to wait after failing (max 3 tries) to try again
+#'
 #######################################################################################################################################
 
 callAPI <- function(apiKey, requestUrl, keyvalues,  globalParam, retryDelay) {
@@ -365,6 +371,7 @@ callAPI <- function(apiKey, requestUrl, keyvalues,  globalParam, retryDelay) {
 #' This function is a helper that takes in the help URL, and parses the endpoint and workspace from it
 #' This function also documents the assumption that the help URL will end in the format "endpoints/"endpointId/(other keywords)
 #' This function also documents the assumption that the help URL will
+#' @param helpURL the URL of a help page
 #######################################################################################################################################
 
 getDetailsFromUrl <- function(helpURL) {

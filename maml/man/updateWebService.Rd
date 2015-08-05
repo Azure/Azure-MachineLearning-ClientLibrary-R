@@ -8,25 +8,27 @@ updateWebService(functionName, serviceName, wsID, inputSchema, outputSchema,
   wkID, authToken)
 }
 \arguments{
-\item{string}{functionName - The function that is being updated}
+\item{functionName}{function name as a string to be published}
 
-\item{string}{serviceGUID - The name they would like the function published under
-((Note: cannot change the service name))}
+\item{serviceName}{name of the new web service}
 
-\item{list}{inputSchema - List of expected input parameters
-expecting inputSchema = list("arg1"="type", "arg2"="type", ...)}
+\item{wsID}{ID of the web service to be updated}
 
-\item{list}{outputSchema - List of expected output
-expecting outputSchema = list("output1"="type", "output2"="type", ...)}
+\item{inputSchema}{list of input parameters of format \code{list("arg1"="type", "arg2"="type", ...)}}
 
-\item{string}{wkID - The workspace ID}
+\item{outputSchema}{list of outputs of format \code{list("output1"="type", "output2"="type", ...)}}
 
-\item{string}{authToken - The primary authorization token}
+\item{wkID}{the workspace ID}
+
+\item{authToken}{primary authorization token}
 }
 \value{
 List of webservice details, default endpoint details, and the consumption function
 }
 \description{
 This function updates published code given a valid workspace ID and authentication token. The function expects the function name, service id, and the input and output schemas from the user. The user can expect a list of the web service details, the default endpoint details and the consumption function and use this information to access the published function.
+}
+\seealso{
+Other publish: \code{\link{publishWebService}}
 }
 

@@ -298,10 +298,9 @@ publishPreprocess <- function(argList) {
 #' @return nested list, the first element is a list containing information about the new web service, the second element is a list of its endpoints
 #'
 #' @family publish
-#' @examples
-#' \dontrun{
-#' TitanicService <- publishWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
-#' }
+# @examples
+# \dontrun{
+# }
 publishWebService <- function(functionName, serviceName, inputSchema, outputSchema, wkID, authToken) {
 
   # Make sure schema inputted matches function signature
@@ -383,16 +382,11 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 #'
 #' @export
 #'
-#' @param string functionName - The function that is being updated
-#' @param string serviceGUID - The name they would like the function published under
-#' ((Note: cannot change the service name))
-#' @param list inputSchema - List of expected input parameters
-#' expecting inputSchema = list("arg1"="type", "arg2"="type", ...)
-#' @param list outputSchema - List of expected output
-#' expecting outputSchema = list("output1"="type", "output2"="type", ...)
-#' @param string wkID - The workspace ID
-#' @param string authToken - The primary authorization token
+#' @inheritParams publishWebService
+#' @param wsID ID of the web service to be updated
 #' @return List of webservice details, default endpoint details, and the consumption function
+#'
+#' @family publish
 #'
 # @examples
 # TitanicService <- updateWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)

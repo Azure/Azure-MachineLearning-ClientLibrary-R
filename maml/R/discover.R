@@ -67,6 +67,7 @@ getFramework <- function(tUrl, authToken) {
 #'
 #' @param wkID workspace ID
 #' @param authToken primary authorization token
+#' @param url the API url to make the call to, by default hits the Azure management API
 #'
 #' @return Returns a list of lists, where each web service is represented as a nested named list with the following fields:
 #'

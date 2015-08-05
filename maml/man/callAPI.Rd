@@ -7,6 +7,17 @@ It then obtains a response from Azure Machine Learning Studio in the JSON format
 \usage{
 callAPI(apiKey, requestUrl, keyvalues, globalParam, retryDelay)
 }
+\arguments{
+\item{apiKey}{primary API key}
+
+\item{requestUrl}{API URL}
+
+\item{keyvalues}{the data to be passed to the web service}
+
+\item{globalParam}{the global parameters for the web service}
+
+\item{retryDelay}{number of seconds to wait after failing (max 3 tries) to try again}
+}
 \description{
 This function is a helper that takes in an API key, request URL, request in the key value format (in a lists of lists), global parameters of a web service, and delay time before retrying a call in case of a server error.
 It then obtains a response from Azure Machine Learning Studio in the JSON format and returns a response to the consumption functions that call it.

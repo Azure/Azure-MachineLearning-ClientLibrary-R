@@ -14,6 +14,8 @@ getEPDetails(wkID, authToken, wsID, epName, url = prodURL)
 \item{wsID}{webservice ID}
 
 \item{epName}{endpoint name}
+
+\item{url}{the API url to make the call to, by default hits the Azure management API}
 }
 \value{
 Returns a list with the following fields:

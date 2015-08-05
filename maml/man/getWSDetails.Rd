@@ -12,6 +12,8 @@ getWSDetails(wkID, authToken, wsID, url = prodURL)
 \item{authToken}{primary authorization token}
 
 \item{wsID}{webservice ID}
+
+\item{url}{the API url to make the call to, by default hits the Azure management API}
 }
 \value{
 Returns a list with the following fields:

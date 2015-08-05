@@ -15,10 +15,5 @@ source code of the function as a string
 \description{
 Returns the source code of a function as a string
 }
-\seealso{
-Other publish: \code{\link{packDependencies}};
-  \code{\link{publishPreprocess}};
-  \code{\link{publishWebService}}
-}
 \keyword{internal}
 
