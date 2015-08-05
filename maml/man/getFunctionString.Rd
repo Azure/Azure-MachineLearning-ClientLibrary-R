@@ -10,7 +10,7 @@ getFunctionString(x)
 \item{x}{Name of the function to convert to a string}
 }
 \value{
-function in string format
+source code of the function as a string
 }
 \description{
 This is a helper function that will convert a function's source code to a string
