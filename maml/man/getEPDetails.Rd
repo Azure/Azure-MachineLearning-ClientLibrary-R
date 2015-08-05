@@ -2,7 +2,7 @@
 % Please edit documentation in R/discover.R
 \name{getEPDetails}
 \alias{getEPDetails}
-\title{get Endpoint Details}
+\title{Get Endpoint Details.}
 \usage{
 getEPDetails(wkID, authToken, wsID, epName, url = prodURL)
 }
@@ -23,5 +23,9 @@ Returns a named list representing the endpoint with the following fields:
 }
 \description{
 Get the details on a specific endpoint
+}
+\seealso{
+Other Discovery functions: \code{\link{getEndpoints}};
+  \code{\link{getWSDetails}}; \code{\link{getWebServices}}
 }
 

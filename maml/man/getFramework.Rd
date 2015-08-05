@@ -2,7 +2,7 @@
 % Please edit documentation in R/discover.R
 \name{getFramework}
 \alias{getFramework}
-\title{Get FrameWork}
+\title{Get FrameWork.}
 \usage{
 getFramework(tUrl, authToken)
 }
@@ -15,8 +15,7 @@ getFramework(tUrl, authToken)
 prints the framework
 }
 \description{
-Framework for making an HTTP request to the URL specified
-returns a list of lists, so that the elements can be accessed
-via double bracket notation
+Framework for making an HTTP request to the URL specified returns a list of lists, so that the elements can be accessed via double bracket notation
 }
+\keyword{Internal}
 

@@ -2,7 +2,8 @@
 % Please edit documentation in R/discover.R
 \name{getEndpoints}
 \alias{getEndpoints}
-\title{Get Endpoints}
+\title{Get Endpoints.
+Get the endpoints that are part of a web service}
 \usage{
 getEndpoints(wkID, authToken, wsID, url = prodURL)
 }
@@ -21,6 +22,13 @@ as a nested named list with the following fields:
 "MaxConcurrentCalls", "DiagnosticsTraceLevel", "ThrottleLevel"
 }
 \description{
+Get Endpoints.
 Get the endpoints that are part of a web service
+}
+\seealso{
+For publishing to AzureML, see \code{\link{publishWebService}}
+
+Other Discovery functions: \code{\link{getEPDetails}};
+  \code{\link{getWSDetails}}; \code{\link{getWebServices}}
 }
 

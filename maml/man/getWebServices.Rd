@@ -2,7 +2,7 @@
 % Please edit documentation in R/discover.R
 \name{getWebServices}
 \alias{getWebServices}
-\title{Get Web Services}
+\title{Get Web Services.}
 \usage{
 getWebServices(wkID, authToken, url = prodURL)
 }
@@ -12,11 +12,22 @@ getWebServices(wkID, authToken, url = prodURL)
 \item{authToken}{The primary authorization token}
 }
 \value{
-Returns a list of lists, where each web service is represented
-as a nested named list with the following fields:
-"Id", "Name", "Description", "CreationTime", "WorkspaceId", "DefaultEndpointName"
+Returns a list of lists, where each web service is represented as a nested named list with the following fields:
+
+\itemize{
+  \item Id
+  \item Name
+  \item Description
+  \item CreationTime
+  \item WorkspaceId
+  \item DefaultEndpointName
+}
 }
 \description{
 Get a list of webservices available to a workspace
+}
+\seealso{
+Other Discovery functions: \code{\link{getEPDetails}};
+  \code{\link{getEndpoints}}; \code{\link{getWSDetails}}
 }
 
