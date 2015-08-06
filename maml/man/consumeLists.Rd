@@ -2,20 +2,17 @@
 % Please edit documentation in R/consume.R
 \name{consumeLists}
 \alias{consumeLists}
-\title{This function takes in an API key, request URL, requests as lists in the key value format as compulsory parameters.
-It scores requests with lists entered in the key-value format and returns results in a data frame.
-It calls a helper function that sends requests to the server in the key value format.
-It processes requests in batches and stores the responses in order of batches in an array. It returns the results in a data frame.}
+\title{Use a web service to score data in list format}
 \usage{
 consumeLists(apiKey, requestUrl, ..., globalParam = setNames(list(),
   character(0)), retryDelay = 0.3)
 }
 \arguments{
-\item{apiKey}{entered as a string}
+\item{apiKey}{primary access key as a string}
 
-\item{requestUrl}{request URL entered as a string or discovered through the discover schema method}
+\item{requestUrl}{API URL}
 
-\item{...}{variable number of requests entered as lists in the key-value format}
+\item{...}{variable number of requests entered as lists in key-value format}
 
 \item{globalParam}{global parameters entered as a list, default value is an empty list}
 
@@ -25,9 +22,10 @@ consumeLists(apiKey, requestUrl, ..., globalParam = setNames(list(),
 returnDataFrame data frame containing results returned from web service call
 }
 \description{
-This function takes in an API key, request URL, requests as lists in the key value format as compulsory parameters.
-It scores requests with lists entered in the key-value format and returns results in a data frame.
-It calls a helper function that sends requests to the server in the key value format.
-It processes requests in batches and stores the responses in order of batches in an array. It returns the results in a data frame.
+Score data represented as lists, where each list represents one parameter of the web service
+}
+\seealso{
+Other consume: \code{\link{consumeDataframe}};
+  \code{\link{consumeFile}}
 }
 

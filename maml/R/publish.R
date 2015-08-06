@@ -346,7 +346,8 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
   }
 
   # convert the payload to JSON as expected by API
-  body = RJSONIO::toJSON(req)
+  print(gsub("\"", "\\\"", toString(jsonlite::toJSON(req))))
+  body = gsub("\"", "\\\"", toString(jsonlite::toJSON(req)))
 
   # Response gatherer
   h = RCurl::basicTextGatherer()
@@ -364,10 +365,11 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
                  writefunction = h$update)
 
   # Format output
-  newService <- RJSONIO::fromJSON(h$value())
+  newService <- jsonlite::fromJSON(h$value())
+  print(newService)
 
   # Use discovery functions to get endpoints for immediate use
-  endpoints <- getEndpoints(wkID, authToken, newService["Id"])
+  endpoints <- getEndpoints(wkID, authToken, newService[1, "Id"])
 
   # currently returning list of webservice details (as a list) and endpoint details (as a list) in that order
   return(list("serviceDetails"=newService, "endpoints"=endpoints))

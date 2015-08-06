@@ -36,7 +36,7 @@ getFramework <- function(tUrl, authToken) {
   if (h$value() == "") {
     return(-1)
   }
-  response = RJSONIO::fromJSON(h$value())
+  response = jsonlite::fromJSON(h$value())
   # Error handling
   if ('error' %in% names(response)) {
     stop(response$error)

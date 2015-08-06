@@ -2,24 +2,24 @@
 % Please edit documentation in R/consume.R
 \name{discoverSchema}
 \alias{discoverSchema}
-\title{Discover function schema}
+\title{Discover web service schema}
 \usage{
 discoverSchema(helpURL, scheme = "https",
   host = "ussouthcentral.services.azureml.net", api_version = "2.0")
 }
 \arguments{
-\item{helpURL}{help page URL}
+\item{helpURL}{URL of the help page of the web service}
 
 \item{scheme}{the URI scheme}
 
 \item{host}{optional parameter that defaults to ussouthcentral.services.azureml.net}
 
-\item{api_version}{that defaults to 2.0}
+\item{api_version}{defaults to 2.0}
 }
 \value{
 List containing the request URL of the webservice, column names of the data, sample input as well as the input schema
 }
 \description{
-This function discovers using the workspace ID and web service ID, information specific to the consumption functions
+Discover the expected input to a web service specified by a web service ID ng the workspace ID and web service ID, information specific to the consumption functions
 }
 

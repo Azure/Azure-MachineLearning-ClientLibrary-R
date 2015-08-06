@@ -2,18 +2,18 @@
 % Please edit documentation in R/consume.R
 \name{getDetailsFromUrl}
 \alias{getDetailsFromUrl}
-\title{This function is a helper that takes in the help URL, and parses the endpoint and workspace from it
-This function also documents the assumption that the help URL will end in the format "endpoints/"endpointId/(other keywords)
-This function also documents the assumption that the help URL will}
+\title{Helper function to extract information from a help page URL}
 \usage{
 getDetailsFromUrl(helpURL)
 }
 \arguments{
 \item{helpURL}{the URL of a help page}
 }
-\description{
-This function is a helper that takes in the help URL, and parses the endpoint and workspace from it
-This function also documents the assumption that the help URL will end in the format "endpoints/"endpointId/(other keywords)
-This function also documents the assumption that the help URL will
+\value{
+a list containing the endpoint ID and the workspace ID
 }
+\description{
+Given a Microsoft Azure Machine Learning web service endpoint, extracts the endpoint ID and the workspace ID
+}
+\keyword{internal}
 

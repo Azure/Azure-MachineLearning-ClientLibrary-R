@@ -2,8 +2,7 @@
 % Please edit documentation in R/consume.R
 \name{callAPI}
 \alias{callAPI}
-\title{This function is a helper that takes in an API key, request URL, request in the key value format (in a lists of lists), global parameters of a web service, and delay time before retrying a call in case of a server error.
-It then obtains a response from Azure Machine Learning Studio in the JSON format and returns a response to the consumption functions that call it.}
+\title{Framework for making a MAML web service API call.}
 \usage{
 callAPI(apiKey, requestUrl, keyvalues, globalParam, retryDelay)
 }
@@ -18,8 +17,11 @@ callAPI(apiKey, requestUrl, keyvalues, globalParam, retryDelay)
 
 \item{retryDelay}{number of seconds to wait after failing (max 3 tries) to try again}
 }
-\description{
-This function is a helper that takes in an API key, request URL, request in the key value format (in a lists of lists), global parameters of a web service, and delay time before retrying a call in case of a server error.
-It then obtains a response from Azure Machine Learning Studio in the JSON format and returns a response to the consumption functions that call it.
+\value{
+result the response
 }
+\description{
+Helper function that constructs and send the API call to a Microsoft Azure Machine Learning web service, then receives and returns the response in JSON format.
+}
+\keyword{internal}
 

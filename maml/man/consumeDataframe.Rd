@@ -2,25 +2,22 @@
 % Please edit documentation in R/consume.R
 \name{consumeDataframe}
 \alias{consumeDataframe}
-\title{This function takes in an API key, data frame and the request URL as compulsory parameters.
-It scores a data frame and returns results in a data frame.
-It calls a helper function that sends requests to the server in the key-value format.
-It processes requests in batches and stores the responses in order of batches in an array.}
+\title{Use a web service to score a data frame}
 \usage{
 consumeDataframe(apiKey, requestUrl, scoreDataFrame,
   globalParam = setNames(list(), character(0)), batchSize = 300,
   retryDelay = 0.3)
 }
 \arguments{
-\item{apiKey}{entered as a string}
+\item{apiKey}{primary access key of the web service as a string}
 
-\item{requestUrl}{entered as a string or discovered through the discover schema method}
+\item{requestUrl}{API URL}
 
 \item{scoreDataFrame}{the data frame to be scored}
 
 \item{globalParam}{global parameters entered as a list, default value is an empty list}
 
-\item{batchSize}{batch size of each batch, default value is 250}
+\item{batchSize}{batch size of each batch, default value is 300}
 
 \item{retryDelay}{the time in seconds to delay before retrying in case of a server error, default value is 0.3 seconds}
 }
@@ -28,9 +25,10 @@ consumeDataframe(apiKey, requestUrl, scoreDataFrame,
 returnDataFrame data frame containing results returned from web service call
 }
 \description{
-This function takes in an API key, data frame and the request URL as compulsory parameters.
-It scores a data frame and returns results in a data frame.
-It calls a helper function that sends requests to the server in the key-value format.
-It processes requests in batches and stores the responses in order of batches in an array.
+Score a data frame, where each row is the input to the scoring function, using a Microsoft Azure Machine Learning web service
+}
+\seealso{
+Other consume: \code{\link{consumeFile}};
+  \code{\link{consumeLists}}
 }
 

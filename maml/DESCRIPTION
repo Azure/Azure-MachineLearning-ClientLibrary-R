@@ -1,20 +1,18 @@
 Package: maml
-Version: 0.1
+Version: 0.0.0.9000
 Date: 2015-07-24
 Type: Package
-Title: Publishes, discovers and consumes trained models to Microsoft Azure to make accessible as a web service
-Authors@R: c(person("AzureML", "Maintainer", email = "AzureMLForCRAN@microsoft.com", role = c("aut", "cre")),
-  person("Brianna", "Gerads", role = "aut"),
-  person("Ritika", "Ravichandra",  role = "aut"),
-  person("Alex", "Wang", role = "aut"))
+Title: Publish, discover and consume web services on Microsoft Azure Machine Learning
+Authors@R: c(person("Raymond", "Laghaeian", email = "AzureMLForCRAN@microsoft.com", role = c("aut", "cre")),
+  person("Brianna", "Gerads", role = "aut", "cre"),
+  person("Ritika", "Ravichandra",  role = "aut", "cre"),
+  person("Alex", "Wang", role = "aut", "cre"))
 Maintainer: Raymond Laghaeian <AzureMLForCRAN@microsoft.com>
-Description: Provides an interface with Microsoft Azure to easily publish,
-  consume, and discover models as a web service.
+Description: Provides an interface with Microsoft Azure to easily publish functions and trained models as a web service, and discover and consume web service.
 License: MIT + file LICENSE
 LazyData: TRUE
 Imports:
   RCurl,
-  RJSONIO,
   uuid,
   jsonlite,
   codetools,

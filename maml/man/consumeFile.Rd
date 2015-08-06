@@ -2,27 +2,24 @@
 % Please edit documentation in R/consume.R
 \name{consumeFile}
 \alias{consumeFile}
-\title{This function takes in an API key, file name and the request URL as compulsory parameters.
-It scores a file and returns results in a data frame.
-It calls a helper function that sends requests to the server in the key-value format.
-It processes requests in batches and stores the responses in order of batches in an array. It returns the results in a data frame, and stores the results in a text file.}
+\title{Use a web service to score a file}
 \usage{
 consumeFile(apiKey, requestUrl, inFileName, globalParam = setNames(list(),
   character(0)), outputFileName = "results.csv", batchSize = 300,
   retryDelay = 0.3)
 }
 \arguments{
-\item{apiKey}{entered as a string}
+\item{apiKey}{primary access key as a string}
 
-\item{requestUrl}{entered as a string or discovered through the discover schema method}
+\item{requestUrl}{API URL}
 
-\item{inFileName}{the name of the file scored as a string}
+\item{inFileName}{the name of the file to be scored as a string}
 
 \item{globalParam}{global parameters entered as a list, default value is an empty list}
 
 \item{outputFileName}{the name of the file to output results to, entered as a string, default value is "results.csv"}
 
-\item{batchSize}{batch size of each batch, default value is 250}
+\item{batchSize}{batch size of each batch, default value is 300}
 
 \item{retryDelay}{the time in seconds to delay before retrying in case of a server error, default value is 0.3 seconds}
 }
@@ -30,9 +27,10 @@ consumeFile(apiKey, requestUrl, inFileName, globalParam = setNames(list(),
 returnDataFrame data frame containing results returned from web service call
 }
 \description{
-This function takes in an API key, file name and the request URL as compulsory parameters.
-It scores a file and returns results in a data frame.
-It calls a helper function that sends requests to the server in the key-value format.
-It processes requests in batches and stores the responses in order of batches in an array. It returns the results in a data frame, and stores the results in a text file.
+Read in a csv and score it in batches using a Microsoft Azure Machine Learning Web Service. The results are stored in a new csv, default named "results.csv"
+}
+\seealso{
+Other consume: \code{\link{consumeDataframe}};
+  \code{\link{consumeLists}}
 }
 

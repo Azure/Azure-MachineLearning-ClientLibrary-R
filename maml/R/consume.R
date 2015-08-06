@@ -9,7 +9,6 @@
 #' @param host optional parameter that defaults to ussouthcentral.services.azureml.net
 #' @param api_version defaults to 2.0
 #' @return List containing the request URL of the webservice, column names of the data, sample input as well as the input schema
-#'
 discoverSchema <- function(helpURL, scheme = "https", host = "ussouthcentral.services.azureml.net", api_version = "2.0") {
   endpointId = getDetailsFromUrl(helpURL)[[1]]
   workspaceId = getDetailsFromUrl(helpURL)[[2]]
@@ -106,6 +105,9 @@ discoverSchema <- function(helpURL, scheme = "https", host = "ussouthcentral.ser
 #' Use a web service to score a file
 #'
 #' Read in a csv and score it in batches using a Microsoft Azure Machine Learning Web Service. The results are stored in a new csv, default named "results.csv"
+#'
+#' @export
+#'
 #' @param apiKey primary access key as a string
 #' @param requestUrl API URL
 #' @param inFileName the name of the file to be scored as a string
@@ -116,7 +118,6 @@ discoverSchema <- function(helpURL, scheme = "https", host = "ussouthcentral.ser
 #' @return returnDataFrame data frame containing results returned from web service call
 #'
 #' @family consume
-#'
 consumeFile <- function(apiKey, requestUrl, inFileName, globalParam = setNames(list(), character(0)), outputFileName = "results.csv", batchSize = 300, retryDelay = 0.3) {
   #Stops users if they miss out mandatory fields
   if (missing(apiKey)) {
@@ -181,12 +182,13 @@ consumeFile <- function(apiKey, requestUrl, inFileName, globalParam = setNames(l
 #'
 #' Score data represented as lists, where each list represents one parameter of the web service
 #'
+#' @export
+#'
 #' @param apiKey primary access key as a string
 #' @param requestUrl API URL
+#' @param ... variable number of requests entered as lists in key-value format
 #' @param globalParam global parameters entered as a list, default value is an empty list
-#' @param batchSize batch size of each batch, default value is 300
 #' @param retryDelay the time in seconds to delay before retrying in case of a server error, default value is 0.3 seconds
-#' ... variable number of requests entered as lists in key-value format
 #' @return returnDataFrame data frame containing results returned from web service call
 #'
 #' @family consume
@@ -220,9 +222,9 @@ consumeLists <- function(apiKey, requestUrl, ..., globalParam = setNames(list(),
 
 #' Use a web service to score a data frame
 #'
-#' @param apiKey primary access key as a string
+#' Score a data frame, where each row is the input to the scoring function, using a Microsoft Azure Machine Learning web service
+#' @param apiKey primary access key of the web service as a string
 #' @param requestUrl API URL
-#' @param scoreDataFrame the data frame to be scored
 #' @param scoreDataFrame the data frame to be scored
 #' @param globalParam global parameters entered as a list, default value is an empty list
 #' @param batchSize batch size of each batch, default value is 300
@@ -230,7 +232,6 @@ consumeLists <- function(apiKey, requestUrl, ..., globalParam = setNames(list(),
 #' @return returnDataFrame data frame containing results returned from web service call
 #'
 #' @family consume
-#'
 consumeDataframe <- function(apiKey, requestUrl, scoreDataFrame, globalParam=setNames(list(), character(0)), batchSize = 300, retryDelay = 0.3) {
   #Stops users if they miss out mandatory fields
 
@@ -288,17 +289,18 @@ consumeDataframe <- function(apiKey, requestUrl, scoreDataFrame, globalParam=set
 }
 
 
-########################################################### HELPER FUNCTION ###########################################################
-#' This function is a helper that takes in an API key, request URL, request in the key value format (in a lists of lists), global parameters of a web service, and delay time before retrying a call in case of a server error.
-#' It then obtains a response from Azure Machine Learning Studio in the JSON format and returns a response to the consumption functions that call it.
+#' Framework for making a MAML web service API call.
+#'
+#' Helper function that constructs and send the API call to a Microsoft Azure Machine Learning web service, then receives and returns the response in JSON format.
+#'
 #' @param apiKey primary API key
 #' @param requestUrl API URL
 #' @param keyvalues the data to be passed to the web service
 #' @param globalParam the global parameters for the web service
 #' @param retryDelay number of seconds to wait after failing (max 3 tries) to try again
+#' @return result the response
 #'
-#######################################################################################################################################
-
+#' @keywords internal
 callAPI <- function(apiKey, requestUrl, keyvalues,  globalParam, retryDelay) {
   # Set number of tries and HTTP status to 0
   httpStatus = 0
@@ -341,10 +343,7 @@ callAPI <- function(apiKey, requestUrl, keyvalues,  globalParam, retryDelay) {
                          writefunction = h$update,
                          headerfunction = hdr$update,
                          verbose = TRUE
-                         #                          # Parameters below are needed if using test environment, but should not be included for security reasons
-                         #                          ,ssl.verifypeer=FALSE,
-                         #                          ssl.verifyhost = FALSE
-      )
+     )
       # Gather headers
       headers = hdr$value()
       # Get HTTP status to decide whether to throw bad request or retry, or return etc.
@@ -367,13 +366,14 @@ callAPI <- function(apiKey, requestUrl, keyvalues,  globalParam, retryDelay) {
   return(result)
 }
 
-########################################################### HELPER FUNCTION ###########################################################
-#' This function is a helper that takes in the help URL, and parses the endpoint and workspace from it
-#' This function also documents the assumption that the help URL will end in the format "endpoints/"endpointId/(other keywords)
-#' This function also documents the assumption that the help URL will
+#' Helper function to extract information from a help page URL
+#'
+#' Given a Microsoft Azure Machine Learning web service endpoint, extracts the endpoint ID and the workspace ID
+#'
 #' @param helpURL the URL of a help page
-#######################################################################################################################################
-
+#' @return a list containing the endpoint ID and the workspace ID
+#'
+#' @keywords internal
 getDetailsFromUrl <- function(helpURL) {
   #Uses a strong split to extract the endpoint ID and the workspace ID
   return (list((strsplit(((strsplit(helpURL,"endpoints/"))[[1]][2]),"/")[[1]][[1]]),(strsplit(((strsplit(helpURL,"/workspaces/"))[[1]][2]),"/")[[1]][[1]])))
