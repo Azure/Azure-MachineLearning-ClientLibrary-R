@@ -15,13 +15,12 @@ discoverSchema <- function(helpURL, scheme = "https", host = "ussouthcentral.ser
   # Construct swagger document URL using parameters
   # Use paste method without separator
   swaggerURL = paste(scheme,"://", host, "/workspaces/", workspaceId, "/services/", endpointId,"/swagger.json", sep = "")
-
-
-  # Uses httr package to get the HTTP response from the swagger document URL
-  httr::set_config(httr::config(ssl_VERIFYHOST=FALSE,ssl_verifyPEER=FALSE), override=TRUE)
-  response <- httr::GET(swaggerURL)
+  print(swaggerURL)
+  
   # Automatically parses the content and gets the swagger document
-  swagger <- httr::content(response)
+
+  response <- RCurl::getURLContent(swaggerURL)
+  swagger = rjson::fromJSON(response)
 
   # Accesses the input schema in the swagger document
   inputSchema = swagger$definition$input1Item
