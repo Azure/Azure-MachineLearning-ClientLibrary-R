@@ -1,14 +1,15 @@
-################################################################################################################################
-#' This function discovers using the workspace ID and web service ID, information specific to the consumption functions
-#' @title Discover function schema
+#' Discover web service schema
+#'
+#' Discover the expected input to a web service specified by a web service ID ng the workspace ID and web service ID, information specific to the consumption functions
+#'
 #' @export
-#' @param helpURL help page URL
+#'
+#' @param helpURL URL of the help page of the web service
 #' @param scheme the URI scheme
 #' @param host optional parameter that defaults to ussouthcentral.services.azureml.net
-#' @param api_version that defaults to 2.0
+#' @param api_version defaults to 2.0
 #' @return List containing the request URL of the webservice, column names of the data, sample input as well as the input schema
-################################################################################################################################
-
+#'
 discoverSchema <- function(helpURL, scheme = "https", host = "ussouthcentral.services.azureml.net", api_version = "2.0") {
   endpointId = getDetailsFromUrl(helpURL)[[1]]
   workspaceId = getDetailsFromUrl(helpURL)[[2]]
@@ -102,21 +103,20 @@ discoverSchema <- function(helpURL, scheme = "https", host = "ussouthcentral.ser
   return (list("requestUrl" = requestUrl, "columnNames" = columnNames, "sampleInput" = inputExample, "inputSchema" = inputSchema))
 }
 
-################################################################################################################################
-#' This function takes in an API key, file name and the request URL as compulsory parameters.
-#' It scores a file and returns results in a data frame.
-#' It calls a helper function that sends requests to the server in the key-value format.
-#' It processes requests in batches and stores the responses in order of batches in an array. It returns the results in a data frame, and stores the results in a text file.
-#' @param apiKey entered as a string
-#' @param requestUrl entered as a string or discovered through the discover schema method
-#' @param inFileName the name of the file scored as a string
+#' Use a web service to score a file
+#'
+#' Read in a csv and score it in batches using a Microsoft Azure Machine Learning Web Service. The results are stored in a new csv, default named "results.csv"
+#' @param apiKey primary access key as a string
+#' @param requestUrl API URL
+#' @param inFileName the name of the file to be scored as a string
 #' @param globalParam global parameters entered as a list, default value is an empty list
 #' @param outputFileName the name of the file to output results to, entered as a string, default value is "results.csv"
-#' @param batchSize batch size of each batch, default value is 250
+#' @param batchSize batch size of each batch, default value is 300
 #' @param retryDelay the time in seconds to delay before retrying in case of a server error, default value is 0.3 seconds
 #' @return returnDataFrame data frame containing results returned from web service call
-################################################################################################################################
-
+#'
+#' @family consume
+#'
 consumeFile <- function(apiKey, requestUrl, inFileName, globalParam = setNames(list(), character(0)), outputFileName = "results.csv", batchSize = 300, retryDelay = 0.3) {
   #Stops users if they miss out mandatory fields
   if (missing(apiKey)) {
@@ -177,19 +177,20 @@ consumeFile <- function(apiKey, requestUrl, inFileName, globalParam = setNames(l
   return (returnDataFrame)
 }
 
-
-################################################################################################################################
-#' This function takes in an API key, request URL, requests as lists in the key value format as compulsory parameters.
-#' It scores requests with lists entered in the key-value format and returns results in a data frame.
-#' It calls a helper function that sends requests to the server in the key value format.
-#' It processes requests in batches and stores the responses in order of batches in an array. It returns the results in a data frame.
-#' @param apiKey entered as a string
-#' @param requestUrl request URL entered as a string or discovered through the discover schema method
-#' @param ... variable number of requests entered as lists in the key-value format
+#' Use a web service to score data in list format
+#'
+#' Score data represented as lists, where each list represents one parameter of the web service
+#'
+#' @param apiKey primary access key as a string
+#' @param requestUrl API URL
 #' @param globalParam global parameters entered as a list, default value is an empty list
+#' @param batchSize batch size of each batch, default value is 300
 #' @param retryDelay the time in seconds to delay before retrying in case of a server error, default value is 0.3 seconds
+#' ... variable number of requests entered as lists in key-value format
 #' @return returnDataFrame data frame containing results returned from web service call
-################################################################################################################################
+#'
+#' @family consume
+# @example
 consumeLists <- function(apiKey, requestUrl, ..., globalParam = setNames(list(), character(0)), retryDelay = 0.3) {
   #Stops users if they miss out mandatory fields
 
@@ -217,20 +218,19 @@ consumeLists <- function(apiKey, requestUrl, ..., globalParam = setNames(list(),
   return(resultDataFrame)
 }
 
-################################################################################################################################
-#' This function takes in an API key, data frame and the request URL as compulsory parameters.
-#' It scores a data frame and returns results in a data frame.
-#' It calls a helper function that sends requests to the server in the key-value format.
-#' It processes requests in batches and stores the responses in order of batches in an array.
-#' @param apiKey entered as a string
-#' @param requestUrl entered as a string or discovered through the discover schema method
+#' Use a web service to score a data frame
+#'
+#' @param apiKey primary access key as a string
+#' @param requestUrl API URL
+#' @param scoreDataFrame the data frame to be scored
 #' @param scoreDataFrame the data frame to be scored
 #' @param globalParam global parameters entered as a list, default value is an empty list
-#' @param batchSize batch size of each batch, default value is 250
+#' @param batchSize batch size of each batch, default value is 300
 #' @param retryDelay the time in seconds to delay before retrying in case of a server error, default value is 0.3 seconds
 #' @return returnDataFrame data frame containing results returned from web service call
-################################################################################################################################
-
+#'
+#' @family consume
+#'
 consumeDataframe <- function(apiKey, requestUrl, scoreDataFrame, globalParam=setNames(list(), character(0)), batchSize = 300, retryDelay = 0.3) {
   #Stops users if they miss out mandatory fields
 

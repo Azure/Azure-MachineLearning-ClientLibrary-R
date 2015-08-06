@@ -1,10 +1,12 @@
 # String constants --------------------------------------------------------
+
 publishURL <- "https://management.azureml.net/workspaces/%s/webservices/%s"
 wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- matrix(ncol = %s, nrow = nrow(inputDF))\r\ncolnames(outputDF) <- list(%s)\r\noutputDF <- data.frame(outputDF)\r\nfor (file in list.files(\"src\")) {\r\n  if (file == \"%s\") {\r\n    load(\"src/%s\")\r\n    for (item in names(dependencies)) {\r\n      assign(item, dependencies[[item]])\r\n    }\r\n  }\r\n  else {\r\n    if (!(file %%in%% installed.packages()[,\"Package\"])) {\r\n      install.packages(paste(\"src\", file, sep=\"/\"), lib=\".\", repos=NULL, verbose=TRUE)\r\n    }\r\n    library(strsplit(file, \"\\\\.\")[[1]][[1]], character.only=TRUE)\r\n  }\r\n}\r\naction <- %s\r\nfor (i in 1:nrow(inputDF)) {\r\n  outputDF[i,] <- do.call(\"action\", as.list(inputDF[i,]))\r\n}\r\nmaml.mapOutputPort(\"outputDF\")"
 
 
 
 # Functions ---------------------------------------------------------------
+
 #' Get function source code
 #'
 #' Returns the source code of a function as a string
@@ -83,7 +85,7 @@ getFunctionString <- function (x)
 #'
 #' Find a function's in-memory and package dependencies, and turn them into a base-64 encoded zip file. This string is used in the publish API call to upload dependencies to the server.
 #'
-#' @param functionName  function to package dependencies from
+#' @param functionName function to package dependencies from
 #' @return list containing the guid for the rdta file and the encoded zip
 #'
 #' @keywords internal
@@ -344,9 +346,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
   }
 
   # convert the payload to JSON as expected by API
-  # TODO: consolidate json packages, i.e. use only one if possible
   body = RJSONIO::toJSON(req)
-  #print(sprintf(wrapper, length(outputSchema), paste(sprintf("\"%s\"", names(outputSchema)), collapse=","), zipString[[1]], zipString[[1]], paste(getFunctionString(functionName))))
 
   # Response gatherer
   h = RCurl::basicTextGatherer()
@@ -367,7 +367,6 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
   newService <- RJSONIO::fromJSON(h$value())
 
   # Use discovery functions to get endpoints for immediate use
-  # NOTE: switch from internal URL for production
   endpoints <- getEndpoints(wkID, authToken, newService["Id"])
 
   # currently returning list of webservice details (as a list) and endpoint details (as a list) in that order
@@ -378,7 +377,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 
 #' Update a Published Web Service
 #'
-#' This function updates published code given a valid workspace ID and authentication token. The function expects the function name, service id, and the input and output schemas from the user. The user can expect a list of the web service details, the default endpoint details and the consumption function and use this information to access the published function.
+#' Update a web service, i.e. change the underlying R code that the service will run when called.
 #'
 #' @export
 #'
@@ -389,7 +388,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 #' @family publish
 #'
 # @examples
-# TitanicService <- updateWebService("predictTitanic", "TitanicDemo", list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
+# TitanicService <- updateWebService("predictTitanic", "TitanicDemo", "wsID of list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
 updateWebService <- function(functionName, serviceName, wsID, inputSchema, outputSchema, wkID, authToken) {
 
   # Make sure schema inputted matches function signature

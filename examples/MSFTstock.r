@@ -36,7 +36,7 @@ msftWebService <- publishWebService("MSFTpredict", "MSFTdemo", list("close"="flo
 msftEndpoints <- msftWebService[[2]]
 
 #
-msftConsumeSingleRows <- consumeDataTable(msftEndpoints[[1]]["PrimaryKey"], msftEndpoints[[1]]$ApiLocation, list("close", "volume"), list(25, 300), list(30, 100))
+msftConsumeSingleRows <- consumeLists(msftEndpoints[[1]]["PrimaryKey"], msftEndpoints[[1]]$ApiLocation, list("close", "volume"), list(25, 300), list(30, 100))
 
 msftDF <- data.frame("close"=c(107,208,300), "volume"=c(400,569,665))
 msftConsumeDF <- consumeDataframe(msftWebService[[2]][[1]]$PrimaryKey, msftWebService[[2]][[1]]$ApiLocation, msftDF)

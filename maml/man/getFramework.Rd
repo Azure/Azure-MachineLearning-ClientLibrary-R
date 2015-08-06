@@ -7,9 +7,9 @@
 getFramework(tUrl, authToken)
 }
 \arguments{
-\item{tUrl}{API URL}
+\item{tUrl}{the API URL}
 
-\item{authToken}{authentication token}
+\item{authToken}{the authentication token}
 }
 \value{
 the response as a named list
@@ -22,5 +22,5 @@ Other discovery: \code{\link{getEPDetails}};
   \code{\link{getEndpoints}}; \code{\link{getWSDetails}};
   \code{\link{getWebServices}}
 }
-\keyword{Internal}
+\keyword{internal}
 

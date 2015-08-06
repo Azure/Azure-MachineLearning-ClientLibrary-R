@@ -7,7 +7,7 @@ Authors@R: c(person("AzureML", "Maintainer", email = "AzureMLForCRAN@microsoft.c
   person("Brianna", "Gerads", role = "aut"),
   person("Ritika", "Ravichandra",  role = "aut"),
   person("Alex", "Wang", role = "aut"))
-Maintainer: AzureML Maintainer <AzureMLForCRAN@microsoft.com>
+Maintainer: Raymond Laghaeian <AzureMLForCRAN@microsoft.com>
 Description: Provides an interface with Microsoft Azure to easily publish,
   consume, and discover models as a web service.
 License: MIT + file LICENSE

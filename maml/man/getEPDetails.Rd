@@ -11,7 +11,7 @@ getEPDetails(wkID, authToken, wsID, epName, url = prodURL)
 
 \item{authToken}{primary authorization token}
 
-\item{wsID}{webservice ID}
+\item{wsID}{the web service ID}
 
 \item{epName}{endpoint name}
 

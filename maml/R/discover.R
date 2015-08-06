@@ -1,18 +1,6 @@
 # API URLs ----------------------------------------------------------------
 
-wsURL = "https://management-tm.azureml.net/workspaces/%s/webservices"
-wsURLdet = "https://management-tm.azureml.net/workspaces/%s/webservices/%s"
-epURL = "https://management-tm.azureml.net/workspaces/%s/webservices/%s/endpoints"
-epURLdet = "https://management-tm.azureml.net/workspaces/%s/webservices/%s/endpoints/%s"
-
-# remove in real version
-testURL = "https://hiteshsm.cloudapp.net/workspaces/%s/webservices/%s/endpoints"
-internalURL = "https://management.azureml-int.net/workspaces/%s/webservices/%s/endpoints"
-
-internalURL = "https://management.azureml-int.net"
 prodURL = "https://management-tm.azureml.net"
-
-
 
 # Functions ---------------------------------------------------------------
 
@@ -20,13 +8,13 @@ prodURL = "https://management-tm.azureml.net"
 #'
 #' Framework for making GET requests to the Azure management APIs.
 #'
-#' @param tUrl API URL
-#' @param authToken authentication token
+#' @param tUrl the API URL
+#' @param authToken the authentication token
 #'
 #' @return the response as a named list
 #'
 #' @family discovery
-#' @keywords Internal
+#' @keywords internal
 getFramework <- function(tUrl, authToken) {
   # Collectors for API response
   h = RCurl::basicTextGatherer()
@@ -104,7 +92,7 @@ getWebServices <- function(wkID, authToken, url=prodURL) {
 #' @export
 #'
 #' @inheritParams getWebServices
-#' @param wsID webservice ID
+#' @param wsID the web service ID
 #'
 #' @return Returns a list with the following fields:
 #'

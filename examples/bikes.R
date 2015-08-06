@@ -37,7 +37,7 @@ bikeCount <- publishWebService("predictBikeCount", "bikeCount", list("dateTime"=
 
 # Consume web service
 endpoints <- bikeCount[[2]]
-response <- consumeDataTable(endpoints[[1]]["PrimaryKey"], endpoints[[1]]["ApiLocation"],
+response <- consumeDataLists(endpoints[[1]]["PrimaryKey"], endpoints[[1]]["ApiLocation"],
                              list("dateTime", "month", "hr", "hldy", "wkdy", "weather",
                                   "temp", "hum", "wndspd", "casual", "registered", "cnt",
                                   "isWorking", "mthCnt", "dayWeek", "wrkTime", "xformHr"),
