@@ -28,7 +28,18 @@ List of webservice details, default endpoint details, and the consumption functi
 \description{
 Update a web service, i.e. change the underlying R code that the service will run when called.
 }
+\examples{
+\dontrun{
+add1 <- function(x) { return(x+1) }
+addService <- publishWebService("add1", "add1",
+ list("x"="int"), list("z"="int"), wsID, wsAuth)
+
+add2 <- function(x) { return(x+2) }
+addService <- updateWebService("add2", "add2", addService[[1]]$Id,
+ list("x"="int"), list("z"="int"), wsID, wsAuth)
+}
+}
 \seealso{
-Other publish: \code{\link{publishWebService}}
+Other publishing functions: \code{\link{publishWebService}}
 }
 

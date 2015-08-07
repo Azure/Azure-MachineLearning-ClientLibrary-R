@@ -24,8 +24,20 @@ returnDataFrame data frame containing results returned from web service call
 \description{
 Score data represented as lists, where each list represents one parameter of the web service
 }
+\examples{
+\dontrun{
+add <- function(x,y) { return(x+y) }
+newService <- publishWebService("add", "add",
+ list("x"="int","y"="int"), list("z"="int"), wsID, authToken)
+webserviceDetails <- newService[[1]]
+endpoints <- newService[[2]]
+
+response <- consumeLists(endpoints[[1]]$PrimaryKey, endpoints[[1]]$ApiLocation,
+ list("x"=1, "y"=2), list("x"=3, "y"=4))
+}
+}
 \seealso{
-Other consume: \code{\link{consumeDataframe}};
-  \code{\link{consumeFile}}
+Other consumption functions: \code{\link{consumeDataframe}};
+  \code{\link{consumeFile}}; \code{\link{discoverSchema}}
 }
 

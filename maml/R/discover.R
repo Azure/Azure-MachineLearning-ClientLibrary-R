@@ -13,7 +13,7 @@ prodURL = "https://management-tm.azureml.net"
 #'
 #' @return the response as a named list
 #'
-#' @family discovery
+#' @family discovery functions
 #' @keywords internal
 getFramework <- function(tUrl, authToken) {
   # Collectors for API response
@@ -68,7 +68,7 @@ getFramework <- function(tUrl, authToken) {
 #'   \item DefaultEndpointName
 #' }
 #'
-#' @family discovery
+#' @family discovery functions
 #'
 #' @examples
 #' \dontrun{
@@ -105,7 +105,7 @@ getWebServices <- function(wkID, authToken, url=prodURL) {
 #'   \item DefaultEndpointName
 #' }
 #'
-#' @family discovery
+#' @family discovery functions
 getWSDetails <- function(wkID, authToken, wsID, url=prodURL) {
   return(getFramework(sprintf(paste(url, "/workspaces/%s/webservices/%s", sep=""), wkID, wsID), authToken))
 }
@@ -139,19 +139,20 @@ getWSDetails <- function(wkID, authToken, wsID, url=prodURL) {
 #'  \item ThrottleLevel
 #'  }
 #'
-#' @family discovery
+#' @family discovery functions
 #'
 #' @examples
 #' \dontrun{
 #' endpoints <- getEndpoints("wkId", "authToken", "wsID")
-#' apiURL <- endpoints[[1]]$HelpLocation
+#' helpURL <- endpoints[[1]]$HelpLocation
 #' pKey <- endpoints[[1]]$PrimaryKey
+#' apiURL <- endpoints[[1]]$ApiLocation
 #' }
 getEndpoints <- function(wkID, authToken, wsID, url=prodURL) {
   response <- getFramework(sprintf(paste(url, "/workspaces/%s/webservices/%s/endpoints", sep=""), wkID, wsID), authToken)
   # for convenience because by default the repsonse doesn't include the full API location
   for (i in 1:length(response)) {
-    response[[i]]$ApiLocation <- paste(response[[i]]$ApiLocation, "/execute?api-version=2.0&details=true",sep="")
+    response[[i]]$ApiLocation <- paste(response[[i]]$ApiLocation, "/execute?api-version=2.0&details=true&format=swagger",sep="")
   }
   return(response)
 }
@@ -185,11 +186,11 @@ getEndpoints <- function(wkID, authToken, wsID, url=prodURL) {
 #'  \item ThrottleLevel
 #'  }
 #'
-#' @family discovery
+#' @family discovery functions
 getEPDetails <- function(wkID, authToken, wsID, epName, url=prodURL) {
   sprintf(paste(url, "/workspaces/%s/webservices/%s/endpoints/%s", sep=""), wkID, wsID, epName)
   endpoint <- getFramework(sprintf(paste(url, "/workspaces/%s/webservices/%s/endpoints/%s", sep=""), wkID, wsID, epName), authToken)
   # for convenience because by default the repsonse doesn't include the full API location
-  endpoint$ApiLocation <- paste(endpoint$ApiLocation, "/execute?api-version=2.0&details=true",sep="")
+  endpoint$ApiLocation <- paste(endpoint$ApiLocation, "/execute?api-version=2.0&details=true&format=swagger",sep="")
   return(endpoint)
 }

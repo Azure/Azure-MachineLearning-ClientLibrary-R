@@ -41,12 +41,13 @@ Get the API endpoints that belong to a Microsoft Azure Machine Learning web serv
 \examples{
 \dontrun{
 endpoints <- getEndpoints("wkId", "authToken", "wsID")
-apiURL <- endpoints[[1]]$HelpLocation
+helpURL <- endpoints[[1]]$HelpLocation
 pKey <- endpoints[[1]]$PrimaryKey
+apiURL <- endpoints[[1]]$ApiLocation
 }
 }
 \seealso{
-Other discovery: \code{\link{getEPDetails}};
+Other discovery functions: \code{\link{getEPDetails}};
   \code{\link{getFramework}}; \code{\link{getWSDetails}};
   \code{\link{getWebServices}}
 }

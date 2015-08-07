@@ -9,6 +9,14 @@
 #' @param host optional parameter that defaults to ussouthcentral.services.azureml.net
 #' @param api_version defaults to 2.0
 #' @return List containing the request URL of the webservice, column names of the data, sample input as well as the input schema
+#'
+#' @family consumption functions
+#'
+#' @examples
+#' \dontrun{
+#' endpoints <- getEndpoints("wsID", "wsAuth", "webserviceID")
+#' wsSchema <- discoverSchema(endpoints[[1]]$HelpLocation)
+#' }
 discoverSchema <- function(helpURL, scheme = "https", host = "ussouthcentral.services.azureml.net", api_version = "2.0") {
   endpointId = getDetailsFromUrl(helpURL)[[1]]
   workspaceId = getDetailsFromUrl(helpURL)[[2]]
@@ -116,7 +124,18 @@ discoverSchema <- function(helpURL, scheme = "https", host = "ussouthcentral.ser
 #' @param retryDelay the time in seconds to delay before retrying in case of a server error, default value is 0.3 seconds
 #' @return returnDataFrame data frame containing results returned from web service call
 #'
-#' @family consume
+#' @family consumption functions
+#'
+#' @examples
+#' \dontrun{
+#' add <- function(x,y) { return(x+y) }
+#' newService <- publishWebService("add", "add",
+#'  list("x"="int","y"="int"), list("z"="int"), wsID, authToken)
+#' webserviceDetails <- newService[[1]]
+#' endpoints <- newService[[2]]
+#'
+#' response <- consumeFile(endpoints[[1]]$PrimaryKey, endpoints[[1]]$ApiLocation, "test.csv")
+#' }
 consumeFile <- function(apiKey, requestUrl, inFileName, globalParam = setNames(list(), character(0)), outputFileName = "results.csv", batchSize = 300, retryDelay = 0.3) {
   #Stops users if they miss out mandatory fields
   if (missing(apiKey)) {
@@ -190,8 +209,18 @@ consumeFile <- function(apiKey, requestUrl, inFileName, globalParam = setNames(l
 #' @param retryDelay the time in seconds to delay before retrying in case of a server error, default value is 0.3 seconds
 #' @return returnDataFrame data frame containing results returned from web service call
 #'
-#' @family consume
-# @example
+#' @family consumption functions
+#' @examples
+#' \dontrun{
+#' add <- function(x,y) { return(x+y) }
+#' newService <- publishWebService("add", "add",
+#'  list("x"="int","y"="int"), list("z"="int"), wsID, authToken)
+#' webserviceDetails <- newService[[1]]
+#' endpoints <- newService[[2]]
+#'
+#' response <- consumeLists(endpoints[[1]]$PrimaryKey, endpoints[[1]]$ApiLocation,
+#'  list("x"=1, "y"=2), list("x"=3, "y"=4))
+#' }
 consumeLists <- function(apiKey, requestUrl, ..., globalParam = setNames(list(), character(0)), retryDelay = 0.3) {
   #Stops users if they miss out mandatory fields
 
@@ -233,7 +262,18 @@ consumeLists <- function(apiKey, requestUrl, ..., globalParam = setNames(list(),
 #' @param retryDelay the time in seconds to delay before retrying in case of a server error, default value is 0.3 seconds
 #' @return returnDataFrame data frame containing results returned from web service call
 #'
-#' @family consume
+#' @family consumption functions
+#' @examples
+#' \dontrun{
+#' add <- function(x,y) { return(x+y) }
+#' newService <- publishWebService("add", "add",
+#'  list("x"="int","y"="int"), list("z"="int"), wsID, authToken)
+#' webserviceDetails <- newService[[1]]
+#' endpoints <- newService[[2]]
+#'
+#' df <- data.frame("x"=c(1,2), "y"=c(3,4))
+#' response <- consumeDataframe(endpoints[[1]]$PrimaryKey, endpoints[[1]]$ApiLocation, df)
+#' }
 consumeDataframe <- function(apiKey, requestUrl, scoreDataFrame, globalParam=setNames(list(), character(0)), batchSize = 300, retryDelay = 0.3) {
   #Stops users if they miss out mandatory fields
 

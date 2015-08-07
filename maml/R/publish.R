@@ -73,7 +73,7 @@ getFunctionString <- function (x)
 
   #don't show the full response!
   #res
-  # Might return multiple objects in a list, currently returning first object (BIG ASSUMPTION)
+  # Might return multiple objects in a list if multiple functions with the same name
   return(gsub("\n", "\r\n", gsub("\"", "\\\"", objs[1])))
 }
 
@@ -297,10 +297,15 @@ publishPreprocess <- function(argList) {
 #' @param authToken primary authorization token
 #' @return nested list, the first element is a list containing information about the new web service, the second element is a list of its endpoints
 #'
-#' @family publish
-# @examples
-# \dontrun{
-# }
+#' @family publishing functions
+#' @examples
+#' \dontrun{
+#' add <- function(x,y) { return(x+y) }
+#' newService <- publishWebService("add", "add",
+#'  list("x"="int","y"="int"), list("z"="int"), wsID, authToken)
+#' webserviceDetails <- newService[[1]]
+#' endpoints <- newService[[2]]
+#' }
 publishWebService <- function(functionName, serviceName, inputSchema, outputSchema, wkID, authToken) {
 
   # Make sure schema inputted matches function signature
@@ -385,10 +390,18 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 #' @param wsID ID of the web service to be updated
 #' @return List of webservice details, default endpoint details, and the consumption function
 #'
-#' @family publish
+#' @family publishing functions
 #'
-# @examples
-# TitanicService <- updateWebService("predictTitanic", "TitanicDemo", "wsID of list("Pclass"="string", "Sex"="string", "Age"="int", "SibSp"="int", "Parch"="int", "Fare"="float"), list("survProb"="float"), wsID, wsAuth)
+#' @examples
+#' \dontrun{
+#' add1 <- function(x) { return(x+1) }
+#' addService <- publishWebService("add1", "add1",
+#'  list("x"="int"), list("z"="int"), wsID, wsAuth)
+#'
+#' add2 <- function(x) { return(x+2) }
+#' addService <- updateWebService("add2", "add2", addService[[1]]$Id,
+#'  list("x"="int"), list("z"="int"), wsID, wsAuth)
+#' }
 updateWebService <- function(functionName, serviceName, wsID, inputSchema, outputSchema, wkID, authToken) {
 
   # Make sure schema inputted matches function signature

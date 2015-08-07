@@ -1,11 +1,11 @@
-#test_that("GetFunctionString gets a function source code with no quotes or newlines", {
+# test_that("GetFunctionString gets a function source code with no quotes or newlines", {
 #  add <- function (x, y) {
 #    print("This will add x and y")
 #    return(x + y)
 #  }
-
-#  expect_equal(getFunctionString(add), "function (x, y) \r\n{\r\n    print(\"This will add x and y\")\r\n    return(x + y)\r\n}")
-#})
+#
+#   expect_equal(getFunctionString(add), "function (x, y) \r\n{\r\n    print(\"This will add x and y\")\r\n    return(x + y)\r\n}")
+# })
 
 
 #test_that("packDependencies handles recursive packaging", {

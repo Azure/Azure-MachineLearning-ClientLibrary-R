@@ -22,4 +22,14 @@ List containing the request URL of the webservice, column names of the data, sam
 \description{
 Discover the expected input to a web service specified by a web service ID ng the workspace ID and web service ID, information specific to the consumption functions
 }
+\examples{
+\dontrun{
+endpoints <- getEndpoints("wsID", "wsAuth", "webserviceID")
+wsSchema <- discoverSchema(endpoints[[1]]$HelpLocation)
+}
+}
+\seealso{
+Other consumption functions: \code{\link{consumeDataframe}};
+  \code{\link{consumeFile}}; \code{\link{consumeLists}}
+}
 

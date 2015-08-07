@@ -35,7 +35,7 @@ serviceID = services[[1]]["Id"]
 }
 }
 \seealso{
-Other discovery: \code{\link{getEPDetails}};
+Other discovery functions: \code{\link{getEPDetails}};
   \code{\link{getEndpoints}}; \code{\link{getFramework}};
   \code{\link{getWSDetails}}
 }

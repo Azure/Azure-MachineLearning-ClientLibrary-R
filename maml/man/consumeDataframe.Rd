@@ -27,8 +27,20 @@ returnDataFrame data frame containing results returned from web service call
 \description{
 Score a data frame, where each row is the input to the scoring function, using a Microsoft Azure Machine Learning web service
 }
+\examples{
+\dontrun{
+add <- function(x,y) { return(x+y) }
+newService <- publishWebService("add", "add",
+ list("x"="int","y"="int"), list("z"="int"), wsID, authToken)
+webserviceDetails <- newService[[1]]
+endpoints <- newService[[2]]
+
+df <- data.frame("x"=c(1,2), "y"=c(3,4))
+response <- consumeDataframe(endpoints[[1]]$PrimaryKey, endpoints[[1]]$ApiLocation, df)
+}
+}
 \seealso{
-Other consume: \code{\link{consumeFile}};
-  \code{\link{consumeLists}}
+Other consumption functions: \code{\link{consumeFile}};
+  \code{\link{consumeLists}}; \code{\link{discoverSchema}}
 }
 

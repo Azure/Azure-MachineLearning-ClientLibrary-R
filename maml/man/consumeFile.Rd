@@ -29,8 +29,19 @@ returnDataFrame data frame containing results returned from web service call
 \description{
 Read in a csv and score it in batches using a Microsoft Azure Machine Learning Web Service. The results are stored in a new csv, default named "results.csv"
 }
+\examples{
+\dontrun{
+add <- function(x,y) { return(x+y) }
+newService <- publishWebService("add", "add",
+ list("x"="int","y"="int"), list("z"="int"), wsID, authToken)
+webserviceDetails <- newService[[1]]
+endpoints <- newService[[2]]
+
+response <- consumeFile(endpoints[[1]]$PrimaryKey, endpoints[[1]]$ApiLocation, "test.csv")
+}
+}
 \seealso{
-Other consume: \code{\link{consumeDataframe}};
-  \code{\link{consumeLists}}
+Other consumption functions: \code{\link{consumeDataframe}};
+  \code{\link{consumeLists}}; \code{\link{discoverSchema}}
 }
 
