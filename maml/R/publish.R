@@ -3,8 +3,6 @@
 publishURL <- "https://management.azureml.net/workspaces/%s/webservices/%s"
 wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- matrix(ncol = %s, nrow = nrow(inputDF))\r\ncolnames(outputDF) <- list(%s)\r\noutputDF <- data.frame(outputDF)\r\nfor (file in list.files(\"src\")) {\r\n  if (file == \"%s\") {\r\n    load(\"src/%s\")\r\n    for (item in names(dependencies)) {\r\n      assign(item, dependencies[[item]])\r\n    }\r\n  }\r\n  else {\r\n    if (!(file %%in%% installed.packages()[,\"Package\"])) {\r\n      install.packages(paste(\"src\", file, sep=\"/\"), lib=\".\", repos=NULL, verbose=TRUE)\r\n    }\r\n    library(strsplit(file, \"\\\\.\")[[1]][[1]], character.only=TRUE)\r\n  }\r\n}\r\naction <- %s\r\nfor (i in 1:nrow(inputDF)) {\r\n  outputDF[i,] <- do.call(\"action\", as.list(inputDF[i,]))\r\n}\r\nmaml.mapOutputPort(\"outputDF\")"
 
-
-
 # Functions ---------------------------------------------------------------
 
 #' Get function source code
@@ -345,9 +343,9 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
     )
   }
 
+
   # convert the payload to JSON as expected by API
-  print(gsub("\"", "\\\"", toString(jsonlite::toJSON(req))))
-  body = gsub("\"", "\\\"", toString(jsonlite::toJSON(req)))
+  body = rjson::toJSON(req)
 
   # Response gatherer
   h = RCurl::basicTextGatherer()
@@ -365,11 +363,11 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
                  writefunction = h$update)
 
   # Format output
-  newService <- jsonlite::fromJSON(h$value())
+  newService <- rjson::fromJSON(h$value())
   print(newService)
 
   # Use discovery functions to get endpoints for immediate use
-  endpoints <- getEndpoints(wkID, authToken, newService[1, "Id"])
+  endpoints <- getEndpoints(wkID, authToken, newService["Id"])
 
   # currently returning list of webservice details (as a list) and endpoint details (as a list) in that order
   return(list("serviceDetails"=newService, "endpoints"=endpoints))
@@ -435,7 +433,7 @@ updateWebService <- function(functionName, serviceName, wsID, inputSchema, outpu
 
   # convert the payload to JSON as expected by API
   # TODO: consolidate json packages, i.e. use only one if possible
-  body = RJSONIO::toJSON(req)
+  body = rjson::toJSON(req)
 
   # Response gatherer
   h = RCurl::basicTextGatherer()
@@ -450,7 +448,7 @@ updateWebService <- function(functionName, serviceName, wsID, inputSchema, outpu
                  writefunction = h$update)
 
   # Format output
-  updatedService <- RJSONIO::fromJSON(h$value())
+  updatedService <- rjson::fromJSON(h$value())
 
   # Use discovery functions to get default endpoint for immediate use
   endpoints <- getEndpoints(wkID, authToken, updatedService["Id"])

@@ -16,7 +16,7 @@ discoverSchema <- function(helpURL, scheme = "https", host = "ussouthcentral.ser
   # Use paste method without separator
   swaggerURL = paste(scheme,"://", host, "/workspaces/", workspaceId, "/services/", endpointId,"/swagger.json", sep = "")
   print(swaggerURL)
-  
+
   # Automatically parses the content and gets the swagger document
 
   response <- RCurl::getURLContent(swaggerURL)
@@ -222,6 +222,9 @@ consumeLists <- function(apiKey, requestUrl, ..., globalParam = setNames(list(),
 #' Use a web service to score a data frame
 #'
 #' Score a data frame, where each row is the input to the scoring function, using a Microsoft Azure Machine Learning web service
+#'
+#' @export
+#'
 #' @param apiKey primary access key of the web service as a string
 #' @param requestUrl API URL
 #' @param scoreDataFrame the data frame to be scored
@@ -359,6 +362,7 @@ callAPI <- function(apiKey, requestUrl, keyvalues,  globalParam, retryDelay) {
       print(paste("The request failed with status code:", httpStatus, sep=" "))
       print("headers:")
       print(headers)
+      print(h$value())
       return (result)
     }
   }
