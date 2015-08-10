@@ -1,0 +1,17 @@
+{
+    "contents" : "library(testthat)\nlibrary(AzureML)\n\ntest_check(\"AzureML\")\n",
+    "created" : 1439241257606.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2617408939",
+    "id" : "84E93EBD",
+    "lastKnownWriteTime" : 1439241265,
+    "path" : "~/Azure-MachineLearning-ClientLibrary-R/AzureML/tests/testthat.R",
+    "project_path" : "tests/testthat.R",
+    "properties" : {
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

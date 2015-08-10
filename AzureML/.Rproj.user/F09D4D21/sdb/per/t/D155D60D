@@ -1,0 +1,17 @@
+{
+    "contents" : "Package: AzureML\nVersion: 0.0.0.9000\nDate: 2015-07-24\nType: Package\nTitle: Publish, discover and consume web services on Microsoft Azure Machine Learning\nAuthors@R: c(person(\"Raymond\", \"Laghaeian\", email = \"AzureMLForCRAN@microsoft.com\", role = c(\"aut\", \"cre\")),\n  person(\"Brianna\", \"Gerads\", role = \"aut\"),\n  person(\"Ritika\", \"Ravichandra\",  role = \"aut\"),\n  person(\"Alex\", \"Wang\", role = \"aut\"))\nMaintainer: Raymond Laghaeian <AzureMLForCRAN@microsoft.com>\nDescription: Provides an interface with Microsoft Azure to easily publish functions and trained models as a web service, and discover and consume web service.\nLicense: MIT + file LICENSE\nLazyData: TRUE\nImports:\n  RCurl,\n  uuid,\n  codetools,\n  base64enc,\n  df2json,\n  jsonlite,\n  rjson\nSuggests: testthat\n",
+    "created" : 1438637989972.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2093734459",
+    "id" : "D155D60D",
+    "lastKnownWriteTime" : 1439241137,
+    "path" : "~/Azure-MachineLearning-ClientLibrary-R/AzureML/DESCRIPTION",
+    "project_path" : "DESCRIPTION",
+    "properties" : {
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "type" : "dcf"
+}
