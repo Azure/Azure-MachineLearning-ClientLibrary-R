@@ -1,7 +1,7 @@
 # Azure-MachineLearning-ClientLibrary-R
 
-This package provides an interface to access web services on Microsoft Azure Machine Learning (MAML) from your local R environment. There are three main functionalities:
-- publish: define a custom function or train a model and publish it to MAML
+This package provides an interface to access web services on Microsoft Azure Machine Learning from your local R environment. There are three main functionalities:
+- publish: define a custom function or train a model and publish it to Azure
 - discover: browse web services that are available to your workspace
 - consume: use available web service from R in a variety of convenient formats
 
@@ -13,7 +13,7 @@ Currently the package lives only on this GitHub repo. You can install the packag
 
 ```
 install.packages(c("RCurl", "RJSONIO", "uuid", "jsonlite", "codetools", "base64enc", "httr", "data.table", "df2json", "rjson", "devtools"), repos = "http://cran.r-project.org")
-devtools::install_github("Azure-MachineLearning-ClientLibrary-R", "Azure", subdir="maml")
+devtools::install_github("Azure-MachineLearning-ClientLibrary-R", "Azure", subdir="AzureML")
 ```
 
 Also, you will need to install [R tools](https://cran.r-project.org/bin/windows/Rtools/) and 
