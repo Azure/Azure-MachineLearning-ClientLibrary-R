@@ -86,6 +86,8 @@ getFunctionString <- function (x)
 #' @param functionName function to package dependencies from
 #' @return list containing the guid for the rdta file and the encoded zip
 #'
+#' @import utils
+#'
 #' @keywords internal
 packDependencies <- function(functionName) {
 
@@ -97,9 +99,9 @@ packDependencies <- function(functionName) {
       pkgList <- c(pkgName, pkgList)
 
       # if the package is available on a repo
-      if (pkgName %in% row.names(available.packages())) {
+      if (pkgName %in% row.names(utils::available.packages())) {
         # iterate through the dependencies and check if need to add them
-        for (pkg in strsplit(available.packages()[pkgName, "Depends"], split=", ")[[1]]) {
+        for (pkg in strsplit(utils::available.packages()[pkgName, "Depends"], split=", ")[[1]]) {
           # filter out duplicates, R version dependencies, and base packages
           if (!(pkg %in% pkgList) && !(grepl("R \\((.*)\\)", pkg)) && (pkg %in% row.names(available.packages()))) {
             # recursively call recurPkg
@@ -297,7 +299,9 @@ publishPreprocess <- function(argList) {
 #' @param authToken primary authorization token
 #' @return nested list, the first element is a list containing information about the new web service, the second element is a list of its endpoints
 #'
+#' @seealso \code{\link{getWSDetails}} \code{\link{getEndpoints}} \code{\link{discoverSchema}} \code{\link{consumeLists}}
 #' @family publishing functions
+#'
 #' @examples
 #' \dontrun{
 #' add <- function(x,y) { return(x+y) }
@@ -390,6 +394,7 @@ publishWebService <- function(functionName, serviceName, inputSchema, outputSche
 #' @param wsID ID of the web service to be updated
 #' @return List of webservice details, default endpoint details, and the consumption function
 #'
+#' @seealso \code{\link{getWSDetails}} \code{\link{getEndpoints}} \code{\link{discoverSchema}} \code{\link{consumeLists}}
 #' @family publishing functions
 #'
 #' @examples

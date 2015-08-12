@@ -18,9 +18,9 @@ the response as a named list
 Framework for making GET requests to the Azure management APIs.
 }
 \seealso{
-Other discovery functions: \code{\link{getEPDetails}};
-  \code{\link{getEndpoints}}; \code{\link{getWSDetails}};
-  \code{\link{getWebServices}}
+Other discovery functions: \code{\link{discoverSchema}};
+  \code{\link{getEPDetails}}; \code{\link{getEndpoints}};
+  \code{\link{getWSDetails}}; \code{\link{getWebServices}}
 }
 \keyword{internal}
 

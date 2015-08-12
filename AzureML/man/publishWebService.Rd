@@ -36,6 +36,8 @@ endpoints <- newService[[2]]
 }
 }
 \seealso{
+\code{\link{getWSDetails}} \code{\link{getEndpoints}} \code{\link{discoverSchema}} \code{\link{consumeLists}}
+
 Other publishing functions: \code{\link{updateWebService}}
 }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/consume.R
 \name{callAPI}
 \alias{callAPI}
-\title{Framework for making a MAML web service API call.}
+\title{Framework for making an Azure ML web service API call.}
 \usage{
 callAPI(apiKey, requestUrl, keyvalues, globalParam, retryDelay)
 }

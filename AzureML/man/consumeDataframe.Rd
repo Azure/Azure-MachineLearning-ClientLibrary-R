@@ -40,7 +40,9 @@ response <- consumeDataframe(endpoints[[1]]$PrimaryKey, endpoints[[1]]$ApiLocati
 }
 }
 \seealso{
+\code{\link{discoverSchema}} \code{\link{publishWebService}}
+
 Other consumption functions: \code{\link{consumeFile}};
-  \code{\link{consumeLists}}; \code{\link{discoverSchema}}
+  \code{\link{consumeLists}}
 }
 

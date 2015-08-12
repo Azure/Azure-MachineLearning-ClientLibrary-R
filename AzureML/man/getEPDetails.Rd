@@ -40,8 +40,8 @@ Returns a list with the following fields:
 Get detailed information about a specific endpoint for a web service specified by the web service ID
 }
 \seealso{
-Other discovery functions: \code{\link{getEndpoints}};
-  \code{\link{getFramework}}; \code{\link{getWSDetails}};
-  \code{\link{getWebServices}}
+Other discovery functions: \code{\link{discoverSchema}};
+  \code{\link{getEndpoints}}; \code{\link{getFramework}};
+  \code{\link{getWSDetails}}; \code{\link{getWebServices}}
 }
 

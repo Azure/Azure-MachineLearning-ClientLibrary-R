@@ -1,4 +1,4 @@
-# source("maml/tests/testthat/0-config.R")
+# source("AzureML/tests/testthat/0-config.R")
 # if(interactive()) library(testthat)
 #
 # test_that("Can discover endpoints starting from workspace ID", {

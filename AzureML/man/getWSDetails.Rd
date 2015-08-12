@@ -31,8 +31,8 @@ Returns a list with the following fields:
 Get detailed information about a specific Microsoft Azure Machine Learning web service specified by the web service ID.
 }
 \seealso{
-Other discovery functions: \code{\link{getEPDetails}};
-  \code{\link{getEndpoints}}; \code{\link{getFramework}};
-  \code{\link{getWebServices}}
+Other discovery functions: \code{\link{discoverSchema}};
+  \code{\link{getEPDetails}}; \code{\link{getEndpoints}};
+  \code{\link{getFramework}}; \code{\link{getWebServices}}
 }
 

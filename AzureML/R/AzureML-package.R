@@ -27,8 +27,8 @@
 #'    \item Score data as lists: \code{\link{consumeLists}}
 #' }
 #'
-#' @name maml-package
-#' @aliases maml
+#' @name AzureML-package
+#' @aliases AzureML
 #' @docType package
 #' @keywords package
 ?NULL

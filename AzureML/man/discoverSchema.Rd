@@ -29,7 +29,10 @@ wsSchema <- discoverSchema(endpoints[[1]]$HelpLocation)
 }
 }
 \seealso{
-Other consumption functions: \code{\link{consumeDataframe}};
-  \code{\link{consumeFile}}; \code{\link{consumeLists}}
+\code{\link{publishWebService}} \code{\link{consumeLists}}
+
+Other discovery functions: \code{\link{getEPDetails}};
+  \code{\link{getEndpoints}}; \code{\link{getFramework}};
+  \code{\link{getWSDetails}}; \code{\link{getWebServices}}
 }
 

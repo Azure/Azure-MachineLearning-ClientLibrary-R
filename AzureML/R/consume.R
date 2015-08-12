@@ -10,7 +10,8 @@
 #' @param api_version defaults to 2.0
 #' @return List containing the request URL of the webservice, column names of the data, sample input as well as the input schema
 #'
-#' @family consumption functions
+#' @seealso \code{\link{publishWebService}} \code{\link{consumeLists}}
+#' @family discovery functions
 #'
 #' @examples
 #' \dontrun{
@@ -109,6 +110,8 @@ discoverSchema <- function(helpURL, scheme = "https", host = "ussouthcentral.ser
   return (list("requestUrl" = requestUrl, "columnNames" = columnNames, "sampleInput" = inputExample, "inputSchema" = inputSchema))
 }
 
+
+
 #' Use a web service to score a file
 #'
 #' Read in a csv and score it in batches using a Microsoft Azure Machine Learning Web Service. The results are stored in a new csv, default named "results.csv"
@@ -124,7 +127,10 @@ discoverSchema <- function(helpURL, scheme = "https", host = "ussouthcentral.ser
 #' @param retryDelay the time in seconds to delay before retrying in case of a server error, default value is 0.3 seconds
 #' @return returnDataFrame data frame containing results returned from web service call
 #'
+#' @seealso \code{\link{discoverSchema}} \code{\link{publishWebService}}
 #' @family consumption functions
+#'
+#' @import stats
 #'
 #' @examples
 #' \dontrun{
@@ -209,7 +215,9 @@ consumeFile <- function(apiKey, requestUrl, inFileName, globalParam = setNames(l
 #' @param retryDelay the time in seconds to delay before retrying in case of a server error, default value is 0.3 seconds
 #' @return returnDataFrame data frame containing results returned from web service call
 #'
+#' @seealso \code{\link{discoverSchema}} \code{\link{publishWebService}}
 #' @family consumption functions
+#'
 #' @examples
 #' \dontrun{
 #' add <- function(x,y) { return(x+y) }
@@ -262,7 +270,9 @@ consumeLists <- function(apiKey, requestUrl, ..., globalParam = setNames(list(),
 #' @param retryDelay the time in seconds to delay before retrying in case of a server error, default value is 0.3 seconds
 #' @return returnDataFrame data frame containing results returned from web service call
 #'
+#' @seealso \code{\link{discoverSchema}} \code{\link{publishWebService}}
 #' @family consumption functions
+#'
 #' @examples
 #' \dontrun{
 #' add <- function(x,y) { return(x+y) }
@@ -331,7 +341,7 @@ consumeDataframe <- function(apiKey, requestUrl, scoreDataFrame, globalParam=set
 }
 
 
-#' Framework for making a MAML web service API call.
+#' Framework for making an Azure ML web service API call.
 #'
 #' Helper function that constructs and send the API call to a Microsoft Azure Machine Learning web service, then receives and returns the response in JSON format.
 #'
