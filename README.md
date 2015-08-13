@@ -19,7 +19,7 @@ devtools::install_github("Azure-MachineLearning-ClientLibrary-R", "Azure", subdi
 Also, you will need to install [R tools](https://cran.r-project.org/bin/windows/Rtools/) and 
 make sure that a zipper is included in your PATH variable (instructions [here](http://stackoverflow.com/questions/29129681/create-zip-file-error-running-command-had-status-127))
 
-We plan on releasing the package to CRAN eventually.
+We plan on releasing the package to CRAN soon.
 
 
 ## Using the package
