@@ -9,11 +9,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-The **AzureML** R package provides an interface with Microsoft Azure Machine Learning Studio. Currently, the package allows users to access Azure web services. Namely, users are able to publish an R function as a Azure Machine Learning web service, discover the web services already available to their workspace, and consume those web services all from R. This vignette describes the process of getting started and using the package functionality.
+The **AzureML** R package provides an interface with Microsoft Azure Machine Learning (Azure ML). Currently, the package allows users to access Azure web services. Namely, users are able to publish an R function as a Azure Machine Learning web service, discover the web services already available to their workspace, and consume those web services all from R. This vignette describes the process of getting started and using the package functionality.
 
 ## Obtaining Credentials
 
-Before using the package, it is necessary to first obtain the security credentials to your Azure Machine Learning account. You can find this be logging in at [studio.azureml.net](Azure Studio). If you do not have an account, you can create a free temporary account, though your web services will not be saved once the account expires.
+Before using the package, it is necessary to first obtain the security credentials to your Azure Machine Learning account. You can find this be logging in at [https://studio.azureml.net](Azure ML web site). If you do not have an account, you can create a free account (not guest) to use these APIs.
 
 Once logged in, you will be brought to the studio landing page. Using the lefthand menu, navigate to the 'Settings' tab to find your workspace ID. Note this, or copy it into your R session and store it is a variable, e.g. myWsID.
 <img src="workspaceID.png" width="100%">
