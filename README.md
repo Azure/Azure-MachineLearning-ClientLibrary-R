@@ -35,7 +35,7 @@ We expect to migrate to the production version of Azure within a few weeks.
 The primary functionality implemented by this package is the capability to publish a model from R to Azure Machine Learning without having to copy and paste your R script to the Machine Learning Studio UI. Publishing a function is now a simple one line function call.
 
 ```
-publishWebService(functionName, serviceName, inputSchema, outputSchema, wkID, authToken)
+newService<-publishWebService(functionName, serviceName, inputSchema, outputSchema, wkID, authToken)
 ```
 
 The publish function takes in the name of the function to be published as a string, the name to be displayed on Azure, your workspace ID, and your authorization token. The function also requires the input and output schemas of the function to be published, which is a list of the format
@@ -57,7 +57,15 @@ The R datatypes supported are as follows:
 If using a factor variable, it is recommend you use strings instead, e.g. "male" and "female".
 We are currently working to extend functionality to be able to handle complex data types, as well as infer the signature of user functions, so users won't need to manually enter the schemas.
 
-The publish function will return a lists of lists. The first list contains the details of the web service. The second list contains a list of the endpoints of the web service. Please refer to the example for how to programmatically use the return values to consume the new web service.
+The publish function will return a lists of lists. The first list contains the details of the web service. The second list contains a list of the endpoints of the web service. From the response, you can obtain the information needed to use the web service immediately:
+
+```
+endpoints <- newService[[2]]
+webServiceURL <- endpoints[[1]]$ApiLocation
+webServiceKey <- endpoints[[1]]$PrimaryKey
+webPageHelpURL <- endpoints[[1]]$HelpLocation
+```
+For an example, please refer to the end of the readme.
 
 You are also able to update your function with one line. Note that this also requires passing the input and output schemas of the function.
 
@@ -65,20 +73,18 @@ You are also able to update your function with one line. Note that this also req
 updateWebService(functionName, webServiceID, inputSchema, outputScema, wkID, authToken)
 ```
 
-The return value is the same as that of publishWebService()
+The return value is the same as that of publishWebService().
 
 
 ## Discovering web services
 
 This package allows you to start with a workspace ID and discover all web service available, or start with a web service ID and discover all service endpoints and any information needed to access the endpoint. Service can then be consumed directly in R or used on another platform, e.g. Visual Studio or Excel.
 
-While we currently using internal APIs, in order to discover your web service published through this package, please use the optional parameters "url=internalURL". Otherwise, for discovery in the production environment, simply leave that parameter out.
-
 ```
-getWebServices(workspaceID, authToken, url=internalURL)
-getWSDetails(wkID, authToken, webserviceID, url)
-getEndpoints(wID, authToken, wsID, url)
-getEPDetails(wkID, authToken, wsID, endpointName, url)
+getWebServices(workspaceID, authToken)
+getWSDetails(wkID, authToken, webserviceID)
+getEndpoints(wID, authToken, wsID)
+getEPDetails(wkID, authToken, wsID, endpointName)
 ```
 
 
@@ -151,8 +157,10 @@ endpoints <- getEndpoints(wsID, wsAuth, TitanicService[[1]]["Id"], internalURL)
 # Alternatively,
 endpoints <- TitanicService[[2]]
 
+
 # Consume the new web service
 # First, consume with inputs as a list
+# Notice that we can use access the API key and location from the results of publishWebService(). If need additional help, we can also access the help page URL via endpoints[[1]]$HelpLocation
 response <- consumeDataTable(endpoints[[1]]$PrimaryKey, endpoints[[1]]$ApiLocation, list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list(1, "male", 20, 2, 0, 8.50), list(1, "female", 20, 1, 0, 8.50))
 # Next, consume with inputs as dataframe
 demoDF <- data.frame("Pclass"=c(1,2,1), "Sex"=c("male","female","male"), "Age"=c(8,20, 30), "Parch"=c(1,1,1), "SibSp"=c(1,3,1), "Fare"=c(10,7.5, 9))
