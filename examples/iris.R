@@ -29,7 +29,7 @@ irisWebService <- publishWebService("predictClass", "TestIris", list("sepalLengt
 irisEndpoints <- irisWebService[[2]]
 
 #Consume single request
-irisConsumeSingleRows <- consumeDataTable(irisEndpoints[[1]]$PrimaryKey, irisEndpoints[[1]]$ApiLocation, list("sepalLength", "sepalWidth", "petalLength", "petalWidth"), list(5, 5, 4, 3), list(4.5, 6.5, 4.5, 2))
+irisConsumeSingleRows <- consumeLists(irisEndpoints[[1]]$PrimaryKey, irisEndpoints[[1]]$ApiLocation, list("sepalLength", "sepalWidth", "petalLength", "petalWidth"), list(5, 5, 4, 3), list(4.5, 6.5, 4.5, 2))
 
 #Consume data frame
 irisDF <- data.frame("sepalLength"=c(1,2,3), "sepalWidth"=c(4,5,6), "petalLength"=c(7,8,9), "petalWidth"=c(10,11,12))

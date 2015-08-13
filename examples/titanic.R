@@ -76,7 +76,7 @@ titanicWebService <- publishWebService("predictTitanicSurvival", "TestTitanic", 
 titanicEndpoints <- titanicWebService[[2]]
 
 #May take long since servers are getting warmed up
-titanicConsumeSingleRows <- consumeDataTable(titanicEndpoints[[1]]["PrimaryKey"], titanicEndpoints[[1]]$ApiLocation, list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list(1, "male", 20, 2, 0, 8.50), list(1, "female", 20, 1, 0, 8.50))
+titanicConsumeSingleRows <- consumeLists(titanicEndpoints[[1]]["PrimaryKey"], titanicEndpoints[[1]]$ApiLocation, list("Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"), list(1, "male", 20, 2, 0, 8.50), list(1, "female", 20, 1, 0, 8.50))
 
 # consume with inputs as dataframe
 # creating test data.frame

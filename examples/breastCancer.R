@@ -25,6 +25,6 @@ onlineCluster <- publishWebService("getCluster", "kMeansCancer", list("age"="int
                                                                       "Irradiat"="int"), list("cluster"="int"), wsID, wsAuth)
 # Consume web service
 endpoints <- onlineCluster[[2]]
-responseDF <- consumeDataTable(endpoints[[1]]$PrimaryKey, endpoints[[1]]$ApiLocation,
+responseDF <- consumeDataLists(endpoints[[1]]$PrimaryKey, endpoints[[1]]$ApiLocation,
                                list("age", "mp", "tSize", "invNodes", "nodeCaps", "DegMalig", "Breast", "BreastQuad", "Irradiat"),
                                list(7, 2, 3, 4, 2, 3, 2, 1, 1))
