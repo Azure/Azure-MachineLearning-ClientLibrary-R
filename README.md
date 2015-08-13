@@ -1,9 +1,9 @@
 # Azure-MachineLearning-ClientLibrary-R
 
 This package provides an interface to publish web services on Microsoft Azure Machine Learning (Azure ML) from your local R environment. There are three main functionalities:
-- publish: define a custom function or train a model and publish it as a web service
-- discover: browse the web services in your workspace
-- consume: use available web service from R in a variety of convenient formats
+- Publish: define a custom function or train a model and publish it as a web service
+- Discover: browse the web services in your workspace
+- Consume: use available web service from R in a variety of convenient formats
 
 This is a technology preview. The APIs used by the package are still subject to change. Please send any bugs or comments you have to the maintainers listed.
 
