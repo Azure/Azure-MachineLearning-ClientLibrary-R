@@ -28,9 +28,11 @@ Returns a list with the following fields:
 }
 }
 \description{
-Get detailed information about a specific Microsoft Azure Machine Learning web service specified by the web service ID.
+Get detailed information about a specific Microsoft Azure Machine Learning web service specified by the Azure ML web service ID.
 }
 \seealso{
+\code{\link{publishWebService}} \code{\link{consumeLists}}
+
 Other discovery functions: \code{\link{discoverSchema}};
   \code{\link{getEPDetails}}; \code{\link{getEndpoints}};
   \code{\link{getFramework}}; \code{\link{getWebServices}}

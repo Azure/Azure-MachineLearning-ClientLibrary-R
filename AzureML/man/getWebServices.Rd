@@ -26,7 +26,7 @@ Returns a list of lists, where each web service is represented as a nested named
 }
 }
 \description{
-Get a list of webservices available to the Microsoft Azure Machine Learning workspace specified by the workspace ID.
+Get a list of webservices available to the Microsoft Azure Machine Learning workspace specified by the Azure ML workspace ID.
 }
 \examples{
 \dontrun{
@@ -35,6 +35,8 @@ serviceID = services[[1]]["Id"]
 }
 }
 \seealso{
+\code{\link{publishWebService}} \code{\link{consumeLists}}
+
 Other discovery functions: \code{\link{discoverSchema}};
   \code{\link{getEPDetails}}; \code{\link{getEndpoints}};
   \code{\link{getFramework}}; \code{\link{getWSDetails}}

@@ -59,16 +59,12 @@ publishWebService() will return a list containing two elements. The first is a l
 ```{r access, eval=FALSE}
 webservice <- response[[1]]
 endpoints <- response[[2]]
-```
-
-The web service created is identical to a web service published through the Azure Machine Learning Studio. From the response, you can get the Web Service's URL, API Key and Help Page URL. The first two are needed to make calls to the web service. The latter has the sample code, sample request and other information for consuming the API from client apps such as mobile and web applications.
-
-```{r access, eval=FALSE}
-endpoints <- newService[[2]]
 webServiceURL <- endpoints[[1]]$ApiLocation
 webServiceKey <- endpoints[[1]]$PrimaryKey
 webPageHelpURL <- endpoints[[1]]$HelpLocation
 ```
+
+The web service created is identical to a web service published through the Azure Machine Learning Studio. From the response, you can get the Web Service's URL, API Key and Help Page URL, as shown above. The first two are needed to make calls to the web service. The latter has the sample code, sample request and other information for consuming the API from client apps such as mobile and web applications.
 
 The new web service will show up on the 'Web Services' tab of the Studio interface, and the service will have a help page for each endpoint, e.g.
 

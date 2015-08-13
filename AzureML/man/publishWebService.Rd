@@ -24,7 +24,7 @@ publishWebService(functionName, serviceName, inputSchema, outputSchema, wkID,
 nested list, the first element is a list containing information about the new web service, the second element is a list of its endpoints
 }
 \description{
-Publish a function to Microsoft Azure as a web service. The web service can then be consumed within R, Visual Studio, Excel, etc. as long as the user has the API key and location. The function to be published can use arbitrary objects and packages. Currently, the function to be published can only take in primitive data types as input, i.e. no data frames or lists, but support for those functions will be added in the future.
+Publish a function to Microsoft Azure Machine Learning as a web service. The web service created is a standard Azure ML web service, and can be utilized from any web or mobile platform. as long as the user has the API key and URL. The function to be published can use arbitrary objects and packages. Currently, the function to be published can only take in primitive data types as input, i.e. no data frames or lists, but support for those functions will be added in the future.
 }
 \examples{
 \dontrun{
@@ -33,6 +33,9 @@ newService <- publishWebService("add", "add",
  list("x"="int","y"="int"), list("z"="int"), wsID, authToken)
 webserviceDetails <- newService[[1]]
 endpoints <- newService[[2]]
+helpURL <- endpoints[[1]]$HelpLocation
+pKey <- endpoints[[1]]$PrimaryKey
+apiURL <- endpoints[[1]]$ApiLocation
 }
 }
 \seealso{
