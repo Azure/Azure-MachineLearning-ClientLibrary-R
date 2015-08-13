@@ -13,7 +13,7 @@ getEPDetails(wkID, authToken, wsID, epName, url = prodURL)
 
 \item{wsID}{the web service ID}
 
-\item{epName}{endpoint name}
+\item{epName}{endpoint name, e.g. "default"}
 
 \item{url}{the API url to make the call to, by default hits the Azure management API}
 }
@@ -37,9 +37,11 @@ Returns a list with the following fields:
  }
 }
 \description{
-Get detailed information about a specific endpoint for a web service specified by the web service ID
+Get detailed information about a specific endpoint for a web service specified by the Azure ML web service ID and endpoint name.
 }
 \seealso{
+\code{\link{publishWebService}} \code{\link{consumeLists}}
+
 Other discovery functions: \code{\link{discoverSchema}};
   \code{\link{getEndpoints}}; \code{\link{getFramework}};
   \code{\link{getWSDetails}}; \code{\link{getWebServices}}

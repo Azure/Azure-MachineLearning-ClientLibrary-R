@@ -47,6 +47,8 @@ apiURL <- endpoints[[1]]$ApiLocation
 }
 }
 \seealso{
+\code{\link{publishWebService}} \code{\link{consumeLists}}
+
 Other discovery functions: \code{\link{discoverSchema}};
   \code{\link{getEPDetails}}; \code{\link{getFramework}};
   \code{\link{getWSDetails}}; \code{\link{getWebServices}}

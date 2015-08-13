@@ -26,7 +26,7 @@ updateWebService(functionName, serviceName, wsID, inputSchema, outputSchema,
 List of webservice details, default endpoint details, and the consumption function
 }
 \description{
-Update a web service, i.e. change the underlying R code that the service will run when called.
+Update a web service, i.e. change the underlying R code that the service will run when called. The same restrictions that apply to publishWebService() also apply to updateWebService()
 }
 \examples{
 \dontrun{

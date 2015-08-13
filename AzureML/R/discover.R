@@ -49,7 +49,7 @@ getFramework <- function(tUrl, authToken) {
 
 #' Get Available Web Services.
 #'
-#' Get a list of webservices available to the Microsoft Azure Machine Learning workspace specified by the workspace ID.
+#' Get a list of webservices available to the Microsoft Azure Machine Learning workspace specified by the Azure ML workspace ID.
 #'
 #' @export
 #'
@@ -68,6 +68,7 @@ getFramework <- function(tUrl, authToken) {
 #'   \item DefaultEndpointName
 #' }
 #'
+#' @seealso \code{\link{publishWebService}} \code{\link{consumeLists}}
 #' @family discovery functions
 #'
 #' @examples
@@ -87,7 +88,7 @@ getWebServices <- function(wkID, authToken, url=prodURL) {
 
 #' Get Web Service Details.
 #'
-#' Get detailed information about a specific Microsoft Azure Machine Learning web service specified by the web service ID.
+#' Get detailed information about a specific Microsoft Azure Machine Learning web service specified by the Azure ML web service ID.
 #'
 #' @export
 #'
@@ -105,6 +106,7 @@ getWebServices <- function(wkID, authToken, url=prodURL) {
 #'   \item DefaultEndpointName
 #' }
 #'
+#' @seealso \code{\link{publishWebService}} \code{\link{consumeLists}}
 #' @family discovery functions
 getWSDetails <- function(wkID, authToken, wsID, url=prodURL) {
   return(getFramework(sprintf(paste(url, "/workspaces/%s/webservices/%s", sep=""), wkID, wsID), authToken))
@@ -139,6 +141,7 @@ getWSDetails <- function(wkID, authToken, wsID, url=prodURL) {
 #'  \item ThrottleLevel
 #'  }
 #'
+#' @seealso \code{\link{publishWebService}} \code{\link{consumeLists}}
 #' @family discovery functions
 #'
 #' @examples
@@ -161,12 +164,12 @@ getEndpoints <- function(wkID, authToken, wsID, url=prodURL) {
 
 #' Get Endpoint Details.
 #'
-#' Get detailed information about a specific endpoint for a web service specified by the web service ID
+#' Get detailed information about a specific endpoint for a web service specified by the Azure ML web service ID and endpoint name.
 #'
 #' @export
 #'
 #' @inheritParams getWSDetails
-#' @param epName endpoint name
+#' @param epName endpoint name, e.g. "default"
 #'
 #' @return Returns a list with the following fields:
 #'
@@ -186,6 +189,7 @@ getEndpoints <- function(wkID, authToken, wsID, url=prodURL) {
 #'  \item ThrottleLevel
 #'  }
 #'
+#' @seealso \code{\link{publishWebService}} \code{\link{consumeLists}}
 #' @family discovery functions
 getEPDetails <- function(wkID, authToken, wsID, epName, url=prodURL) {
   sprintf(paste(url, "/workspaces/%s/webservices/%s/endpoints/%s", sep=""), wkID, wsID, epName)

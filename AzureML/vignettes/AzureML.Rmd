@@ -9,21 +9,21 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-The **AzureML** R package provides an interface with Microsoft Azure Machine Learning Studio. Currently, the package allows users to access Azure web services. Namely, users are able to publish an R function as a Azure Machine Learning web service, discover the web services already available to their workspace, and consume those web services all from R. This vignette describes the process of getting started and using the package functionality.
+The **AzureML** R package provides an interface with Microsoft Azure Machine Learning (Azure ML). Currently, the package allows users to publish, discover and consume Azure ML web services. Namely, users are able to publish an R function or a trained model as a RESTFul web service running on Azure ML, discover the web services already available in their workspace, and consume those web services all from R. This vignette describes the process of getting started and using the package functionality.
 
 ## Obtaining Credentials
 
-Before using the package, it is necessary to first obtain the security credentials to your Azure Machine Learning account. You can find this be logging in at [studio.azureml.net](Azure Studio). If you do not have an account, you can create a free temporary account, though your web services will not be saved once the account expires.
+Before using the package, it is necessary to first obtain the security credentials to your Azure Machine Learning workspace. You can find this be logging in at [https://studio.azureml.net](Azure ML web site). If you do not have an account, you can create a free account (not guest) to use these APIs.
 
-Once logged in, you will be brought to the studio landing page. Using the lefthand menu, navigate to the 'Settings' tab to find your workspace ID. Note this, or copy it into your R session and store it is a variable, e.g. myWsID.
+Once logged in, you will be brought to the Studio landing page. Using the left-hand menu, navigate to the 'Settings' tab to find your Workspace ID. Note this, or copy it into your R session and store it is a variable, e.g. myWsID.
 <img src="workspaceID.png" width="100%">
 
-Next, within the 'Settings' tab, use the overhead menu to navigate to the 'Authorization Tokens' tab and similarly note your primary authorization token.
+Next, within the 'Settings' tab, use the overhead menu to navigate to the 'Authorization Tokens' tab and similarly note your Primary Authorization Token.
 <img src="authToken.png" width="100%">
 
 ## Publishing a Web Service
 
-The publishing functionality of this package allows you to publish a function defined in R as an Azure web service. Functions can depend on arbitrary package or object. However, currently functions are constrained to take in primitive data types, e.g. ints, strings, etc., meaning the function to be published cannot take in dataframes, lists, etc.
+The publishing functionality of this package allows you to publish a function or a trained model defined in R as an Azure ML web service. Functions can depend on arbitrary package or object. However, currently functions are constrained to take in primitive data types, e.g. ints, strings, etc., meaning the function to be published cannot take in dataframes, lists, etc.
 
 As an example, consider this simple R function:
 ```{r train}
@@ -59,9 +59,14 @@ publishWebService() will return a list containing two elements. The first is a l
 ```{r access, eval=FALSE}
 webservice <- response[[1]]
 endpoints <- response[[2]]
+webServiceURL <- endpoints[[1]]$ApiLocation
+webServiceKey <- endpoints[[1]]$PrimaryKey
+webPageHelpURL <- endpoints[[1]]$HelpLocation
 ```
 
-The web service created is identical to a web service published through the Azure Machine Learning Studio. Therefore, the service will show up on the 'Web Services' tab of the Studio interface, and the service will have a help page for each endpoint, e.g.
+The web service created is identical to a web service published through the Azure Machine Learning Studio. From the response, you can get the Web Service's URL, API Key and Help Page URL, as shown above. The first two are needed to make calls to the web service. The latter has the sample code, sample request and other information for consuming the API from client apps such as mobile and web applications.
+
+The new web service will show up on the 'Web Services' tab of the Studio interface, and the service will have a help page for each endpoint, e.g.
 
 ```{r help, eval=FALSE}
 helpPageUrl <- endpoints[[1]]$HelpLocation
@@ -124,4 +129,4 @@ response <- consumeLists(endpoints[[1]]$PrimaryKey, schema$requestUrl,
                          schema$sampleInput)
 ```
 
-Alternatively, the endpoint primary key and API location can be found on the help page for that specific endpoint, which can be found on Azure Machine Learning Studio.
+Alternatively, the endpoint primary key and API location can be found on the help page for that specific endpoint, which can be found on Azure Machine Learning Studio. Using the Help Page URL, you can access sample code to build clients that can consume this web service in real time to make predictions.

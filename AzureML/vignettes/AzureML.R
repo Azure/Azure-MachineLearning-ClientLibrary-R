@@ -10,6 +10,9 @@ add <- function(x,y) {
 ## ----access, eval=FALSE--------------------------------------------------
 #  webservice <- response[[1]]
 #  endpoints <- response[[2]]
+#  webServiceURL <- endpoints[[1]]$ApiLocation
+#  webServiceKey <- endpoints[[1]]$PrimaryKey
+#  webPageHelpURL <- endpoints[[1]]$HelpLocation
 
 ## ----help, eval=FALSE----------------------------------------------------
 #  helpPageUrl <- endpoints[[1]]$HelpLocation
