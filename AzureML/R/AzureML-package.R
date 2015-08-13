@@ -1,6 +1,18 @@
-#' Publish, discover, and consume Microsoft Azure Web Services
+#' Discover, publish and consume Microsoft Azure Web Services
 #'
-#' This package implements an interface with Microsoft Azure Machine Learning, allowing users to publish a function, e.g. a prediction function using a trained machine learning model, as a web service from which it can be utilized by users on Visual Studio, Excel, etc., or consumed within R itself. Users are also able to access their preexisting web service endpoints to consume within R. All functions require a workspace ID (wsID) and authorization token (authToken) that can be found on the settings tab of \url{studio.azureml.net}, but users can make a temporary free account at \url{https://azure.microsoft.com/en-us/pricing/free-trial/}. For more information, check out this page: \url{https://github.com/Azure/Azure-MachineLearning-ClientLibrary-R}.
+#' @description
+#'
+#' This package implements an interface with Microsoft Azure Machine Learning, allowing you to publish a function, e.g. a prediction function using a trained machine learning model, as a web service from which it can be utilized by users on Visual Studio, Excel, etc., or consumed within R itself.
+#'
+#' You are also able to access pre-existing web service endpoints to consume directly from R.
+#'
+#' @section Finding the workspace ID and authorization token:
+#'
+#' All functions require a workspace ID (\code{wsID}) and authorization token (\code{authToken}). You can find these on the settings tab of \url{https://studio.azureml.net}, but users can make a temporary free account at \url{https://azure.microsoft.com/en-us/pricing/free-trial/}.
+#'
+#' For more information, see: \url{https://github.com/Azure/Azure-MachineLearning-ClientLibrary-R}.
+#'
+#' @section Summary of functions:
 #'
 #' 1. Discovery
 #'
@@ -31,4 +43,4 @@
 #' @aliases AzureML
 #' @docType package
 #' @keywords package
-?NULL
+NULL
