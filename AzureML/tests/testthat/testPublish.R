@@ -1,13 +1,26 @@
-test_that("packDependencies", {
+context("Publish API")
+
+
+
+test_that("packDependencies handles recursive packaging", {
+
+  assign("add", function(x, y) x + y,
+         envir = .GlobalEnv
+  )
+
   results <- packDependencies("add")
-  expect_that(nchar(results[[1]]), equals(32))
-  expect_that(results[[2]], equals(""))
+  expect_equal(nchar(results[[1]]), 32)
+  expect_equal(results[[2]], "")
 })
 
 
 
 test_that("publishPreprocess", {
-  expect_that(publishPreprocess(list("x"="int", "y"="string", "z"="float")), is_equivalent_to(list("x"=list("type"="integer", "format"="int32"), "y"=list("type"="string", "format"="string"), "z"=list("type"="number", "format"="float"))))
+  expect_equivalent(
+    publishPreprocess(list(x="int", y="string", z="float")),
+    list(x=list("type"="integer", "format"="int32"),
+         y=list("type"="string", "format"="string"),
+         z=list("type"="number", "format"="float")))
   expect_error(publishPreprocess(list("x"="dataframe")))
 })
 

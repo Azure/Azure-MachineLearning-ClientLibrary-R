@@ -8,7 +8,7 @@
 #'
 #' @section Finding the workspace ID and authorization token:
 #'
-#' All functions require a workspace ID (\code{wsID}) and authorization token (\code{authToken}). You can find these on the settings tab of \url{https://studio.azureml.net}, but users can make a temporary free account at \url{https://azure.microsoft.com/en-us/pricing/free-trial/}.
+#' All functions require a workspace ID (\code{wsID}) and authorization token (\code{authToken}). You can find these on the settings tab of https://studio.azureml.net, but users can make a temporary free account at \url{https://azure.microsoft.com/en-us/pricing/free-trial/}.
 #'
 #' For more information, see: \url{https://github.com/Azure/Azure-MachineLearning-ClientLibrary-R} or refer to the vignette included in this package.
 #'
