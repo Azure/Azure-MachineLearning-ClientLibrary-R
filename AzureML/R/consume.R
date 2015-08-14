@@ -394,7 +394,7 @@ callAPI <- function(apiKey, requestUrl, keyvalues,  globalParam, retryDelay) {
                          postfields=body,
                          writefunction = h$update,
                          headerfunction = hdr$update,
-                         verbose = TRUE
+                         verbose = FALSE
      )
       # Gather headers
       headers = hdr$value()
