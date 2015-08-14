@@ -1,19 +1,16 @@
-# test_that("GetFunctionString gets a function source code with no quotes or newlines", {
-#  add <- function (x, y) {
-#    print("This will add x and y")
-#    return(x + y)
-#  }
-#
-#   expect_equal(getFunctionString(add), "function (x, y) \r\n{\r\n    print(\"This will add x and y\")\r\n    return(x + y)\r\n}")
-# })
+test_that("packDependencies handles recursive packaging", {
+  results <- packDependencies("add")
+  expect_that(nchar(results[[1]]), equals(32))
+  expect_that(results[[2]], equals(""))
+})
 
 
-#test_that("packDependencies handles recursive packaging", {
-#  skip_on_cran()
-#  require("e1071") || install.packages("e1071")
-#  library("e1071")
-#  require(quantmod) || install.packages(quantmod)
-#  library(quantmod)
+
+test_that("publishPreprocess", {
+  expect_that(publishPreprocess(list("x"="int", "y"="string", "z"="float")), is_equivalent_to(list("x"=list("type"="integer", "format"="int32"), "y"=list("type"="string", "format"="string"), "z"=list("type"="number", "format"="float"))))
+  expect_error(publishPreprocess(list("x"="dataframe")))
+})
+
 
 
 #  # Train the model
@@ -65,25 +62,4 @@
 #  expect_error(publishWebService("add", "add", list("x"="float", "y"="float"), list("z"="float"), "foo", "bar"), "InvalidWorkspaceIdInvalid workspace ID provided. Verify the workspace ID is correct and try again.")
 #})
 
-
-#test_that("updateWebService correctly updates a web service", {
-#  skip_on_cran()
-#  testID = ""
-#  testAuth = ""
-#  add1 <- function (x) {
-#    return(x + 1)
-#  }
-#  expect_equal(consumeDataTable("yoDjX5h4Cm/fjjWRlcfN9NWP8Zsob9nfKblI9D6di8lfZ6ecU1CClMwA4ITMhkVWp4IQjGqPvRudhVX8uSS5Cw==", "https://ussouthcentral.services.azureml-int.net/workspaces/3612640f27234eb7b2b91ac62e8b4a40/services/04f9321f08e548299e79ca79b0bd8517/execute?api-version=2.0&details=true/execute?api-version=2.0&details=true",
-#                   list("x"), list(1))[[1]], as.factor(2))
-
-
-#  add2 <- function (x) {
-#    return(x + 2)
-#  }
-
-#  updateWebService("add2", "addTest", "b48b51fa364c11e5bc9595fc9bdb7ae6", list("x"="float"), list("y"="float"), testID, testAuth)
-#  expect_equal(consumeDataTable("yoDjX5h4Cm/fjjWRlcfN9NWP8Zsob9nfKblI9D6di8lfZ6ecU1CClMwA4ITMhkVWp4IQjGqPvRudhVX8uSS5Cw==", "https://ussouthcentral.services.azureml-int.net/workspaces/3612640f27234eb7b2b91ac62e8b4a40/services/04f9321f08e548299e79ca79b0bd8517/execute?api-version=2.0&details=true/execute?api-version=2.0&details=true",
-#                                list("x"), list(1))[[1]], as.factor(3))
-#  updateWebService("add1", "addTest","b48b51fa364c11e5bc9595fc9bdb7ae6", list("x"="float"), list("y"="float"), testID, testAuth)
-#})
 
