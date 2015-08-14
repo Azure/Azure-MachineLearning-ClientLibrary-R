@@ -9,6 +9,8 @@ wrapper <- "inputDF <- maml.mapInputPort(1)\r\noutputDF <- matrix(ncol = %s, nro
 #'
 #' Returns the source code of a function as a string
 #'
+#' @export
+#'
 #' @param x name of the function to convert to a string
 #' @return source code of the function as a string
 #'

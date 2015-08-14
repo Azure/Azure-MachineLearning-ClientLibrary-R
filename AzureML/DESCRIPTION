@@ -1,6 +1,6 @@
 Package: AzureML
 Version: 0.1.0
-Date: 2015-08-12
+Date: 2015-08-13
 Type: Package
 Title: Discover, Publish and Consume Web Services on Microsoft Azure Machine Learning
 Authors@R: c(person("Raymond", "Laghaeian", email = "raymondl@microsoft.com", role = c("aut", "cre")),
