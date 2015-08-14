@@ -1,4 +1,4 @@
-test_that("packDependencies handles recursive packaging", {
+test_that("packDependencies", {
   results <- packDependencies("add")
   expect_that(nchar(results[[1]]), equals(32))
   expect_that(results[[2]], equals(""))
