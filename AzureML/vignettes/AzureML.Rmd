@@ -42,7 +42,7 @@ We will describe the parameters.
 
 - First, we pass in the name of the function to be published, as a string
 - Next, we pass the name of the new web service as it will appear on Azure, again as a string
-- Third and fourth, we pass the input and output schema. These are named lists of the format: <parameter name> = <type>. For the input schema, this should match the signature of the function to be published, so the list length should equal the number of parameter the function takes in. For the output schema, the names of the parameters can vary, but should also match the number of expected outputs. The output schema names will be the names of the columns returned when the web service is consumed. For both schemas, the following types are supported:
+- Third and fourth, we pass the input and output schema. These are named lists of the format: `<parameter name> = <type>`. For the input schema, this should match the signature of the function to be published, so the list length should equal the number of parameter the function takes in. For the output schema, the names of the parameters can vary, but should also match the number of expected outputs. The output schema names will be the names of the columns returned when the web service is consumed. For both schemas, the following types are supported:
 
     - float, double
     - date-time
@@ -97,7 +97,7 @@ endpoints <- getEndpoints(myWsId, myAuth, webservices[[1]]$Id)
 ```
 
 From here, the user has all the information needed to consume any web service from any of its endpoints, as described next.
-Alternatively, the discoverSchema() function can also be used to discover the information needed to consume a web service. The function will return all information available on the endpoint help page, including the API location, the input names, and sample input:
+Alternatively, the `discoverSchema()` function can also be used to discover the information needed to consume a web service. The function will return all information available on the endpoint help page, including the API location, the input names, and sample input:
 
 ```{r discover, eval=FALSE}
 schema <- discoverSchema(endpoints[[1]]$HelpLocation)
