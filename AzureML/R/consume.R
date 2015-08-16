@@ -169,7 +169,7 @@ consumeFile <- function(apiKey, requestUrl, inFileName, globalParam = setNames(l
       # Create empty data frame that stores results for that batch
       batchResults = data.frame(stringsAsFactors=FALSE)
       # Store a single batch of requests in a data frame
-      requestBatch = scoreDataFrame[(lastProc+1):i,]
+      requestBatch = scoreDataFrame[(lastProc+1):i,,drop=FALSE]
       # Convert them into key-value lists using rjson and df2json packages
       keyvalues = rjson::fromJSON((df2json::df2json(requestBatch)))
       # Store results returned from call in temp variable
@@ -312,7 +312,7 @@ consumeDataframe <- function(apiKey, requestUrl, scoreDataFrame, globalParam=set
       # Create empty data frame that stores results for that batch
       batchResults = data.frame(stringsAsFactors=FALSE)
       # Store a single batch of requests in a data frame
-      requestBatch = scoreDataFrame[(lastProc+1):i,]
+      requestBatch = scoreDataFrame[(lastProc+1):i,,drop=FALSE]
       # Convert them into key-value lists using rjson and df2json packages
       keyvalues = rjson::fromJSON((df2json::df2json(requestBatch)))
       # Store results returned from call in temp variable
